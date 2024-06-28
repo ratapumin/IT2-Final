@@ -1,0 +1,80 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  max-width: 600px;
+  width: 700px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  width: 100%;
+  background-color: lightgray;
+  height: 650px;
+  padding-top: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.box-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.logo {
+  width: 100%;
+  max-width: 300px;
+}
+
+.form {
+  width: 100%;
+  /* margin-top: 10px; */
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  
+}
+label{
+  width: 100%;
+  text-align: left;
+  margin-bottom: 5px;
+}
+.input-box {
+  width: 100%;
+  height: 40px;
+  display: block;
+  border-radius: 10px;
+  margin: 0 auto 15px auto;
+
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.center-button {
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background-color: black;
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+}
