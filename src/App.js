@@ -1,6 +1,6 @@
 import "./App.css";
 import logo from "./img/logo-kathong.png";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 function App() {
   return (
@@ -23,10 +23,10 @@ function App() {
             </div>
           </form>
           <p>
-            <Link to="D:\Project\project\my-react-app\src\Login.jsx">
+            {/* <Link to="D:\Project\project\my-react-app\src\Login.jsx">
               {" "}
               Link
-            </Link>
+            </Link> */}
           </p>
         </div>
       </div>
