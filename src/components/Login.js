@@ -1,4 +1,6 @@
 import React from "react";
+import logo from "../img/logo-kathong.png";
+
 function Login() {
   return (
     <>
