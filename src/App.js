@@ -4,6 +4,8 @@ import "./App.css";
 import PageHome from "./components/PageHome";
 import PageAbout from "./components/PageAbout";
 import Login from "./components/Login";
+import Coffee from "./components/Coffee";
+
 
 function App() {
   return (
@@ -12,9 +14,11 @@ function App() {
         <Route path="/" element={<PageHome />} />
         <Route path="/about" element={<PageAbout />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/coffee" element={<Coffee />} />
       </Routes>
     </Router>
   );
 }
+
 
 export default App;

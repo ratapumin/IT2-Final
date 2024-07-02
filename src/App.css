@@ -1,4 +1,4 @@
-html,
+/* html,
 body {
   margin: 0;
   padding: 0;
@@ -41,7 +41,6 @@ body {
 
 .form {
   width: 100%;
-  /* margin-top: 10px; */
   max-width: 450px;
   display: flex;
   flex-direction: column;
@@ -77,4 +76,4 @@ label{
   display: inline-block;
   border: none;
   cursor: pointer;
-}
+} */
