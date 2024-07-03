@@ -2,38 +2,50 @@ import React from "react";
 import './Coffee.css';
 function Coffee() {
   return <>
-    <div className="grid">
-      <div className="content-order contenttt ">
-        <p>New Order</p>
-      </div>
-
-      <div className="type-menu contenttt">
-        <div className="contain">
-          <p className="card">COF</p>
-          <p className="card">TEA</p>
-          <p className="card">CHOC</p>
-          <p className="card">SODA</p>
-          <p className="card">ANOTHER</p>
+    <div className="container">
+      <div className="grid">
+        <div className="content-order  ">
+          <p>New Order</p>
         </div>
-      </div>
 
-      <div className="ice-hot  contenttt">
-        <div className="contain">
-          <p className="card"> ICE</p>
-          <p className="card"> HOT</p>
-        </div>  </div>
+        <div className="type-menu ">
+          <div className="content-box">
+            <p>COF</p>
+            <p>TEA</p>
+            <p>CHOC</p>
+            <p>SODA</p>
+            <p>ANOTHER</p>
+          </div>
 
-      <div className="main-content contenttt ">
-        <div className="contain">
-          <p className="card">Americano</p>
-          <p className="card">Americano Honey</p>
-          <p className="card">Americano Honey Lemon</p>
-          <p className="card">Espesso</p>
+          <div className="ice-hot  ">
+            <div className="content-box">
+              <p> ICE</p>
+              <p> HOT</p>
+            </div>
+          </div>
+
+          <div className="main-content ">
+            <div className="left-content">
+                <p className="item">Americano</p>
+                <p className="item">Americano Honey</p>
+                <p className="item">Americano Honey Lemon</p>
+                <p className="item">Espesso</p>
+                <p className="item">Americano</p>
+                <p className="item">Americano Honey</p>
+                <p className="item">Americano Honey Lemon</p>
+                <p className="item">Espesso</p>
+                <p className="item">Americano</p>
+                <p className="item">Americano Honey</p>
+                <p className="item">Americano Honey Lemon</p>
+                <p className="item">Espesso</p>
+           
+            </div>
+          </div>
+
         </div>
-      </div>
 
+      </div>
     </div>
-
   </>;
 }
 
