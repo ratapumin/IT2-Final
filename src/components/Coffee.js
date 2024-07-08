@@ -25,25 +25,38 @@ function Coffee() {
           </div>
 
           <div className="main-content ">
-            <div className="left-content">
-                <p className="item">Americano</p>
-                <p className="item">Americano Honey</p>
-                <p className="item">Americano Honey Lemon</p>
-                <p className="item">Espesso</p>
-                <p className="item">Americano</p>
-                <p className="item">Americano Honey</p>
-                <p className="item">Americano Honey Lemon</p>
-                <p className="item">Espesso</p>
-                <p className="item">Americano</p>
-                <p className="item">Americano Honey</p>
-                <p className="item">Americano Honey Lemon</p>
-                <p className="item">Espesso</p>
-           
-            </div>
+            <p className="item">Americano</p>
+            <p className="item">Americano Honey</p>
+            <p className="item">Americano Honey Lemon</p>
+            <p className="item">Espesso</p>
+            <p className="item">Americano</p>
+            <p className="item">Americano Honey</p>
+            <p className="item">Americano Honey Lemon</p>
+            <p className="item">Espesso</p>
+            <p className="item">Americano</p>
+            <p className="item">Americano Honey</p>
+            <p className="item">Americano Honey Lemon</p>
+            <p className="item">Espesso</p>
+            <p className="item">Americano</p>
+            <p className="item">Americano Honey</p>
+            <p className="item">Americano Honey Lemon</p>
+            <p className="item">Espesso</p>
+            <p className="item">Americano</p>
+            <p className="item">Americano Honey</p>
+            <p className="item">Americano Honey Lemon</p>
+            <p className="item">Espesso</p>
+          </div>
+
+
+          <div className="button-close-daily">
+            <p>Close Daily</p>
+          </div>
+
+          <div className="button-exit">
+            <p>Exit</p>
           </div>
 
         </div>
-
       </div>
     </div>
   </>;
