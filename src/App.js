@@ -5,6 +5,7 @@ import PageHome from "./components/PageHome";
 import PageAbout from "./components/PageAbout";
 import Login from "./components/Login";
 import Coffee from "./components/Coffee";
+import Protected from "./components/Protected"
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/about" element={<PageAbout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/coffee" element={<Coffee />} />
+        <Route path="/protected" element={<Protected/>}/>
       </Routes>
     </Router>
   );

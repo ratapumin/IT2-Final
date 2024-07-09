@@ -55,15 +55,37 @@ app.post('/login', (req, res) => {
                 res.status(401).json({ status: 'error', message: 'no user found' });
                 return;
             }
-            // var token = jwt.sign({ user_id }, jwtKey, { expiresIn: '1h' })
-            res.json({ status: 'login successfuly' });
+            const token = jwt.sign({ results }, jwtKey, { expiresIn: '1h' })
+            res.json({ status: 'login successfuly', token });
+
         }
     );
 });
 
 
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization']
+    if (!token) {
+        return res.status(403).json({
+            status: 'error', message: 'No token provided'
+        })
+    }
+    jwt.verify(token, jwtKey, (error, decoded) => {
+        if (error) {
+            return res.status(500).json({
+                status: 'error', message: 'Failed to authenticate token'
+            })
+        }
+        req.user_id = decoded.user_id;
+        next();
+    })
+}
 
-
+app.get('/protected', verifyToken, (req, res) => {
+    res.json({
+        status: 'ok', message: 'This is a protectted route', user_id: req.user_id
+    })
+})
 
 app.listen(3000, () => {
     console.log('Server started on port 3000');

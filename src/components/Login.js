@@ -3,12 +3,6 @@ import './Login.css';
 import axios from 'axios';
 import { useState } from "react";
 
-// var jwt = localStorage.getItem("jwt");
-// if (jwt != null) {
-//   window.location.href = '../App.js'
-// }
-
-
 function Login() {
 
   const [userId, setUserId] = useState('');
@@ -28,8 +22,7 @@ function Login() {
       })
       console.log('Login response:', res.data);
       localStorage.setItem('jwt', res.data.token)
-      // window.alert({ use_id: userId, password})
-      // window.location.href = '/coffee';
+      window.location.href = '/protected';
     } catch (error) {
       console.error('Login failed', error)
     }
