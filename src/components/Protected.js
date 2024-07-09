@@ -1,21 +1,22 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function Protected() {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        try {
-            const protectedData = async () => {
-                const req = await axios.get('http://localhost:3000/protected', {
+        const protectedData = async () => {
+            try {
+                const token = localStorage.getItem('jwt')
+                const res = await axios.get('http://localhost:3000/protected', {
                     headers: {
                         'Authorization': token
                     }
                 })
+                setMessage(res.data.message)
+            } catch (error) {
+                console.error('Error protected data', error)
             }
-            setMessage(res.data.message)
-        } catch {
-            console.error('Error protected data', error)
         }
         protectedData();
     }, [])
