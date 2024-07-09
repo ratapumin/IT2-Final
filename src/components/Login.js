@@ -18,11 +18,18 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('Attempting login with:', { user_id: userId, password });
-      const res = await axios.post('http://localhost:3000/login', { user_id: userId, password });
-      console.log('Attempting login with:', { user_id: userId, password });
+      console.log('Attempting login with:', { user_id: userId, user_password: password });
+      const res = await axios.post('http://localhost:3000/login', {
+        user_id: userId,
+        user_password: password
+      }, {
+        headers: {
+        }
+      })
+      console.log('Login response:', res.data);
       localStorage.setItem('jwt', res.data.token)
-      window.location.href = '/App';
+      // window.alert({ use_id: userId, password})
+      // window.location.href = '/coffee';
     } catch (error) {
       console.error('Login failed', error)
     }

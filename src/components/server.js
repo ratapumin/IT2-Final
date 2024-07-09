@@ -1,6 +1,10 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cors = require('cors');
+var jwt = require('jsonwebtoken')
+// const bodyParser = require('body-parser');
+
+
 
 const app = express();
 app.use(cors());
@@ -16,24 +20,10 @@ const conn = mysql.createConnection({
 conn.connect((error) => {
     if (error) {
         console.log(error);
+        return
     } else {
         console.log('MySQL Connected');
     }
-});
-
-app.post('/login', (req, res) => {
-    const { user_id, password } = req.body;
-    const sql = 'SELECT user_account FROM kathongpos WHERE user_id = ? AND password = ?';
-    conn.query(sql, [user_id, password], (error, results) => {
-        if (error) {
-            res.status(500).json({ error });
-        } else if (results.length > 0) {
-            const token = 'your-jwt-token';
-            res.json({ token });
-        } else {
-            res.status(401).json({ message: 'Invalid credentials' });
-        }
-    });
 });
 
 
@@ -48,16 +38,31 @@ app.get('/users', (req, res) => {
     });
 });
 
-// conn.connect(function (error) {
-//     if (error) {
-//         console.log(error)
-//         conn.query('SELECT * FROM user_account', function (error, results, field) {
-//             if (error) {
-//                 console.log(results)
-//             }
-//         })
-//     }
-// })
+
+const jwtKey = 'your_jwt_token';
+
+
+app.post('/login', (req, res) => {
+    conn.query(
+        'SELECT * FROM user_account WHERE user_id=? AND user_password=?',
+        [req.body.user_id, req.body.user_password],
+        function (error, results, fields) {
+            if (error) {
+                res.status(500).json({ status: 'error', message: error });
+                return;
+            }
+            if (results.length === 0) {
+                res.status(401).json({ status: 'error', message: 'no user found' });
+                return;
+            }
+            // var token = jwt.sign({ user_id }, jwtKey, { expiresIn: '1h' })
+            res.json({ status: 'login successfuly' });
+        }
+    );
+});
+
+
+
 
 
 app.listen(3000, () => {
