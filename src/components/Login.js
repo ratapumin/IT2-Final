@@ -2,6 +2,8 @@ import logo from "../img/logo-kathong.png";
 import './Login.css';
 import axios from 'axios';
 import { useState } from "react";
+import swal from 'sweetalert';
+
 
 function Login() {
 
@@ -22,8 +24,23 @@ function Login() {
       })
       console.log('Login response:', res.data);
       localStorage.setItem('jwt', res.data.token)
-      window.location.href = '/protected';
+      swal({
+        title: "Login Successfuly ",
+        text: `Welcome ${res.data.user_fname}`,
+        icon: "success",
+        button: false,
+        timer: 1200,
+      }).then(() => {
+        window.location.href = '/protected';
+      })
     } catch (error) {
+      swal({
+        title: "Error",
+        text: "Login failed please try aging.",
+        icon: "error",
+        button: false,
+        timer: 1000
+      })
       console.error('Login failed', error)
     }
   }

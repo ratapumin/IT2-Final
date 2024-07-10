@@ -19,6 +19,7 @@ function Protected() {
             }
         }
         protectedData();
+        window.location.href = '/coffee'
     }, [])
 
     return (
