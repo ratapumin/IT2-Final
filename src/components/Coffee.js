@@ -33,7 +33,7 @@ function Coffee() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:3333/api/users')
+        const res = await axios.get('http://localhost:3333/api/products')
         setProducts(res.data)
       } catch (error) {
         console.log(error)
@@ -47,7 +47,7 @@ function Coffee() {
   console.log(products)
   return (
     <>
-      {/* <p>{readproducts}</p> */}
+      {/* <p>{products}</p> */}
 
     </>
   )
