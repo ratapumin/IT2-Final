@@ -40,12 +40,15 @@ function Coffee() {
 
   const handleItem = (id) => {
     const selected = products.find(product => product.p_id === id);
-    const existingProduct = selectedProducts.find(product => product.id === id);
+    const existingIndex = selectedProducts.findIndex(product => product.id === id);
 
-    if (existingProduct) {
-      setSelectedProducts(prevState => prevState.map(product =>
-        product.id === id ? { ...product, quantity: product.quantity + 1 } : product
-      ));
+    if (existingIndex !== -1) {
+      const updatedProducts = [...selectedProducts];
+      updatedProducts[existingIndex] = {
+        ...updatedProducts[existingIndex],
+        quantity: updatedProducts[existingIndex].quantity + 1
+      };
+      setSelectedProducts(updatedProducts);
     } else {
       setSelectedProducts(prevState => [
         ...prevState,
