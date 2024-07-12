@@ -3,16 +3,18 @@ import { useEffect, useState } from "react";
 
 function Protected() {
     const [message, setMessage] = useState('');
+    const [user_id, setuserID] = useState('')
 
     useEffect(() => {
         const protectedData = async () => {
             try {
                 const token = localStorage.getItem('jwt')
-                const res = await axios.get('http://localhost:3000/protected', {
+                const res = await axios.get('http://localhost:3333/api/protected', {
                     headers: {
                         'Authorization': token
-                    }
+                    },
                 })
+                setuserID(res.user_id)
                 setMessage(res.data.message)
             } catch (error) {
                 console.error('Error protected data', error)
@@ -25,7 +27,7 @@ function Protected() {
     return (
         <div>
             <h1> Protected page</h1>
-            <p>{message}</p>
+            <p>{message} {user_id}</p>
         </div>
     )
 }

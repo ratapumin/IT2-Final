@@ -7,10 +7,10 @@ class User {
     set_fname(user_fname) {
         this.user_fname = user_fname;
 
-    }
+    };
     get_fname() {
         return this.user_fname
-    }
+    };
     set_lname(user_lname) {
         this.user_lname = user_lname;
 

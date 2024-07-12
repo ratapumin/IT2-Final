@@ -1,7 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-var jwt = require('jsonwebtoken')
+var jwt = require('jsonwebtoken');
+const { useEffect } = require('react');
 // const bodyParser = require('body-parser');
 
 
@@ -27,7 +28,7 @@ conn.connect((error) => {
 });
 
 
-app.get('/users', (req, res) => {
+app.get('/api/users', (req, res) => {
     const sql = 'SELECT * FROM user_account';
     conn.query(sql, (error, results) => {
         if (error) {
@@ -42,7 +43,7 @@ app.get('/users', (req, res) => {
 const jwtKey = 'your_jwt_token';
 
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     conn.query(
         'SELECT * FROM user_account WHERE user_id=? AND user_password=?',
         [req.body.user_id, req.body.user_password],
@@ -55,8 +56,15 @@ app.post('/login', (req, res) => {
                 res.status(401).json({ status: 'error', message: 'no user found' });
                 return;
             }
+            const user = results[0]
             const token = jwt.sign({ results }, jwtKey, { expiresIn: '1h' })
-            res.json({ status: 'login successfuly', token });
+            res.json({
+                status: 'login successfuly', token, user: {
+                    user_fname: user.user_fname,
+                    user_lname: user.user_lname,
+                    user_tel: user.user_tel
+                }
+            });
 
         }
     );
@@ -77,17 +85,32 @@ const verifyToken = (req, res, next) => {
             })
         }
         req.user_id = decoded.user_id;
-        next();
+        next(); ำ
     })
 }
 
-app.get('/protected', verifyToken, (req, res) => {
+app.get('/api/protected', verifyToken, (req, res) => {
     res.json({
         status: 'ok', message: 'This is a protectted route', user_id: req.user_id
     })
 })
 
-app.listen(3000, () => {
-    console.log('Server started on port 3000');
+
+app.get('/api/products', (req, res) => {
+
+    const sql = 'SELECT * FROM products';
+    conn.query(sql, (error, results) => {
+        if (error) {
+            res.status(500).json({ error });    
+        } else {
+            res.json(results);
+        }
+    });
+
+})
+
+
+app.listen(3333, () => {
+    console.log('Server started on port 3333');
 
 });

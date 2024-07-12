@@ -3,6 +3,7 @@ import './Login.css';
 import axios from 'axios';
 import { useState } from "react";
 import swal from 'sweetalert';
+import User from "./User";
 
 
 function Login() {
@@ -15,18 +16,19 @@ function Login() {
     e.preventDefault();
     try {
       console.log('Attempting login with:', { user_id: userId, user_password: password });
-      const res = await axios.post('http://localhost:3000/login', {
+      const res = await axios.post('http://localhost:3333/api/login', {
         user_id: userId,
         user_password: password
-      }, {
-        headers: {
-        }
       })
-      console.log('Login response:', res.data);
+      console.log('Login response:', res.data.user.user_fname);
+      // console.log(res.data.user)
+      const users = res.data.user;
+      const user = new User(users.user_fname, users.user_lname, users.user_tel)
+      localStorage.setItem('user', JSON.stringify(user))
       localStorage.setItem('jwt', res.data.token)
       swal({
         title: "Login Successfuly ",
-        text: `Welcome ${res.data.user_fname}`,
+        text: `Welcome ${res.data.user.user_fname}`,
         icon: "success",
         button: false,
         timer: 1200,
