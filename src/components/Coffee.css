@@ -7,6 +7,12 @@
 
 }
 
+ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
 .main-content {
     position: absolute;
     display: flex;
@@ -61,8 +67,18 @@
     height: 80px;
     border: solid red;
     text-align: center;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
 
 }
+.item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .item:active {
+    background-color: #e0e0e0;
+  }
 
 .button-close-daily {
     bottom: 200px;
@@ -75,7 +91,8 @@
     position: absolute;
 
 }
-.button-exit{
+
+.button-exit {
     position: absolute;
     width: 250px;
     height: 100px;
