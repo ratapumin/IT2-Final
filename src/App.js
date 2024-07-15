@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Coffee from "./components/Coffee";
 import Protected from "./components/Protected"
 import Owner from "./components/Owner";
+import InsertProduct from "./components/products/Insert_products";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/coffee" element={<Coffee />} />
         <Route path="/protected" element={<Protected />} />
         <Route path="/owner" element={<Owner />} />
+        <Route path='/insert_products' element={<InsertProduct />} />
       </Routes>
     </Router>
   );
