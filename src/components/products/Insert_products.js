@@ -1,6 +1,8 @@
 import axios from "axios"
 import { useState } from "react"
 
+
+
 function Insert_products() {
 
     //state products
@@ -30,11 +32,20 @@ function Insert_products() {
                 product
             )
             console.log('page insert', res)
+            setProduct({
+                p_id: "",
+                p_name: "",
+                p_price: "",
+                p_type: "",
+                category_id: "",
+            });
         } catch (error) {
             console.log('page insert error ', error)
 
         }
         console.log('api: ', product)
+
+
     }
 
 
@@ -72,6 +83,7 @@ function Insert_products() {
                     </select>
                 </label>
                 <button type="submit">Add Product</button>
+
             </form>
         </>
     )

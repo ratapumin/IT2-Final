@@ -42,7 +42,7 @@ function Delete_products() {
         console.log('iem', item)
 
         try {
-            console.log('initem',item)
+            console.log('initem', item)
             await axios.delete(`http://localhost:5000/api/products/${item.p_id}`);
             const res = await axios.get('http://localhost:5000/api/products');
             setProducts(res.data);
