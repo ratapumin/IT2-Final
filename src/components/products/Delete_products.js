@@ -30,32 +30,39 @@ function Delete_products() {
         setItem((delete_item) => ({
             ...delete_item,
             [name]: value
+
         }))
+        console.log('setasd', item)
+
     }
 
 
     const handleDelete = async (e) => {
-        e.preventDefault()
-        console.log('product id', item.p_id)
+        e.preventDefault();
+        console.log('iem', item)
+
         try {
-            await axios.delete(`http://localhost:5000/api/products/:${item.p_id}`)
-            const res = await axios.get('http://localhost:5000/api/products')
-            console.log(res.data)
-            setProducts(res.data)
+            console.log('initem',item)
+            await axios.delete(`http://localhost:5000/api/products/${item.p_id}`);
+            const res = await axios.get('http://localhost:5000/api/products');
+            setProducts(res.data);
             setItem({
                 p_id: '',
                 p_name: '',
                 p_price: '',
                 p_type: '',
                 category_id: ''
-            })
-            setModalDelete(false)
+            });
+            setModalDelete(false);
         } catch (error) {
             console.log('Cannot delete product', error);
-
         }
     }
 
+
+    const handleCancel = () => {
+        setModalDelete(false)
+    }
 
     return (
         <>
@@ -103,16 +110,6 @@ function Delete_products() {
                             onChange={handleChange}
                         />
                     </label>
-                    <label>
-                        Product Type
-                        <select name="p_type" id="p_type" defaultValue="" onChange={handleChange}>
-                            <option value="" disabled>Select a type</option>
-                            <option value="Coffee">Coffee</option>
-                            <option value="Tea">Tea</option>
-                            <option value="Chocolate">Chocolate</option>
-                            <option value="Another">Another</option>
-                        </select>
-                    </label>
                     <label>Category
                         <input
                             type="text"
@@ -121,7 +118,8 @@ function Delete_products() {
                             onChange={handleChange}
                         />
                     </label>
-                    <button type="sumbit">Change</button>
+                    <button type="submit">Delete</button>
+                    <button onClick={handleCancel}> Cancel</button>
                 </form>
             )}
         </>

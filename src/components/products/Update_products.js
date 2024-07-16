@@ -50,7 +50,7 @@ function Update_products() {
         e.preventDefault()
         console.log('currten: ',currentproduct)
         try {
-            await axios.put(`http://localhost:5000/api/products/:${currentproduct.p_id}`, currentproduct)
+            await axios.put(`http://localhost:5000/api/products/${currentproduct.p_id}`, currentproduct)
             const res = await axios.get('http://localhost:5000/api/products')
             console.log(res.data)
             setProducts(res.data)

@@ -39,21 +39,29 @@ router.put('/products/:id', (req, res) => {
         if (error) {
             res.status(500).json({ error });
         } else {
-            res.status(201).json({ message: 'update success', productId: results.p_id });
+            if (results.affectedRows > 0) {
+                res.status(200).json({ message: 'Update success' });
+            } else {
+                res.status(404).json({ message: 'Product not found' });
+            }
         }
     });
 })
 
 
 router.delete('/products/:id', (req, res) => {
-    const { p_id, p_name, p_price, p_type, category_id } = req.body
+    const { id } = req.params;
     const sql = 'DELETE FROM products WHERE p_id=?'
-    const value = p_id
+    const value = [id]
     conn.query(sql, value, (error, results) => {
         if (error) {
             res.status(500).json({ error });
         } else {
-            res.status(201).json({ message: 'delete success', productId: results.p_id });
+            if (results.affectedRows > 0) {
+                res.status(200).json({ message: 'Update success' });
+            } else {
+                res.status(404).json({ message: 'Product not found' });
+            }
         }
     })
 
