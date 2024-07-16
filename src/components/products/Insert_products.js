@@ -14,7 +14,7 @@ function Insert_products() {
 
 
     //add_products
-    const handdleChange = (e) => {
+    const handleChange = (e) => {
         const { name, value } = e.target
         setProduct((insert_product) => ({
             ...insert_product,
@@ -43,29 +43,29 @@ function Insert_products() {
             <form onSubmit={handleSubmit}>
                 <label>
                     Product Id
-                    <input type="text" name="p_id" onChange={handdleChange} />
+                    <input type="text" name="p_id" onChange={handleChange} />
                 </label>
                 <label>
                     Product Name
-                    <input type="text" name="p_name" onChange={handdleChange} />
+                    <input type="text" name="p_name" onChange={handleChange} />
                 </label>
                 <label>
                     Product Price
-                    <input type="text" name="p_price" onChange={handdleChange} />
+                    <input type="text" name="p_price" onChange={handleChange} />
                 </label>
                 <label>
                     Product Type
-                    <select name="p_type" id="p_type" defaultValue="" onChange={handdleChange}>
+                    <select name="p_type" id="p_type" defaultValue="" onChange={handleChange}>
                         <option value="" disabled>Select a type</option>
-                        <option value="coffee">Coffee</option>
-                        <option value="tea">Tea</option>
-                        <option value="chocolate">Chocolate</option>
-                        <option value="another">Another</option>
+                        <option value="Coffee">Coffee</option>
+                        <option value="Tea">Tea</option>
+                        <option value="Chocolate">Chocolate</option>
+                        <option value="Another">Another</option>
                     </select>
                 </label>
                 <label>
                     Category Id
-                    <select name="category_id" id="category_id" defaultValue="" onChange={handdleChange}>
+                    <select name="category_id" id="category_id" defaultValue="" onChange={handleChange}>
                         <option value="" disabled>Select a category</option>
                         <option value="1">ICE</option>
                         <option value="2">HOT</option>
