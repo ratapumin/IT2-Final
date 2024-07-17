@@ -4,26 +4,28 @@ import "./App.css";
 import PageAbout from "./components/PageAbout";
 import Login from "./components/Login";
 import Coffee from "./components/Coffee";
-import Protected from "./components/Protected"
+import Protected from "./components/api/Protected"
 import Owner from "./components/Owner";
-import InsertProduct from "./components/products/Insert_products";
-import UpdateProducts from "./components/products/Update_products";
-import DeleteProducts from "./components/products/Delete_products";
-
+import InsertProduct from "./components/admin/products/Insert_products";
+import EditProduct from "./components/admin/products/Edit_products";
+import DeleteProducts from "./components/admin/products/Delete_products";
+import { UserProvider } from "./components/user/UserContext"
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/about" element={<PageAbout />} />
-        <Route path="/coffee" element={<Coffee />} />
-        <Route path="/protected" element={<Protected />} />
-        <Route path="/owner" element={<Owner />} />
-        <Route path='/insert_products' element={<InsertProduct />} />
-        <Route path='/update_products' element={<UpdateProducts />} />
-        <Route path='/delete_products' element={<DeleteProducts />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/about" element={<PageAbout />} />
+          <Route path="/coffee" element={<Coffee />} />
+          <Route path="/protected" element={<Protected />} />
+          <Route path="/owner" element={<Owner />} />
+          <Route path='/insert_products' element={<InsertProduct />} />
+          <Route path='/edit_products' element={<EditProduct />} />
+          <Route path='/delete_products' element={<DeleteProducts />} />
+        </Routes>
+      </UserProvider>
     </Router>
   );
 }

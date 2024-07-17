@@ -5,22 +5,20 @@ import User from "./User";
 import axios from "axios";
 
 function Coffee() {
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState();
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
-    localStorage.removeItem('user');
     navigate("/");
   }
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData) {
-      const userdata = new User(userData.user_fname, userData.user_lname, userData.user_tel);
-      setUser(userdata);
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      setToken(token);
     } else {
       navigate("/");
     }
@@ -29,7 +27,7 @@ function Coffee() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:3333/api/products');
+        const res = await axios.get('http://localhost:5000/api/products');
         setProducts(res.data);
       } catch (error) {
         console.log(error);
@@ -69,7 +67,7 @@ function Coffee() {
         <div className="grid">
           <div className="content-order">
             <p>New Order</p>
-            <p>page {user && user.get_fname()}</p>
+            {/* <p>page {user && user.get_fname()}</p> */}
             {selectedProducts.length > 0 && selectedProducts.map(product => (
               <div key={product.id}>
                 <p>Product: {product.name}</p>

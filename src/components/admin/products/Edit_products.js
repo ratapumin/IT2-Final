@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 
-function Update_products() {
+function Edit_products() {
     const [products, setProducts] = useState([])
     const [currentproduct, setCurrentproduct] = useState({
         p_id: '',
@@ -48,7 +48,7 @@ function Update_products() {
     //sent new value to api
     const handleEdit = async (e) => {
         e.preventDefault()
-        console.log('currten: ',currentproduct)
+        console.log('currten: ', currentproduct)
         try {
             await axios.put(`http://localhost:5000/api/products/${currentproduct.p_id}`, currentproduct)
             const res = await axios.get('http://localhost:5000/api/products')
@@ -116,15 +116,15 @@ function Update_products() {
                         />
                     </label>
                     <label>
-                    Product Type
-                    <select name="p_type" id="p_type" defaultValue="" onChange={handleChange}>
-                        <option value="" disabled>Select a type</option>
-                        <option value="Coffee">Coffee</option>
-                        <option value="Tea">Tea</option>
-                        <option value="Chocolate">Chocolate</option>
-                        <option value="Another">Another</option>
-                    </select>
-                </label>
+                        Product Type
+                        <select name="p_type" id="p_type" defaultValue="" onChange={handleChange}>
+                            <option value="" disabled>Select a type</option>
+                            <option value="Coffee">Coffee</option>
+                            <option value="Tea">Tea</option>
+                            <option value="Chocolate">Chocolate</option>
+                            <option value="Another">Another</option>
+                        </select>
+                    </label>
                     <label>Category
                         <input
                             type="text"
@@ -142,4 +142,4 @@ function Update_products() {
 
 }
 
-export default Update_products
+export default Edit_products

@@ -25,7 +25,7 @@ router.post('/products', (req, res) => {
         if (error) {
             res.status(500).json({ error });
         } else {
-            res.status(201).json({ message: 'เพิ่มสินค้าสำเร็จ', productId: results.insertId });
+            res.status(201).json({ message: 'add product success', productId: results.insertId });
         }
     });
 })
