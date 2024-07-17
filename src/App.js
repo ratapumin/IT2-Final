@@ -10,6 +10,7 @@ import InsertProduct from "./components/admin/products/Insert_products";
 import EditProduct from "./components/admin/products/Edit_products";
 import DeleteProducts from "./components/admin/products/Delete_products";
 import { UserProvider } from "./components/user/UserContext"
+import InsertOwner from './components/admin/owner/Inser_owner'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path='/insert_products' element={<InsertProduct />} />
           <Route path='/edit_products' element={<EditProduct />} />
           <Route path='/delete_products' element={<DeleteProducts />} />
+          <Route path='/insert_owner' element={<InsertOwner />} />
         </Routes>
       </UserProvider>
     </Router>
