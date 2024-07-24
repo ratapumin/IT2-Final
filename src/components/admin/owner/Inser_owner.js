@@ -61,6 +61,10 @@ function Insert_owner() {
                     <input type="text" name="user_id" onChange={handleChange} />
                 </label>
                 <label>
+                    Owner Id
+                    <input type="text" name="user_password  " onChange={handleChange} />
+                </label>
+                <label>
                     First Name
                     <input type="text" name="user_fname" onChange={handleChange} />
                 </label>
@@ -84,7 +88,7 @@ function Insert_owner() {
                     <input type="text" name="user_status" onChange={handleChange} />
                 </label>
 
-                <button type="submit">Add Product</button>
+                <button type="submit">Add Owner</button>
 
             </form>
         </>

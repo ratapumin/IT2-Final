@@ -2,7 +2,6 @@ import axios from "axios"
 import { useState } from "react"
 
 
-
 function Insert_products() {
 
     //state products

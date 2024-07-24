@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './Coffee.css';
 import { useNavigate } from 'react-router-dom';
-import User from "./User";
 import axios from "axios";
 
 function Coffee() {
