@@ -1,106 +1,114 @@
 import axios from "axios";
-import { useState } from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import { useState, useEffect } from "react";
+// import Button from "react-bootstrap/Button";
+import Swal from "sweetalert2";
 
-function Edit_products({ product, saveEdit }) {
+function EditProducts({ product, saveEdit }) {
     const [currentProduct, setCurrentProduct] = useState(product);
 
-    console.log('product.p_id')
+    useEffect(() => {
+        setCurrentProduct(product);
+    }, [product]);
 
-    // Handle input changes
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentProduct((changeProduct) => ({
-            ...changeProduct,
-            [name]: value,
-        }));
-    };
+    const changeData = async () => {
+        const productTypes = {
+            Coffee: "Coffee",
+            Tea: "Tea",
+            Chocolate: "Chocolate",
+            Another: "Another",
+        };
 
-    // Send new value to API
-    const handleEdit = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.put(
-                `http://localhost:5000/api/products/${currentProduct.p_id}`,
-                currentProduct
-            );
-            saveEdit()
-        } catch (error) {
-            console.log("Cannot edit product", error);
+        const categories = {
+            1: "ICE",
+            2: "HOT",
+        };
+
+        const { value: formValues } = await Swal.fire({
+            title: "Edit Product",
+            html: `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label for="p_id" style="width: 30%;">Product ID</label>
+                <input id="p_id" class="swal2-input" style="width: 65%;" value="${currentProduct.p_id}" readonly>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label for="p_name" style="width: 30%;">Product Name</label>
+                <input id="p_name" class="swal2-input" style="width: 65%;" value="${currentProduct.p_name}">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label for="p_price" style="width: 30%;">Price</label>
+                <input id="p_price" class="swal2-input" style="width: 65%;" value="${currentProduct.p_price}">
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label for="p_type" style="width: 30%;">Product Type</label>
+                <select id="p_type" class="swal2-input" style="width: 65%;">
+                    ${Object.entries(productTypes)
+                    .map(([key, value]) =>
+                        `<option value="${key}" ${currentProduct.p_type === key ? "selected" : ""}>${value}</option>`
+                    )
+                    .join("")}
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label for="category_id" style="width: 30%;">Category</label>
+                <select id="category_id" class="swal2-input" style="width: 65%;">
+                    ${Object.entries(categories)
+                    .map(([key, value]) =>
+                        `<option value="${key}" ${currentProduct.category_id === key ? "selected" : ""}>${value}</option>`
+                    )
+                    .join("")}
+                </select>
+            </div>
+        `,
+            focusConfirm: false,
+            showCancelButton: true,
+            preConfirm: () => {
+                return {
+                    p_id: document.getElementById("p_id").value,
+                    p_name: document.getElementById("p_name").value,
+                    p_price: document.getElementById("p_price").value,
+                    p_type: document.getElementById("p_type").value,
+                    category_id: document.getElementById("category_id").value,
+                };
+            },
+        });
+
+        if (formValues) {
+            try {
+                // ส่งข้อมูลที่แก้ไขไปยัง API
+                await axios.put(
+                    `http://localhost:5000/api/products/${formValues.p_id}`,
+                    formValues
+                );
+                Swal.fire("Saved!", "Your product has been updated.", "success");
+                saveEdit(); // เรียกใช้ฟังก์ชัน saveEdit เพื่ออัปเดตรายการสินค้า
+            } catch (error) {
+                console.log("Cannot edit product", error);
+                Swal.fire(
+                    "Error!",
+                    "There was a problem updating the product.",
+                    "error"
+                );
+            }
+        } else {
+            saveEdit(); // หากกดปุ่ม Cancel จะกลับไปหน้าหลักโดยไม่แก้ไขอะไร
         }
     };
 
-    return (
-        <>
-            <Form onSubmit={handleEdit} className="p-4 bg-light border rounded">
-                <Form.Group>
-                    <Form.Label>Product ID</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="p_id"
-                        value={currentProduct.p_id}
-                        onChange={handleChange}
-                        readOnly
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Product Name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="p_name"
-                        value={currentProduct.p_name}
-                        onChange={handleChange}
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="p_price"
-                        value={currentProduct.p_price}
-                        onChange={handleChange}
-                    />
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Product Type</Form.Label>
-                    <Form.Control
-                        as="select"
-                        name="p_type"
-                        value={currentProduct.p_type}
-                        onChange={handleChange}
-                    >
-                        <option value="" disabled>
-                            Select a type
-                        </option>
-                        <option value="Coffee">Coffee</option>
-                        <option value="Tea">Tea</option>
-                        <option value="Chocolate">Chocolate</option>
-                        <option value="Another">Another</option>
-                    </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>Category</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="category_id"
-                        value={currentProduct.category_id}
-                        onChange={handleChange}
-                    />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                    Change
-                </Button>
-                <Button
-                    variant="secondary"
-                    className="ml-2"
-                    onClick={saveEdit}
-                >
-                    Cancel
-                </Button>
-            </Form>
-        </>
-    );
+
+    useEffect(() => {
+
+        changeData();
+    }, []);
+
+    return null
 }
 
-export default Edit_products;
+export default EditProducts;
+
+// <Button variant="primary" onClick={changeData}>
+//     Edit Product
+// </Button>
