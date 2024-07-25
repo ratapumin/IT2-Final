@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 function Edit_products({ product, saveEdit }) {
     const [currentProduct, setCurrentProduct] = useState(product);
 
-    console.log(product.p_id)
+    console.log('product.p_id')
 
     // Handle input changes
     const handleChange = (e) => {

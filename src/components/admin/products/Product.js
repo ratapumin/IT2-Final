@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import EditProduct from './Edit_products'
+import EditProduct from './Edit_products';
 import DeleteProducts from "./Delete_products";
 
 function Product() {
@@ -24,20 +24,19 @@ function Product() {
     }, []);
 
     const handleSaveEdit = async () => {
-        // console.log(products.p_id)
         await fetchProducts();
         setEditProductId(null);
     };
 
     const handleonDelete = async () => {
-        // console.log(products.p_id)
+        // console.log(deleteProductId)
         await fetchProducts();
         setDeleteProductId(null);
     };
 
     return (
         <>
-            <p>product page</p>
+            <p>Product Page</p>
             <Table striped bordered hover>
                 <thead>
                     <tr>
@@ -74,7 +73,7 @@ function Product() {
                                 </Button>
                             </td>
                         </tr>
-                    ))} 
+                    ))}
                 </tbody>
             </Table>
 
