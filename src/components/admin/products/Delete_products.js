@@ -17,11 +17,12 @@ function DeleteProducts({ product, onDelete }) {
             title: "Are you sure?",
             text: `ID: ${product.p_id} Name: ${product.p_name} Price: ${product.p_price} Type: ${product.p_type} Category: ${product.category_id}  `,
             icon: "warning",
-            width:'600',
-            showDenyButton: true,
+            width: '600',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
-            denyButtonText: 'No, keep it'
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#DC3545'
+            // denyButtonText: 'No, keep it'
         });
 
         if (result.isConfirmed) {
@@ -34,8 +35,6 @@ function DeleteProducts({ product, onDelete }) {
                 console.log('Cannot delete product', error);
                 Swal.fire('Error!', 'There was a problem deleting the product.', 'error');
             }
-        } else if (result.isDenied) {
-            Swal.fire('Product is safe!', '', 'info');
         }
     };
 
