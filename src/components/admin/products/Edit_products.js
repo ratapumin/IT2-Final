@@ -84,7 +84,7 @@ function EditProducts({ product, saveEdit }) {
                     formValues
                 );
                 Swal.fire("Saved!", "Your product has been updated.", "success");
-                saveEdit(); // เรียกใช้ฟังก์ชัน saveEdit เพื่ออัปเดตรายการสินค้า
+                saveEdit();
             } catch (error) {
                 console.log("Cannot edit product", error);
                 Swal.fire(
@@ -94,7 +94,7 @@ function EditProducts({ product, saveEdit }) {
                 );
             }
         } else {
-            saveEdit(); // หากกดปุ่ม Cancel จะกลับไปหน้าหลักโดยไม่แก้ไขอะไร
+            saveEdit();
         }
     };
 
@@ -108,7 +108,3 @@ function EditProducts({ product, saveEdit }) {
 }
 
 export default EditProducts;
-
-// <Button variant="primary" onClick={changeData}>
-//     Edit Product
-// </Button>
