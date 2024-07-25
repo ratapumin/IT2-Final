@@ -24,18 +24,15 @@ function Product() {
     }, []);
 
     const handleSaveEdit = async () => {
+        // console.log(products.p_id)
         await fetchProducts();
         setEditProductId(null);
     };
 
-    const handleDelete = async (productId) => {
-        try {
-            await axios.delete(`http://localhost:5000/api/products/${productId}`);
-            await fetchProducts();
-            setDeleteProductId(null);
-        } catch (error) {
-            console.log("Cannot delete product", error);
-        }
+    const handleonDelete = async () => {
+        // console.log(products.p_id)
+        await fetchProducts();
+        setDeleteProductId(null);
     };
 
     return (
@@ -77,7 +74,7 @@ function Product() {
                                 </Button>
                             </td>
                         </tr>
-                    ))}
+                    ))} 
                 </tbody>
             </Table>
 
@@ -91,8 +88,7 @@ function Product() {
             {deleteProductId && (
                 <DeleteProducts
                     product={products.find((p) => p.p_id === deleteProductId)}
-                    handleDelete={handleDelete}
-                    onCancel={() => setDeleteProductId(null)}
+                    onDelete={handleonDelete}
                 />
             )}
         </>

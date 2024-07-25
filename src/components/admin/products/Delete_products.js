@@ -1,77 +1,121 @@
-import swal from 'sweetalert';
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+function Delete_products({ product, onDelete }) {
+    const [products, setProducts] = useState([])
+    const [item, setItem] = useState({})
+    const [modalDelete, setModalDelete] = useState(false)
 
 
 
-function Delete_products({ product, handleDelete, onCancel }) {
-    if (!product) return null;
-
-    const handleConfirmDelete = async (e) => {
-        e.preventDefault();
-
-        // Show SweetAlert confirmation dialog
-        const result = await swal({
-            title: 'Are you sure?',
-            text: `Do you want to delete the product ${product.p_name}?`,
-            icon: 'warning',
-            buttons: ['Cancel', 'Yes, delete it!'],
-            dangerMode: true,
-        });
-
-        if (result) {
-            // Call the delete handler if confirmed
-            handleDelete(product.p_id);
+    useEffect(() => {
+        if (product) {
+            setItem(product)
+            setModalDelete(true)
         }
-    };
+
+    }, [product])
+
+    const handleDelete = async (e) => {
+        e.preventDefault()
+        console.log('product id', item.p_id)
+        try {
+            await axios.delete(`http://localhost:5000/api/products/${item.p_id}`)
+            const res = await axios.get('http://localhost:5000/api/products')
+            console.log(res.data)
+            setProducts(res.data)
+            setItem({
+                p_id: '',
+                p_name: '',
+                p_price: '',
+                p_type: '',
+                category_id: ''
+            })
+            setModalDelete(false)
+        } catch (error) {
+            console.log('Cannot delete product', error);
+
+        }
+    }
 
 
     return (
-        <div className="modal">
-            <h2>Confirm Delete</h2>
-            <p>Are you sure you want to delete the following product?</p>
-            <label>Product ID
-                <input
-                    type="text"
-                    name="p_id"
-                    value={product.p_id}
-                    readOnly
-                />
-            </label>
-            <label>Product Name
-                <input
-                    type="text"
-                    name="p_name"
-                    value={product.p_name}
-                    readOnly
-                />
-            </label>
-            <label>Price
-                <input
-                    type="text"
-                    name="p_price"
-                    value={product.p_price}
-                    readOnly
-                />
-            </label>
-            <label>Product Type
-                <input
-                    type="text"
-                    name="p_type"
-                    value={product.p_type}
-                    readOnly
-                />
-            </label>
-            <label>Category
-                <input
-                    type="text"
-                    name="category_id"
-                    value={product.category_id}
-                    readOnly
-                />
-            </label>
-            <button type="button" onClick={handleConfirmDelete}>Delete</button>
-            <button type="button" onClick={onCancel}>Cancel</button>
-        </div>
-    );
-}
+        <>
+            {products.length > 0 && products.map(product => (
+                <ul key={product.p_id}>
+                    <li>Product Name: {product.p_name}</li>
+                    <li>Price: {product.p_price}</li>
+                    <li>productType: {product.p_type}</li>
+                    <li>Category: {product.category_id}</li>
+                    <button
+                    // onClick={() => handleChange(product.p_id)}
+                    >delete</button>
+                </ul>
+            ))}
 
-export default Delete_products;
+            {modalDelete && (
+                <form onSubmit={handleDelete}>
+                    <label>Product ID
+                        <input
+                            type="text"
+                            name="p_id"
+                            value={item.p_id}
+                            // onChange={handleChange}
+                            readOnly />
+                    </label>
+                    <label>Product Name
+                        <input
+                            type="text"
+                            name="p_name"
+                            value={item.p_name}
+                        // onChange={handleChange}
+                        />
+                    </label>
+                    <label>Price
+                        <input
+                            type="text"
+                            name="p_price"
+                            value={item.p_price}
+                        // onChange={handleChange}
+                        />
+                    </label>
+                    <label>Product Type
+                        <input
+                            type="text"
+                            name="p_type"
+                            value={item.p_type}
+                        // onChange={handleChange}
+                        />
+                    </label>
+                    <label>
+                        Product Type
+                        <select name="p_type" id="p_type" defaultValue=""
+                        //  onChange={handleChange}
+                        >
+                            <option value="" disabled>Select a type</option>
+                            <option value="Coffee">Coffee</option>
+                            <option value="Tea">Tea</option>
+                            <option value="Chocolate">Chocolate</option>
+                            <option value="Another">Another</option>
+                        </select>
+                    </label>
+                    <label>Category
+                        <input
+                            type="text"
+                            name="category_id"
+                            value={item.category_id}
+                        // onChange={handleChange}
+                        />
+                    </label>
+                    <button type="sumbit">Delete</button>
+                </form>
+            )}
+        </>
+    )
+
+
+
+
+
+}
+export default Delete_products
