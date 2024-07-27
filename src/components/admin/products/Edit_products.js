@@ -65,6 +65,7 @@ function EditProducts({ product, saveEdit }) {
         `,
             focusConfirm: false,
             showCancelButton: true,
+            timer:1000,
             preConfirm: () => {
                 return {
                     p_id: document.getElementById("p_id").value,

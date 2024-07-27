@@ -4,11 +4,14 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import EditProduct from './Edit_products';
 import DeleteProducts from "./Delete_products";
+import InsertProduct from './Insert_products'
+import './product.css'
 
 function Product() {
     const [products, setProducts] = useState([]);
     const [editProductId, setEditProductId] = useState(null);
     const [deleteProductId, setDeleteProductId] = useState(null);
+    const [showAddProduct, setShowAddProduct] = useState(false);
 
     const fetchProducts = async () => {
         try {
@@ -34,51 +37,69 @@ function Product() {
         setDeleteProductId(null);
     };
 
+
+    const handleAddProduct = async () => {
+        await fetchProducts()
+        setShowAddProduct(!showAddProduct);
+
+    }
     return (
         <>
-            <p>Product Page</p>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Type</th>
-                        <th>Category</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.map((product, index) => (
-                        <tr key={product.p_id}>
-                            <td>{index + 1}</td>
-                            <td>{product.p_id}</td>
-                            <td>{product.p_name}</td>
-                            <td>{product.p_price}</td>
-                            <td>{product.p_type}</td>
-                            <td>{product.category_id}</td>
-                            <td>
-                                <Button
-                                    variant="warning"
-                                    onClick={() => setEditProductId(product.p_id)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    variant="danger"
-                                    onClick={() => setDeleteProductId(product.p_id)}
-                                >
-                                    Delete
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
+
+            <div className="box-table">
+                <div className="btn-add " >
+                    <Button variant="primary" className="btn-item" onClick={handleAddProduct}>
+                    Add Product
+                    </Button>
+                </div>
+                <div className="table">
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((product, index) => (
+                                <tr key={product.p_id}>
+                                    <td>{index + 1}</td>
+                                    <td>{product.p_id}</td>
+                                    <td>{product.p_name}</td>
+                                    <td>{product.p_price}</td>
+                                    <td>{product.p_type}</td>
+                                    <td>{product.category_id}</td>
+                                    <td>
+                                        <Button
+                                            variant="warning"
+                                            className="btn-item"
+                                            onClick={() => setEditProductId(product.p_id)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            className="btn-item"
+                                            onClick={() => setDeleteProductId(product.p_id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </div>
+            </div>
 
             {editProductId && (
                 <EditProduct
+
                     product={products.find((p) => p.p_id === editProductId)}
                     saveEdit={handleSaveEdit}
                 />
@@ -90,6 +111,11 @@ function Product() {
                     onDelete={handleonDelete}
                 />
             )}
+
+            {showAddProduct && (
+                <InsertProduct insertProduct={handleAddProduct} />
+            )}
+
         </>
     );
 }
