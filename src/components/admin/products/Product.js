@@ -11,7 +11,7 @@ function Product() {
     const [products, setProducts] = useState([]);
     const [editProductId, setEditProductId] = useState(null);
     const [deleteProductId, setDeleteProductId] = useState(null);
-    const [showAddProduct, setShowAddProduct] = useState(false);
+    const [insertOwner, setInsertOwner] = useState(false);
 
     const fetchProducts = async () => {
         try {
@@ -38,9 +38,9 @@ function Product() {
     };
 
 
-    const handleAddProduct = async () => {
+    const handleInsertProduct = async () => {
         await fetchProducts()
-        setShowAddProduct(!showAddProduct);
+        setInsertOwner(!insertOwner);
 
     }
     return (
@@ -48,7 +48,7 @@ function Product() {
 
             <div className="box-table">
                 <div className="btn-add " >
-                    <Button variant="primary" className="btn-item" onClick={handleAddProduct}>
+                    <Button variant="primary" className="btn-item" onClick={handleInsertProduct}>
                     Add Product
                     </Button>
                 </div>
@@ -112,8 +112,8 @@ function Product() {
                 />
             )}
 
-            {showAddProduct && (
-                <InsertProduct insertProduct={handleAddProduct} />
+            {insertOwner && (
+                <InsertProduct insertProduct={handleInsertProduct} />
             )}
 
         </>

@@ -6,7 +6,7 @@ import PageAbout from "./components/PageAbout";
 import Login from "./components/Login";
 import Coffee from "./components/Coffee";
 import Protected from "./components/api/Protected";
-import Owner from "./components/Owner";
+import Owner from "./components/admin/owner/Owner";
 import InsertOwner from './components/admin/owner/Inser_owner';
 import EditOwner from './components/admin/owner/Edit_owner';
 import DeleteOwner from './components/admin/owner/Delete_owner';
@@ -53,13 +53,13 @@ function App() {
           <Route element={<LayoutWithSidebar />}>
 
             {/* Owner */}
-            <Route path="/owner" element={<Owner />} />
+            <Route path="/owners" element={<Owner />} />
             <Route path="/insert_owner" element={<InsertOwner />} />
             <Route path="/edit_owner" element={<EditOwner />} />
             <Route path="/delete_owner" element={<DeleteOwner />} />
 
             {/*Products */}
-            <Route path="/product" element={<Product />} />
+            <Route path="/products" element={<Product />} />
             <Route path="/insert_products" element={<InsertProduct />} />
             <Route path="/edit_products" element={<EditProduct />} />
             <Route path="/delete_products" element={<DeleteProducts />} />

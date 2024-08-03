@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
-// import Button from "react-bootstrap/Button";
+import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 
 function EditProducts({ product, saveEdit }) {
@@ -10,7 +9,8 @@ function EditProducts({ product, saveEdit }) {
         setCurrentProduct(product);
     }, [product]);
 
-    const changeData = async () => {
+    // Memoize the changeData function using useCallback
+    const changeData = useCallback(async () => {
         const productTypes = {
             Coffee: "Coffee",
             Tea: "Tea",
@@ -65,7 +65,6 @@ function EditProducts({ product, saveEdit }) {
         `,
             focusConfirm: false,
             showCancelButton: true,
-            timer:1000,
             preConfirm: () => {
                 return {
                     p_id: document.getElementById("p_id").value,
@@ -84,28 +83,36 @@ function EditProducts({ product, saveEdit }) {
                     `http://localhost:5000/api/products/${formValues.p_id}`,
                     formValues
                 );
-                Swal.fire("Saved!", "Your product has been updated.", "success");
+                Swal.fire({
+                    title: "Saved!",
+                    text: "Your Product has been updated.",
+                    icon: "success",
+                    timer: 1000, // ระยะเวลาแสดงผลเป็นมิลลิวินาที
+                    showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+                });
+                
                 saveEdit();
             } catch (error) {
                 console.log("Cannot edit product", error);
-                Swal.fire(
-                    "Error!",
-                    "There was a problem updating the product.",
-                    "error"
-                );
+                await Swal.fire({
+                    title: "Error!",
+                    text: "There was a problem updating the product.",
+                    icon: "error",
+                });
             }
         } else {
             saveEdit();
         }
-    };
+    }, [currentProduct, saveEdit]); // Include necessary dependencies here
 
-
+    // Add changeData as a dependency in useEffect
     useEffect(() => {
+        if (currentProduct) {
+            changeData();
+        }
+    }, [changeData,currentProduct]);
 
-        changeData();
-    }, []);
-
-    return null
+    return null;
 }
 
 export default EditProducts;

@@ -30,8 +30,8 @@ function Login() {
         user_id: userId,
         user_password: password
       })
+      
       console.log(userId, password)
-      // console.log('usr', res.data.user)
       setUser(res.data.user)
       localStorage.setItem('jwt', res.data.token)
       swal({

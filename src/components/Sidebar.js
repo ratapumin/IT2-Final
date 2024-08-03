@@ -1,21 +1,24 @@
 import "./Sidebar.css";
+import { Link } from 'react-router-dom';
+
+
 function Sidebar() {
 
 
     return (
         <>
 
-            <div  bg="dark" className="sidebar">
+            <div bg="dark" className="sidebar">
                 <button className="kathong">
                     Kathong POS
                 </button>
 
-                <button className="textsidebar">
+                <Link to="/products" className="textsidebar">
                     Products
-                </button>
-                <button className="textsidebar">
+                </Link>
+                <Link to="/owners" className="textsidebar">
                     Owners
-                </button>
+                </Link>
                 <button className="signout">
                     Sign Out
                 </button>

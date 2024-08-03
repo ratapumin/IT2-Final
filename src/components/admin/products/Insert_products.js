@@ -1,5 +1,5 @@
 import axios from "axios"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 
 function Insert_products({ insertProduct }) {
@@ -14,41 +14,41 @@ function Insert_products({ insertProduct }) {
 
 
     //add_products
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setProduct((insert_product) => ({
-            ...insert_product,
-            [name]: value
-        }))
-    }
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target
+    //     setProduct((insert_product) => ({
+    //         ...insert_product,
+    //         [name]: value
+    //     }))
+    // }
 
     //add to api
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await axios.post('http://localhost:5000/api/products',
-                product
-            )
-            console.log('page insert', res)
-            setProduct({
-                p_id: "",
-                p_name: "",
-                p_price: "",
-                p_type: "",
-                category_id: "",
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault()
+    //     try {
+    //         const res = await axios.post('http://localhost:5000/api/products',
+    //             product
+    //         )
+    //         console.log('page insert', res)
+    //         setProduct({
+    //             p_id: "",
+    //             p_name: "",
+    //             p_price: "",
+    //             p_type: "",
+    //             category_id: "",
 
-            });
-            insertProduct()
-        } catch (error) {
-            console.log('page insert error ', error)
+    //         });
+    //         insertProduct()
+    //     } catch (error) {
+    //         console.log('page insert error ', error)
 
-        }
-        console.log('api: ', product)
+    //     }
+    //     console.log('api: ', product)
 
 
-    }
+    // }
 
-    const addProduct = async () => {
+    const addProduct = useCallback(async () => {
         const productTypes = {
             Coffee: "Coffee",
             Tea: "Tea",
@@ -142,12 +142,14 @@ function Insert_products({ insertProduct }) {
         } else {
             insertProduct(false);
         }
-    };
+    }, [product, insertProduct])
 
 
     useEffect(() => {
-        addProduct()
-    }, [])
+        if (product) {
+            addProduct()
+        }
+    }, [product,addProduct])
 
     return null
 

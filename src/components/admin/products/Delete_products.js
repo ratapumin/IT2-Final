@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
 
@@ -12,12 +12,12 @@ function DeleteProducts({ product, onDelete }) {
         }
     }, [product]);
 
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         const result = await Swal.fire({
             title: "Are you sure?",
             text: `ID: ${product.p_id} Name: ${product.p_name} Price: ${product.p_price} Type: ${product.p_type} Category: ${product.category_id}  `,
             icon: "warning",
-            width: '600',
+            width: 'auto',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
             confirmButtonColor: '#198754',
@@ -36,7 +36,7 @@ function DeleteProducts({ product, onDelete }) {
                 Swal.fire('Error!', 'There was a problem deleting the product.', 'error');
             }
         }
-    };
+    }, [product, onDelete])
 
     useEffect(() => {
         if (modalDelete) {
@@ -44,7 +44,7 @@ function DeleteProducts({ product, onDelete }) {
         } else {
             onDelete()
         }
-    }, [modalDelete]);
+    }, [modalDelete, onDelete, handleDelete]);
 
     return null;
 }
