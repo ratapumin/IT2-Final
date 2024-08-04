@@ -18,13 +18,13 @@ function Protected() {
                 });
                 console.log(res.data)
                 setUser(res.data);
-                if (user.role_type === 'A') {
-                    navigate('/products')
-                }
-                else if (user.role_type === 'E'||user.role_type === 'O') {
+
+                if (res.data.role_type === 'A') {
+                    navigate('/products');
+                } else if (res.data.role_type === 'E' || res.data.role_type === 'O') {
                     navigate('/coffee');
                 } else {
-                    navigate('/about')
+                    navigate('/about');
                 }
             } catch (error) {
                 console.error('Error fetching protected data', error);
@@ -33,7 +33,7 @@ function Protected() {
 
         protectedData();
 
-    }, [user, setUser, navigate])
+    }, [setUser, navigate])
 
     return (
         <div>

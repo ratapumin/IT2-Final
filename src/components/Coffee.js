@@ -20,7 +20,7 @@ function Coffee() {
     }
   }, [user, navigate]);
 
-  console.log('user', user)
+  // console.log('user', user)
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -70,52 +70,17 @@ function Coffee() {
 
   return (
     <>
-      <div className="container">
-        <div className="grid">
-          <div className="content-order">
-            <p>New Order</p>
-            <p>page {user && user.user_id}</p>
-            {selectedProducts.length > 0 && selectedProducts.map(product => (
-              <div key={product.id}>
-                <p>Product: {product.name}</p>
-                <p>Price: {product.price}</p>
-                <p>Quantity: {product.quantity}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="type-menu">
-            <div className="content-box">
-              <p>COF</p>
-              <p>TEA</p>
-              <p>CHOC</p>
-              <p>SODA</p>
-              <p>ANOTHER</p>
-            </div>
-
-            <div className="ice-hot">
-              <div className="content-box">
-                <p> ICE</p>
-                <p> HOT</p>
-              </div>
-            </div>
-
-            <div className="main-content">
-              {productslist}
-            </div>
-
-            <div className="button-close-daily">
-              <p>Close Daily</p>
-            </div>
-
-            <div className="button-exit">
-              <button className="item" onClick={handleLogout}>Exit</button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="flex-content">
+    <section className="orders">
+      <h1>New Orders</h1>
+    </section>
+    <section className="menu">
+      <h1>Menu</h1>
+    </section>
+    </div>
     </>
-  );
+   )
+  
 }
 
 export default Coffee;
