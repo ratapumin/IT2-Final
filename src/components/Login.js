@@ -10,7 +10,7 @@ function Login() {
 
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('')
-  const { setUser } = useUser()
+  const { user,setUser } = useUser()
 
 
 
@@ -19,7 +19,7 @@ function Login() {
     if (token) {
       window.location.href = '/coffee'
     }
-  })
+  },[])
 
 
   const handleLogin = async (e) => {
@@ -30,13 +30,15 @@ function Login() {
         user_id: userId,
         user_password: password
       })
-      
-      console.log(userId, password)
-      setUser(res.data.user)
+      // console.log(userId, password)
+      const userData = res.data.user
+      setUser(userData)
       localStorage.setItem('jwt', res.data.token)
+      // const userRole = userData.role_type
+      // ${userData.user_fname}
       swal({
-        title: "Login Successfuly ",
-        text: `Welcome ${res.data.user.user_fname}`,
+        title: "Login Successfuly ",  
+        text: `Welcome`,
         icon: "success",
         button: false,
         timer: 1200,

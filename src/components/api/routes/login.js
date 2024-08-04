@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../db');
 const jwt = require('jsonwebtoken');
-const { route } = require('./products');
 const jwtKey = 'your_jwt_token';
 
 
@@ -28,12 +27,19 @@ router.post('/users/login', (req, res) => {
             res.status(500).json({ error });
         } else {
             if (results.length > 0) {
-                const token = jwt.sign({ user_id: results[0].user_id }, jwtKey, { expiresIn: '1h' });
-                res.status(201).json({
-                    message: 'Login success',
-                    user: results[0],
-                    token
-                });
+                const userData = results[0]
+                const payload = {
+                    user_id: userData.user_id,
+                    user_password: userData.user_password,
+                    user_fname: userData.user_fname,
+                    user_lname: userData.user_lname,
+                    user_tel: userData.user_tel,
+                    user_id_card: userData.user_id_card,
+                    role_type: userData.role_type,
+                    user_status: userData.user_status,
+                }
+                const token = jwt.sign(payload, jwtKey, { expiresIn: '1h' });
+                res.header("authorization", token).json({ token: token });
             } else {
                 res.status(401).json({ message: 'Invalid credentials' });
             }
@@ -41,29 +47,46 @@ router.post('/users/login', (req, res) => {
     })
 })
 
-const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization']
-    if (!token) {
-        return res.status(401), json({
-            status: 'error', message: 'no token'
-        })
-    }
-    jwt.verify(token, jwtKey, (error, decoded) => {
-        if (error) {
-            return res.status(403).json({
-                status: 'error', message: 'failed to authrntichate token'
-            })
+const verifyToken = async (req, res, next) => {
+    try {
+        const token = req.headers['authorization']
+        if (!token) {
+            return res.status(401).send('No token')
         }
-        req.user_id = decoded.user_id
-        next()
-    })
+        jwt.verify(token, jwtKey, (error, decoded) => {
+            if (error) {
+                return res.status(403).json({ message: 'Failed to authenticate token' });
+            }
+            req.user = decoded;
+
+            next()
+        })
+    } catch (error) {
+        console.log(error)
+        res.send('Token Invalid').status(500)
+    }
 }
 
-router.get('/protected', verifyToken, (req, res) => {
-    res.json({
-        status: 'ok', message: 'have token'
-    })
-})
+const checkUser = async (req, res, next) => {
+    try {
+        const token = req.headers["authorization"]
+        if (!token) {
+            return res.status(401).send('check No token')
+        }
+        const decoded = jwt.verify(token, jwtKey)
+        userData = decoded;
+        if (userData) {
+            res.send(userData)
+        } else {
+            res.status(403).send('Access denied' ); // ส่ง response กลับถ้าไม่ได้เป็น admin
+        }
+    } catch (error) {
+        console.log(error)
+        res.send('Token Invalid').status(500)
+    }
+}
+
+router.get('/protected', verifyToken, checkUser)
 
 
 

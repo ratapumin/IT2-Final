@@ -2,17 +2,25 @@ import React, { useEffect, useState } from "react";
 import './Coffee.css';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { useUser } from '../components/user/UserContext';
+import { useLogout } from '../components/Logout';
+
 
 function Coffee() {
   const [token, setToken] = useState();
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const navigate = useNavigate();
+  const { user, setUser } = useUser()
+  const handleLogout = useLogout();
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwt');
-    navigate("/");
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate('/protected');
+    }
+  }, [user, navigate]);
+
+  console.log('user', user)
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -29,7 +37,7 @@ function Coffee() {
         const res = await axios.get('http://localhost:5000/api/products');
         setProducts(res.data);
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching products:', error);
       }
     };
     fetchProducts();
@@ -66,7 +74,7 @@ function Coffee() {
         <div className="grid">
           <div className="content-order">
             <p>New Order</p>
-            {/* <p>page {user && user.get_fname()}</p> */}
+            <p>page {user && user.user_id}</p>
             {selectedProducts.length > 0 && selectedProducts.map(product => (
               <div key={product.id}>
                 <p>Product: {product.name}</p>

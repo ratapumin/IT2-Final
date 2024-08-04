@@ -46,8 +46,8 @@ function App() {
           <Route element={<LayoutWithoutSidebar />}>
             <Route path="/" element={<Login />} />
             <Route path="/about" element={<PageAbout />} />
-            <Route path="/coffee" element={<Coffee />} />
             <Route path="/protected" element={<Protected />} />
+            <Route path="/coffee" element={<Coffee />} />
           </Route>
 
           <Route element={<LayoutWithSidebar />}>
