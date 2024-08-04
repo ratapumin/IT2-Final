@@ -61,6 +61,7 @@ function Insert_owner({ insertOwner }) {
             Unactive: "Unactive",
         };
 
+
         const { value: formValues } = await Swal.fire({
             title: "Insert Owner",
             width: "auto",
@@ -91,16 +92,18 @@ function Insert_owner({ insertOwner }) {
       </div>
   
       <!-- Row 3: Tel and ID Card -->
-      <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
-          <div style="display: flex; align-items: center; width: 48%;">
-              <label for="tel" style="width: 30%; text-align: right; padding-right: 10px;">Tel</label>
-              <input id="tel" class="swal2-input" style="width: 70%;" value="${owner.user_tel}">
-          </div>
-          <div style="display: flex; align-items: center; width: 48%;">
-              <label for="id_card" style="width: 30%; text-align: right; padding-right: 10px;">ID Card</label>
-              <input id="id_card" class="swal2-input" style="width: 70%;" value="${owner.user_id_card}">
-          </div>
-      </div>
+         <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; width: 48%;">
+                <label for="tel" style="width: 30%; text-align: right; padding-right: 10px;">Tel</label>
+                <input id="tel" class="swal2-input" style="width: 70%;" value="${owner.user_tel}" 
+                oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="10">
+            </div>
+            <div style="display: flex; align-items: center; width: 48%;">
+                <label for="id_card" style="width: 30%; text-align: right; padding-right: 10px;">ID Card</label>
+                <input id="id_card" class="swal2-input" style="width: 70%;" value="${owner.user_id_card}"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="13">
+            </div>
+        </div>
   
       <!-- Row 4: Role and Status -->
       <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
@@ -142,25 +145,37 @@ function Insert_owner({ insertOwner }) {
                 const user_id_card = document.getElementById("id_card")?.value;
                 const role_type = document.getElementById("role")?.value;
                 const user_status = document.getElementById("status")?.value;
+                
+                // const inputNum = document.getElementById('tel'); // Remove the '#' character here
+
+                // inputNum.onkeydown = function (event) {
+                //     // Check if the key is not a number and not a special key like Backspace
+                //     if (!/[0-9]/.test(event.key) && event.key !== "Backspace") {
+                //         event.preventDefault(); // Prevent the default action of the key
+                //     }
+                // };
+        
+
+                console.log(user_tel)
 
                 let validationMessage = "";
 
                 if (!user_id) validationMessage = "Please User ID";
 
-                else if (!user_password) validationMessage = "Please Password";
-                else if (!user_password.length < 5 && !user_password.length > 15) validationMessage = "Please Password 5-15 character";
+                else if (!user_password) validationMessage = "Please enter a Password";
+                else if (user_password.length < 5 || user_password.length > 15) validationMessage = "Please Password 5-15 character";                
 
                 else if (!user_fname) validationMessage = "Please First Name";
-                else if (!user_fname.length > 30) validationMessage = " First Name is Maximum 30 character";
+                else if (user_fname.length > 30) validationMessage = " First Name is Maximum 30 character";
 
                 else if (!user_lname) validationMessage = "Please Last Name";
-                else if (!user_lname.length > 30) validationMessage = " Last Name is Maximum 30 character";
+                else if (user_lname.length > 30) validationMessage = " Last Name is Maximum 30 character";
 
-                else if (!user_tel) validationMessage = "Please Tel";
-                else if (!user_tel.length !== 10) validationMessage = " Telephone is Equal to 10 character";
-                
+                else if (!user_tel) validationMessage = "Please enter a Telephone number";
+                else if (user_tel.toString().length !== 10) validationMessage = " Telephone is Equal to 10 character";
+
                 else if (!user_id_card) validationMessage = "Please ID Card";
-                else if (!user_id_card.length !== 13) validationMessage = " ID Card is Equal to 13 character";
+                else if (user_id_card.length !== 13) validationMessage = " ID Card is Equal to 13 character";
 
                 else if (!role_type) validationMessage = "Select Role";
                 else if (!user_status) validationMessage = "Select Status";
