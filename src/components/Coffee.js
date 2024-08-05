@@ -5,11 +5,15 @@ import axios from "axios";
 import { useUser } from '../components/user/UserContext';
 import { useLogout } from '../components/Logout';
 import Orders from '../components/order/Orders';
+import DrinkType from "./order/DrinkType";
+import IceHot from "./order/IceHot";
 
 
 function Coffee() {
   const [token, setToken] = useState();
   const [coffeeList, setCoffeeList] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState();
+  const [selectedType, setSelectedType] = useState();
   const navigate = useNavigate();
   const { user, setUser } = useUser()
   const handleLogout = useLogout();
@@ -51,9 +55,9 @@ function Coffee() {
         <Orders user={user} />
 
         <section className="menu">
+          <DrinkType selectedCategory={selectedCategory} onCategoryClick={setSelectedCategory} />
 
-
-          <div className="menu-drink">
+          {/* <div className="menu-drink">
             <h2 className="drink-type" style={{ backgroundColor: '#FFE8A3 ', border: 'solid #FFCD2B ' }}>
               Coffee
             </h2>
@@ -66,13 +70,16 @@ function Coffee() {
             <h2 className="drink-type">
               Anothor
             </h2>
-          </div>
+          </div> */}
 
 
           <section className="flex-box">
             <div className="ice-hot">
-              <h2 className="icehot-box" style={{ backgroundColor: '#BDE3FF', border: 'solid #0D99FF ' }}>ICE</h2>
+              {/* <h2 className="icehot-box" style={{ backgroundColor: '#BDE3FF', border: 'solid #0D99FF ' }}>ICE</h2>
               <h2 className="icehot-box" style={{ backgroundColor: '#FFC7C2', border: 'solid #FF8C82 ' }}>HOT</h2>
+            */}
+
+              <IceHot selectedType={selectedType} onTypeClick={setSelectedType} />
             </div>
           </section>
 
