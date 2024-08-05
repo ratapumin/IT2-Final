@@ -4,18 +4,123 @@
     align-items: stretch;
     width: 100%;
     height: 100vh;
-    border: solid red;
+    background-color: #F5FBFF;
 }
 
 .orders {
     margin: 15px;
-    border: solid;
+    background-color: #FFFFFF;
     width: 30%;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
 .menu {
-    border: solid blue;
     width: 70%;
     margin: 15px;
+    /* display: flex; */
+    /* flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: space-around; */
+    position: relative;
+}
+
+.menu-drink {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.drink-type {
+    cursor: pointer;
+    margin: 10px;
+    padding: 10px;
+    padding-top: 25px;
+    width: 25%;
+    text-align: center;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    background-color: white;
+    height: 100px;
+    /* border-radius: 15px; */
+
+}
+
+.flex-box {
+    display: flex;
+    /* border: solid red; */
+    justify-content: space-around;
+    width: 100%;
+
+}
+
+.ice-hot {
+    display: flex;
+    justify-content: space-evenly;
+    /* border: solid; */
+    width: 50%;
+}
+
+.icehot-box {
+    cursor: pointer;
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    padding-top: 25px;
+    width: 50%;
+    height: 100px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+
+}
+
+.product-section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 80%;
+}
+
+.product-flex {
+    display: flex;
+    width: 26%;
+    /* แก้ไขขนาดให้เหมาะสม */
+    margin: 5px;
+}
+
+.product-box {
+    cursor: pointer;
+    width: 100%;
+    margin: 10px;
+    box-sizing: border-box;
+    height: 80px;
+    text-align: center;
+    padding: 25px;
+    list-style-type: none;
+    background-color: white;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.exit-box {
+    cursor: pointer;
+    width: 30%;
+    padding: 25px;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #E4CCFF;
+}
+
+.closeSales-box {
+    cursor: pointer;
+    width: 25%;
+    height: 70px;
+    padding: 15px;
+    text-align: center;
+    right: 0;
+    bottom: 140px;
+    position: absolute;
+    background-color: #FFFBB9;
+
 
 }

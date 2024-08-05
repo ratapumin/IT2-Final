@@ -1,11 +1,21 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useUser } from '../user/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Protected() {
     const { user, setUser } = useUser()
     const navigate = useNavigate();
+    const [token, setToken] = useState();
+
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+          setToken(token);
+        } else {
+          navigate("/");
+        }
+      }, [token,navigate]);
 
     useEffect(() => {
         const protectedData = async () => {

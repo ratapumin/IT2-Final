@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { useUser } from '../components/user/UserContext';
 import { useLogout } from '../components/Logout';
+import Orders from '../components/order/Orders';
 
 
 function Coffee() {
   const [token, setToken] = useState();
-  const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [coffeeList, setCoffeeList] = useState([]);
   const navigate = useNavigate();
   const { user, setUser } = useUser()
   const handleLogout = useLogout();
@@ -29,13 +29,14 @@ function Coffee() {
     } else {
       navigate("/");
     }
-  }, [navigate]);
+  }, [token, navigate]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get('http://localhost:5000/api/products');
-        setProducts(res.data);
+        const filteredCoffee = res.data.filter(coffee => coffee.p_type === "Coffee" && coffee.category_id === 1)
+        setCoffeeList(filteredCoffee);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -43,44 +44,68 @@ function Coffee() {
     fetchProducts();
   }, []);
 
-  const handleItem = (id) => {
-    const selected = products.find(product => product.p_id === id);
-    const existingIndex = selectedProducts.findIndex(product => product.id === id);
-
-    if (existingIndex !== -1) {
-      const updatedProducts = [...selectedProducts];
-      updatedProducts[existingIndex] = {
-        ...updatedProducts[existingIndex],
-        quantity: updatedProducts[existingIndex].quantity + 1
-      };
-      setSelectedProducts(updatedProducts);
-    } else {
-      setSelectedProducts(prevState => [
-        ...prevState,
-        { id: selected.p_id, name: selected.p_name, price: selected.p_price, quantity: 1 }
-      ]);
-    }
-  };
-
-  const productslist = products.map(item => (
-    <button className="item" key={item.p_id} onClick={() => handleItem(item.p_id)}>
-      {item.p_name}
-    </button>
-  ));
 
   return (
     <>
-    <div className="flex-content">
-    <section className="orders">
-      <h1>New Orders</h1>
-    </section>
-    <section className="menu">
-      <h1>Menu</h1>
-    </section>
-    </div>
+      <div className="flex-content">
+        <Orders user={user} />
+
+        <section className="menu">
+
+
+          <div className="menu-drink">
+            <h2 className="drink-type" style={{ backgroundColor: '#FFE8A3 ', border: 'solid #FFCD2B ' }}>
+              Coffee
+            </h2>
+            <h2 className="drink-type">
+              Tea
+            </h2>
+            <h2 className="drink-type">
+              Choc
+            </h2>
+            <h2 className="drink-type">
+              Anothor
+            </h2>
+          </div>
+
+
+          <section className="flex-box">
+            <div className="ice-hot">
+              <h2 className="icehot-box" style={{ backgroundColor: '#BDE3FF', border: 'solid #0D99FF ' }}>ICE</h2>
+              <h2 className="icehot-box" style={{ backgroundColor: '#FFC7C2', border: 'solid #FF8C82 ' }}>HOT</h2>
+            </div>
+          </section>
+
+
+          <section className="product-section">
+            {coffeeList &&
+              coffeeList.map((coffee) => (
+                <div className="product-flex" key={coffee.p_id}>
+                  <ul className="product-box">
+                    <li>{coffee.p_name}</li>
+                  </ul>
+                </div>
+              ))}
+          </section>
+
+
+          <section className="exit-box">
+            <h1 onClick={handleLogout} style={{ cursor: "pointer" }}>
+              EXIT
+            </h1>
+          </section>
+
+          <section className="closeSales-box">
+            <h3>
+              Close daily Sales
+            </h3>
+          </section>
+
+        </section>
+      </div>
     </>
-   )
-  
+  )
+
 }
 
 export default Coffee;
