@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react"
-import axios from "axios";
 
-
-function DrinkType({ selectedCategory, onCategoryClick }) {
+function DrinkType({ selectedType, onTypeClick }) {
     // const [productType, setProductType] = useState()
 
     // useEffect(() => {
@@ -30,10 +27,10 @@ function DrinkType({ selectedCategory, onCategoryClick }) {
                     key={type}
                     className="drink-type"
                     style={{
-                        backgroundColor: selectedCategory === type ? '#FFE8A3' : 'initial',
-                        border: `solid ${selectedCategory === type ? '#FFCD2B' : 'transparent'}`
+                        backgroundColor: selectedType === type ? '#FFE8A3' : 'initial',
+                        border: `solid ${selectedType === type ? '#FFCD2B' : 'transparent'}`
                     }}
-                    onClick={() => onCategoryClick(type)}
+                    onClick={() => onTypeClick(type)}
                 >
                     {type}
                 </h2>

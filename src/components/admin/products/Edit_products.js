@@ -19,8 +19,8 @@ function EditProducts({ product, saveEdit }) {
         };
 
         const categories = {
-            1: "ICE",
-            2: "HOT",
+            ICE: "ICE",
+            HOT: "HOT",
         };
 
         const { value: formValues } = await Swal.fire({
@@ -53,11 +53,11 @@ function EditProducts({ product, saveEdit }) {
             </div>
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="category_id" style="width: 30%;">Category</label>
-                <select id="category_id" class="swal2-input" style="width: 65%;">
+                <label for="category" style="width: 30%;">Category</label>
+                <select id="category" class="swal2-input" style="width: 65%;">
                     ${Object.entries(categories)
                     .map(([key, value]) =>
-                        `<option value="${key}" ${currentProduct.category_id === key ? "selected" : ""}>${value}</option>`
+                        `<option value="${key}" ${currentProduct.category === key ? "selected" : ""}>${value}</option>`
                     )
                     .join("")}
                 </select>
@@ -71,7 +71,7 @@ function EditProducts({ product, saveEdit }) {
                     p_name: document.getElementById("p_name").value,
                     p_price: document.getElementById("p_price").value,
                     p_type: document.getElementById("p_type").value,
-                    category_id: document.getElementById("category_id").value,
+                    category: document.getElementById("category").value,
                 };
             },
         });

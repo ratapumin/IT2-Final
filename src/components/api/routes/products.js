@@ -17,9 +17,9 @@ router.get('/products', (req, res) => {
 
 //create products
 router.post('/products', (req, res) => {
-    const { p_id, p_name, p_price, p_type, category_id } = req.body
-    const sql = `INSERT INTO products (p_id,p_name,p_price,p_type,category_id) VALUES (?,?,?,?,?)`
-    const values = [p_id, p_name, p_price, p_type, category_id];
+    const { p_id, p_name, p_price, p_type, category } = req.body
+    const sql = `INSERT INTO products (p_id,p_name,p_price,p_type,category) VALUES (?,?,?,?,?)`
+    const values = [p_id, p_name, p_price, p_type, category];
     console.log(req.body)
     conn.query(sql, values, (error, results) => {
         if (error) {
@@ -32,9 +32,9 @@ router.post('/products', (req, res) => {
 
 //update products
 router.put('/products/:id', (req, res) => {
-    const { p_id, p_name, p_price, p_type, category_id } = req.body
-    const sql = 'UPDATE products SET p_name = ?, p_price = ? , p_type = ?, category_id = ? WHERE p_id = ?'
-    const values = [p_name, p_price, p_type, category_id, p_id];
+    const { p_id, p_name, p_price, p_type, category } = req.body
+    const sql = 'UPDATE products SET p_name = ?, p_price = ? , p_type = ?, category = ? WHERE p_id = ?'
+    const values = [p_name, p_price, p_type, category, p_id];
     conn.query(sql, values, (error, results) => {
         if (error) {
             res.status(500).json({ error });

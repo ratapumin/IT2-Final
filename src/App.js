@@ -4,7 +4,7 @@ import "./App.css";
 import { UserProvider } from "./components/user/UserContext";
 import PageAbout from "./components/PageAbout";
 import Login from "./components/Login";
-import Coffee from "./components/Coffee";
+import OrderProducts from "./components/order/OrderProducts";
 import Protected from "./components/api/Protected";
 import Owner from "./components/admin/owner/Owner";
 import InsertOwner from './components/admin/owner/Inser_owner';
@@ -47,7 +47,7 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/about" element={<PageAbout />} />
             <Route path="/protected" element={<Protected />} />
-            <Route path="/coffee" element={<Coffee />} />
+            <Route path="/orders" element={<OrderProducts />} />
           </Route>
 
           <Route element={<LayoutWithSidebar />}>

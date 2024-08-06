@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useUser } from "../../user/UserContext";
 import './owner.css'
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
@@ -13,8 +15,14 @@ function Owner() {
     const [editOwnerId, setEditOwnerId] = useState(null);
     const [deleteOwnerId, setDeleteOwnerId] = useState(null);
     const [insertOwner, setInsertOwner] = useState(false);
+    const navigate = useNavigate();
+    const { user } = useUser()
 
-
+    useEffect(() => {
+        if (!user || user.role === 'A') {
+            navigate('/protected');
+        }
+    }, [user, navigate]);
 
     const fetchOwners = async () => {
         try {

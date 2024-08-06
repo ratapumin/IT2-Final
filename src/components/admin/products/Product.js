@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useUser } from "../../user/UserContext";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import EditProduct from './Edit_products';
@@ -12,7 +14,14 @@ function Product() {
     const [editProductId, setEditProductId] = useState(null);
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [insertOwner, setInsertOwner] = useState(false);
+    const navigate = useNavigate();
+    const { user } = useUser()
 
+    useEffect(() => {
+        if (!user || user.role === 'A') {
+            navigate('/protected');
+        }
+    }, [user, navigate]);
     const fetchProducts = async () => {
         try {
             const res = await axios.get("http://localhost:5000/api/products");
@@ -49,7 +58,7 @@ function Product() {
             <div className="box-table">
                 <div className="btn-add " >
                     <Button variant="primary" className="btn-item" onClick={handleInsertProduct}>
-                    Add Product
+                        Add Product
                     </Button>
                 </div>
                 <div className="table">
@@ -73,7 +82,7 @@ function Product() {
                                     <td>{product.p_name}</td>
                                     <td>{product.p_price}</td>
                                     <td>{product.p_type}</td>
-                                    <td>{product.category_id}</td>
+                                    <td>{product.category}</td>
                                     <td>
                                         <Button
                                             variant="warning"

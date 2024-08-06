@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from '../user/UserContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,16 +11,20 @@ function Protected() {
     useEffect(() => {
         const token = localStorage.getItem('jwt');
         if (token) {
-          setToken(token);
+            setToken(token);
         } else {
-          navigate("/");
+            navigate("/");
         }
-      }, [token,navigate]);
+    }, [token, navigate]);
 
     useEffect(() => {
         const protectedData = async () => {
             try {
                 const token = localStorage.getItem('jwt');
+                if (!token) {
+                    navigate("/");
+                    return;
+                }
                 const res = await axios.get('http://localhost:5000/api/protected', {
                     headers: {
                         'authorization': token
@@ -32,12 +36,18 @@ function Protected() {
                 if (res.data.role_type === 'A') {
                     navigate('/products');
                 } else if (res.data.role_type === 'E' || res.data.role_type === 'O') {
-                    navigate('/coffee');
+                    navigate('/orders');
                 } else {
                     navigate('/about');
                 }
             } catch (error) {
                 console.error('Error fetching protected data', error);
+                if (error.response && error.response.status === 403) {
+                    localStorage.removeItem('jwt')
+                    navigate('/')
+                } else {
+                    console.error('An unexpected error occurred:', error.message);
+                }
             }
         };
 

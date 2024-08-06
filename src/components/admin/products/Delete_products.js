@@ -15,7 +15,7 @@ function DeleteProducts({ product, onDelete }) {
     const handleDelete = useCallback(async () => {
         const result = await Swal.fire({
             title: "Are you sure?",
-            text: `ID: ${product.p_id} Name: ${product.p_name} Price: ${product.p_price} Type: ${product.p_type} Category: ${product.category_id}  `,
+            text: `ID: ${product.p_id} Name: ${product.p_name} Price: ${product.p_price} Type: ${product.p_type} Category: ${product.category}  `,
             icon: "warning",
             width: 'auto',
             showCancelButton: true,
