@@ -7,15 +7,10 @@
     background-color: #F5FBFF;
 }
 
-.orders {
-    margin: 15px;
-    background-color: #FFFFFF;
-    width: 30%;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-}
+
 
 .menu {
-    width: 70%;
+    width: 80%;
     margin: 15px;
     /* display: flex; */
     /* flex-direction: row;
@@ -139,38 +134,150 @@
 
 
 /* Orders.js page*/
+
+.orders {
+    margin: 15px;
+    background-color: #FFFFFF;
+    width: 20%;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.content-order {
+    position: relative;
+    height: 70%;
+    border: solid;
+}
+
+.bg-order {
+    border-radius: 10px;
+    width: 90%;
+    height: 80%;
+    background-color: #FFE8A3;
+    position: absolute;
+    left: 50%; /* จัดให้อยู่ตรงกลางแนวนอน */
+    transform: translateX(-50%); /* ขยับให้อยู่ตรงกลาง */
+}
+
 .order-box {
     display: flex;
     flex-direction: column;
     width: 100%;
-    border: solid;
-    padding: 10px;
+    height: 45%;
+    padding-left: 10px;
+    flex: 1;
+    overflow: auto;
+    overflow-x: hidden;
+
+}
+
+.order-box::-webkit-scrollbar {
+    display: none;
 }
 
 .order-flex {
     display: flex;
-    /* border: solid bisque; */
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    padding: 10px;
-    width: 100%;
+    justify-content: space-between;
+    align-content: center;
     text-align: center;
-    /* จัดกลางข้อความ */
-    box-sizing: border-box;
-    gap: 10px;
-    border: solid;
-
 }
 
 .item-box {
-    width: 30%;
-    /* border: solid red; */
+    width: 40%;
+    /* ปรับขนาดให้เหมาะสม */
     text-align: start;
 }
 
 .item-box-2 {
-    width: 10%;
-    /* border: solid blue; */
+    width: 20%;
+    /* ปรับขนาดให้เหมาะสม */
+    text-align: center;
+}
 
+.subtotal,
+.total,
+.cash,
+.change {
+    position: absolute;
+    padding: 5px 10px;
+    text-align: start;
+}
+
+.subtotal {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+    bottom: 30%;
+
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+    bottom: 20%;
+
+
+}
+
+.cash {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    bottom: 10%;
+
+}
+
+.change {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    bottom: 0%;
+
+}
+
+
+.order-bottom {
+    position: absolute;
+    bottom: 0;
+    height: 20%;
+    width: 100%;
+}
+
+.delete {
+    background-color: #9747FF;
+    color: #FFFFFF;
+    width: 50%;
+    height: 50%;
+    text-align: center;
+    align-content: center;
+    cursor: pointer;
+}
+
+.delete-all {
+    background-color: #B6F7F7;
+    width: 50%;
+    height: 50%;
+    text-align: center;
+    align-content: center;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.cashh {
+    cursor: pointer;
+    background-color: #E4CCFF;
+    position: absolute;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    top: 0;
+    text-align: center;
+    align-content: center;
 }
