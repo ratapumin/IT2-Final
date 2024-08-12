@@ -7,6 +7,7 @@ import Orders from './Orders';
 import DrinkType from "./DrinkType";
 import IceHot from "./IceHot";
 import ProductList from './ProductList';
+import Another from "./Another";
 
 function OrderProducts() {
   const [token, setToken] = useState();
@@ -16,10 +17,6 @@ function OrderProducts() {
   const { user } = useUser();
   const handleLogout = useLogout();
   const [carts, setCarts] = useState([]);
-
-
-
-
 
   useEffect(() => {
     if (!user || user.role === 'O') {
@@ -36,17 +33,13 @@ function OrderProducts() {
     }
   }, [token, navigate]);
 
-
   const handleProductSelect = (product) => {
     const currentProduct = product;
-    console.log('current', currentProduct)
     const inCart = carts.find(cart => cart.p_id === product.p_id);
 
     if (inCart) {
-      console.log('incart', inCart)
-      // อัปเดตจำนวนสินค้าในรถเข็น
-      setCarts(
-        prevState => prevState.map(cart =>
+      setCarts(prevState =>
+        prevState.map(cart =>
           cart.p_id === product.p_id
             ? {
               ...cart,
@@ -56,40 +49,29 @@ function OrderProducts() {
         )
       );
     } else {
-      // เพิ่มสินค้าลงในรถเข็น
-      setCarts(prevState => {
-        const updatedCarts = [
-          ...prevState,
-          {
-            p_id: currentProduct.p_id, // ใช้ p_id สำหรับการเปรียบเทียบ
-            p_name: currentProduct.p_name,
-            p_price: currentProduct.p_price,
-            p_type: currentProduct.p_type,
-            category: currentProduct.category,
-            quantity: 1
-          }
-        ];
-        console.log("Updated carts in callback:", updatedCarts); // แสดงผลค่าใหม่
-        return updatedCarts;
-      });
+      setCarts(prevState => [
+        ...prevState,
+        {
+          p_id: currentProduct.p_id,
+          p_name: currentProduct.p_name,
+          p_price: currentProduct.p_price,
+          p_type: currentProduct.p_type,
+          category: currentProduct.category,
+          quantity: 1
+        }
+      ]);
     }
   }
 
   const handleUpdateCart = (updatedCart) => {
-    setCarts(updatedCart)
-    console.log("Updated carts:", carts); // ตรวจสอบค่า carts หลังจากการเปลี่ยนแปลง
-
+    setCarts(updatedCart);
   }
 
   const handleDeletedAll = () => {
     setCarts([]);
-    console.log('Delete All')
-
   }
 
-  const handleCash =()=>{
-
-  }
+  const handleCash = () => {}
 
   return (
     <>
@@ -107,18 +89,27 @@ function OrderProducts() {
             selectedType={selectedType}
             onTypeClick={setSelectedType}
           />
-          <section className="flex-box">
-            <IceHot
-              selectedCategory={selectedCategory}
-              onCategoryClick={setSelectedCategory}
-            />
-          </section>
 
-          <ProductList
-            selectedCategory={selectedCategory}
-            selectedType={selectedType}
-            onProductSelect={handleProductSelect}
-          />
+          {selectedType !== 'Another' && (
+            <>
+              <section className="flex-box">
+                <IceHot
+                  selectedCategory={selectedCategory}
+                  onCategoryClick={setSelectedCategory}
+                />
+              </section>
+
+              <ProductList
+                selectedCategory={selectedCategory}
+                selectedType={selectedType}
+                onProductSelect={handleProductSelect}
+              />
+            </>
+          )}
+
+          {selectedType === 'Another' && (
+            <Another />
+          )}
 
           <section className="exit-box">
             <h1 onClick={handleLogout} style={{ cursor: "pointer" }}>
@@ -127,11 +118,8 @@ function OrderProducts() {
           </section>
 
           <section className="closeSales-box">
-            <h3>
-              Close daily Sales
-            </h3>
+            <h3>Close daily Sales</h3>
           </section>
-
         </section>
       </div>
     </>

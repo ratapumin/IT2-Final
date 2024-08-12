@@ -1,20 +1,5 @@
 
 function DrinkType({ selectedType, onTypeClick }) {
-    // const [productType, setProductType] = useState()
-
-    // useEffect(() => {
-    //     const fetchProductType = async () => {
-    //         try {
-    //             const res = await axios.get('http://localhost:5000/api/products');
-    //             // ใช้ Set เพื่อลบประเภทสินค้าที่ซ้ำกัน
-    //             const uniqueTypes = Array.from(new Set(res.data.map(item => item.p_type)));
-    //             setProductType(uniqueTypes);
-    //         } catch (error) {
-    //             console.error('Error fetching products:', error);
-    //         }
-    //     };
-    //     fetchProductType();
-    // }, []);
 
     const types = ['Coffee', 'Tea', 'Choc', 'Another'];
 

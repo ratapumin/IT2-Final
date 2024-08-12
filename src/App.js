@@ -15,6 +15,7 @@ import InsertProduct from "./components/admin/products/Insert_products";
 import EditProduct from "./components/admin/products/Edit_products";
 import DeleteProducts from "./components/admin/products/Delete_products";
 import Sidebar from "./components/Sidebar";
+import Members from "./components/order/Members";
 
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
@@ -48,6 +49,10 @@ function App() {
             <Route path="/about" element={<PageAbout />} />
             <Route path="/protected" element={<Protected />} />
             <Route path="/orders" element={<OrderProducts />} />
+
+            {/* Members */}
+            <Route path="/members" element={<Members />} />
+            
           </Route>
 
           <Route element={<LayoutWithSidebar />}>
@@ -63,6 +68,10 @@ function App() {
             <Route path="/insert_products" element={<InsertProduct />} />
             <Route path="/edit_products" element={<EditProduct />} />
             <Route path="/delete_products" element={<DeleteProducts />} />
+
+
+
+
           </Route>
         </Routes>
       </UserProvider>

@@ -309,3 +309,14 @@
     border: none;
     font-size: 30px;
 }
+
+
+.btn-member{
+    position: absolute;
+    border: none;
+    background-color: #E4CCFF;
+    width: 20%;
+    height: 8%;
+    right: 0;
+    top: 150px;
+}
