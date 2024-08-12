@@ -17,6 +17,10 @@ function OrderProducts() {
   const handleLogout = useLogout();
   const [carts, setCarts] = useState([]);
 
+
+
+
+
   useEffect(() => {
     if (!user || user.role === 'O') {
       navigate('/protected');
@@ -32,9 +36,6 @@ function OrderProducts() {
     }
   }, [token, navigate]);
 
-  useEffect(() => {
-    console.log("Updated carts:", carts); // ตรวจสอบค่า carts หลังจากการเปลี่ยนแปลง
-  }, [carts]);
 
   const handleProductSelect = (product) => {
     const currentProduct = product;
@@ -74,12 +75,31 @@ function OrderProducts() {
     }
   }
 
+  const handleUpdateCart = (updatedCart) => {
+    setCarts(updatedCart)
+    console.log("Updated carts:", carts); // ตรวจสอบค่า carts หลังจากการเปลี่ยนแปลง
+
+  }
+
+  const handleDeletedAll = () => {
+    setCarts([]);
+    console.log('Delete All')
+
+  }
+
+  const handleCash =()=>{
+
+  }
+
   return (
     <>
       <div className="flex-content">
         <Orders
           user={user}
           products={carts}
+          onUpdateCart={handleUpdateCart}
+          onDeleteAll={handleDeletedAll}
+          onCash={handleCash}
         />
 
         <section className="menu">

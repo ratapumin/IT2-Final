@@ -148,7 +148,6 @@
 .content-order {
     position: relative;
     height: 70%;
-    border: solid;
 }
 
 .bg-order {
@@ -157,44 +156,62 @@
     height: 80%;
     background-color: #FFE8A3;
     position: absolute;
-    left: 50%; /* จัดให้อยู่ตรงกลางแนวนอน */
-    transform: translateX(-50%); /* ขยับให้อยู่ตรงกลาง */
+    left: 50%;
+    top: 50%;
+    /* จัดให้อยู่ตรงกลางแนวนอน */
+    transform: translate(-50% ,-40%);
+    /* ขยับให้อยู่ตรงกลาง */
 }
 
 .order-box {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 45%;
+    height: 55%;
     padding-left: 10px;
+    padding-right: 10px;
     flex: 1;
     overflow: auto;
     overflow-x: hidden;
-
 }
+
 
 .order-box::-webkit-scrollbar {
     display: none;
 }
 
 .order-flex {
-    display: flex;
-    justify-content: space-between;
-    align-content: center;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    /* ใช้ grid ในการจัดแบ่งคอลัมน์ */
+    align-items: center;
     text-align: center;
+    padding-left: 20px;
+    gap: 10px;
+    /* ระยะห่างระหว่างคอลัมน์ */
+    margin-top: 20px;
+    cursor: pointer;
+    /* เพิ่ม cursor ให้แสดงว่าคลิกได้ */
 }
+
+.order-flex.selected {
+    border: 2px solid #007BFF;
+    /* ใช้ border เพื่อเน้นว่ารายการถูกเลือก */
+    background-color: #E3F2FD;
+    /* เพิ่มสีพื้นหลังเพื่อเน้น */
+    padding-top: 10px;
+}
+
 
 .item-box {
-    width: 40%;
-    /* ปรับขนาดให้เหมาะสม */
-    text-align: start;
+    text-align: left;
+    /* ปรับให้ตัวอักษรชิดซ้าย */
+    justify-content: center;
+    padding-left: 10px;
+    cursor: pointer;
 }
 
-.item-box-2 {
-    width: 20%;
-    /* ปรับขนาดให้เหมาะสม */
-    text-align: center;
-}
+
 
 .subtotal,
 .total,
@@ -258,21 +275,30 @@
     text-align: center;
     align-content: center;
     cursor: pointer;
+    border: none;
+    font-size: 30px;
 }
 
 .delete-all {
     background-color: #B6F7F7;
     width: 50%;
+    color: #aba8a8;
     height: 50%;
     text-align: center;
     align-content: center;
     box-sizing: border-box;
     cursor: pointer;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border: none;
+    font-size: 30px;
 }
 
 .cashh {
     cursor: pointer;
     background-color: #E4CCFF;
+    color: #aba8a8;
     position: absolute;
     right: 0;
     width: 50%;
@@ -280,4 +306,6 @@
     top: 0;
     text-align: center;
     align-content: center;
+    border: none;
+    font-size: 30px;
 }
