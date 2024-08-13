@@ -1,0 +1,17 @@
+.flexCash {
+    border: solid;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+}
+
+.btnClick {
+    width: 15%;
+    height: 100px;
+    margin: 5px;
+    border: 1px gray solid;
+    background-color: white;
+
+
+}

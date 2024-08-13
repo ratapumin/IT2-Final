@@ -8,11 +8,15 @@ import DrinkType from "./DrinkType";
 import IceHot from "./IceHot";
 import ProductList from './ProductList';
 import Another from "./Another";
+import Cash from "./cash/Cash";
+
+
 
 function OrderProducts() {
   const [token, setToken] = useState();
   const [selectedCategory, setSelectedCategory] = useState('ICE');
   const [selectedType, setSelectedType] = useState('Coffee');
+  const [cash, setCash] = useState(false)
   const navigate = useNavigate();
   const { user } = useUser();
   const handleLogout = useLogout();
@@ -71,7 +75,23 @@ function OrderProducts() {
     setCarts([]);
   }
 
-  const handleCash = () => {}
+  const handleCash = () => {
+    console.log(carts)
+    if (carts) {
+  
+      setCash(true)
+      setSelectedType('Cash');
+    } else {
+      setCash(false)
+      setSelectedType('Coffee');
+    }
+
+
+  }
+
+
+
+
 
   return (
     <>
@@ -89,8 +109,10 @@ function OrderProducts() {
             selectedType={selectedType}
             onTypeClick={setSelectedType}
           />
+          {/* {cash && <Cash />} */}
 
-          {selectedType !== 'Another' && (
+
+          {selectedType !== 'Another' && selectedType !== 'Cash' && (
             <>
               <section className="flex-box">
                 <IceHot
@@ -109,6 +131,10 @@ function OrderProducts() {
 
           {selectedType === 'Another' && (
             <Another />
+          )}
+
+          {selectedType === 'Cash' && (
+            <Cash />
           )}
 
           <section className="exit-box">

@@ -1,9 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
-function Orders({ user, products, onUpdateCart, onDeleteAll }) {
+
+
+
+function Orders({ user, products, onUpdateCart, onDeleteAll, onCash }) {
   const [productCart, setProductCart] = useState([]);
   const [selected, setSelected] = useState()
   const orderBoxRef = useRef(null)
+  const [showsum, setShowSum] = useState();
 
   useEffect(() => {
     if (products && products.length > 0) {
@@ -32,6 +36,19 @@ function Orders({ user, products, onUpdateCart, onDeleteAll }) {
 
 
 
+  const countItem = useCallback(() => {
+    let sum = 0;
+    productCart.forEach(item => {
+      sum += item.p_price * (item.quantity || 1); // คำนวณราคาสินค้าและจำนวนที่สั่ง
+    });
+    return sum;
+  }, [productCart]);
+
+
+  useEffect(() => {
+    setShowSum(countItem())
+  }, [productCart, countItem])
+
   return (
     <section className="orders">
       <div className="content-order">
@@ -53,12 +70,19 @@ function Orders({ user, products, onUpdateCart, onDeleteAll }) {
           </section>
 
           <section className="subtotal">
-            <p>Subtotal</p>
-            <p>0</p>
+            <p>
+              Subtotal
+            </p>
+
+            <p>
+              {showsum !== false ? showsum : 0}
+            </p>
           </section>
           <section className="total">
             <p>Total</p>
-            <p>0</p>
+            <p>
+              {showsum !== false ? showsum : 0}
+            </p>
           </section>
           <section className="cash">
             <p>Cash</p>
@@ -89,8 +113,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll }) {
         >
           DELETE ALL
         </button>
-
-        <button className='cashh'>CASH</button>
+        <button className='cashh' onClick={() => onCash()}>CASH</button>
       </section>
     </section >
   );

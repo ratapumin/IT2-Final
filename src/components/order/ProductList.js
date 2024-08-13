@@ -5,7 +5,7 @@ function ProductList({ selectedType, selectedCategory, onProductSelect }) {
     const [productList, setProductList] = useState([]);
 
     useEffect(() => {
-        console.log("Fetching products with:", selectedType, selectedCategory);
+        // console.log("Fetching products with:", selectedType, selectedCategory);
 
         const fetchProducts = async () => {
             try {
@@ -15,7 +15,7 @@ function ProductList({ selectedType, selectedCategory, onProductSelect }) {
                         (product.category === 'ICE' || product.category === 'HOT')) &&
                     product.category.includes(selectedCategory)
                 );
-                console.log("Filtered products:", filterProductList);
+                // console.log("Filtered products:", filterProductList);
                 setProductList(filterProductList);
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -28,7 +28,7 @@ function ProductList({ selectedType, selectedCategory, onProductSelect }) {
     const handleFindProduct = (id) => {
         const selectedProduct = productList.find(product => product.p_id === id);
         if (selectedProduct) {
-            console.log("Selected product:", selectedProduct);
+            // console.log("Selected product:", selectedProduct);
             onProductSelect(selectedProduct);
       
         }
