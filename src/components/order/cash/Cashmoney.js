@@ -15,7 +15,7 @@ function Cashmoney() {
 
             <section className='flexinput'>
                 <label className='labelCash'>CASH</label>
-                <input type="text" />
+                <input type="text" className='inputCash' />
             </section>
 
             <section >
