@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom'
+
+
 function Another() {
 
 
@@ -6,7 +9,10 @@ function Another() {
         <>
 
             <button className="btn-member">
-                MEMBER
+                <Link to='/members' className='memberLink'>
+                    MEMBER
+                </Link>
+
             </button>
         </>
     )

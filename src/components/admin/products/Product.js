@@ -22,10 +22,12 @@ function Product() {
             navigate('/protected');
         }
     }, [user, navigate]);
+    
     const fetchProducts = async () => {
         try {
             const res = await axios.get("http://localhost:5000/api/products");
             setProducts(res.data);
+            console.log(res.data)
         } catch (error) {
             console.log("Cannot fetch products", error);
         }

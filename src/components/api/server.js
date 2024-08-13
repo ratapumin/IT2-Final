@@ -5,6 +5,7 @@ const app = express();
 const productRoutes = require('./routes/products');
 const loginRoutes = require('./routes/login')
 const usersRoutes = require('./routes/owner')
+const membersRoutes = require('./routes/member')
 
 
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/api', productRoutes)
 app.use('/api', loginRoutes)
 app.use('/api', usersRoutes)
+app.use('/api', membersRoutes)
 
 
 app.listen(5000, () => {
