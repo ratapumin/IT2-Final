@@ -77,8 +77,8 @@ function OrderProducts() {
 
   const handleCash = () => {
     console.log(carts)
-    if (carts) {
-  
+    if (carts.length > 0) {
+
       setCash(true)
       setSelectedType('Cash');
     } else {
