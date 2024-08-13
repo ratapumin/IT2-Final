@@ -1,0 +1,42 @@
+
+.flexinput{
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.labelCash{
+    margin: 5px;
+    background-color: #FFE8A3;
+    text-align: center;
+    height: 50px;
+    align-items: center;
+width: 50px;
+}
+
+
+
+
+.flexNum {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: absolute;
+    left: 50%;
+    top: 70%;
+    transform: translate(-50%, -50%);
+}
+
+.butN {
+    padding: 15px;
+    /* Adjust the padding for the buttons */
+    font-size: 20px;
+    /* Adjust the font size for the numbers */
+    border: none;
+    background-color: white;
+    /* Background color */
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    border: 1px solid rgb(223, 222, 222);
+}
