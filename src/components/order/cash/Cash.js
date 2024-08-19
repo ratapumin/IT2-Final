@@ -1,9 +1,8 @@
+import { useEffect } from 'react';
 import './Cash.css';
 import Cashmoney from './Cashmoney';
 
-function Cash({ onCashChange, products }) {
-
-
+function Cash({ onCashChange, products, sumCash, onChange }) {
 
     return (
         <div className="flexCash">
@@ -11,6 +10,8 @@ function Cash({ onCashChange, products }) {
             <Cashmoney
                 onCashChange={onCashChange}
                 products={products}
+                sumCash={sumCash}
+                onChange={onChange}
             />
             <button className="btnClick">PROMPTPAY</button>
             <button className="btnClick">MEMBER</button>

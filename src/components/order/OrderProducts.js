@@ -22,6 +22,8 @@ function OrderProducts() {
   const handleLogout = useLogout();
   const [carts, setCarts] = useState([]);
   const [cashAmount, setCashAmount] = useState('')
+  const [sumCash, setSumCash] = useState('')
+  const [change, setChange] = useState('')
 
   useEffect(() => {
     if (!user || user.role === 'O') {
@@ -93,7 +95,13 @@ function OrderProducts() {
     console.log(cashAmount)
   }
 
-
+  const handleSetSum = (sum) => {
+    setSumCash(sum);
+    // console.log(sumCash)
+  }
+  const handleChange = (change) => {
+    setChange(change)
+  }
 
   return (
     <>
@@ -105,6 +113,8 @@ function OrderProducts() {
           onDeleteAll={handleDeletedAll}
           onCash={handleCash}
           cash={cashAmount}
+          sumCash={handleSetSum}
+          change={change}
         />
 
         <section className="menu">
@@ -140,6 +150,8 @@ function OrderProducts() {
             <Cash
               onCashChange={handleCashAmount}
               products={carts}
+              sumCash={sumCash}
+              onChange={handleChange}
             />
           )}
 

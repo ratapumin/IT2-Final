@@ -3,11 +3,14 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 
-function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
+
+function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change }) {
   const [productCart, setProductCart] = useState([]);
   const [selected, setSelected] = useState()
   const orderBoxRef = useRef(null)
   const [showsum, setShowSum] = useState();
+
+  console.log('change', change)
 
   useEffect(() => {
     if (products && products.length > 0) {
@@ -17,11 +20,10 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
 
 
   useEffect(() => {
-    // เลื่อน scrollbar ไปที่ตำแหน่งล่างสุดเมื่อมีการเพิ่มสินค้าใหม่
     if (orderBoxRef.current) {
       orderBoxRef.current.scrollTop = orderBoxRef.current.scrollHeight;
     }
-  }, [productCart]); // ทำการเลื่อน scrollbar ทุกครั้งที่ productCart เปลี่ยนแปลง
+  }, [productCart]);
 
   const handleSelected = (id) => {
     setSelected(id)
@@ -39,7 +41,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
   const countItem = useCallback(() => {
     let sum = 0;
     productCart.forEach(item => {
-      sum += item.p_price * (item.quantity || 1); // คำนวณราคาสินค้าและจำนวนที่สั่ง
+      sum += item.p_price * (item.quantity || 1);
     });
     return sum;
   }, [productCart]);
@@ -48,6 +50,12 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
   useEffect(() => {
     setShowSum(countItem())
   }, [productCart, countItem])
+
+
+  useEffect(() => {
+    sumCash(showsum)
+  }, [showsum, sumCash])
+
 
   return (
     <section className="orders">
@@ -59,7 +67,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
           <section className="order-box" ref={orderBoxRef}>
             {productCart.map((item, index) => (
               <div
-                className={`order-flex ${selected === item.p_id ? 'selected' : ''}`} // เพิ่ม class 'selected' ถ้ารายการนี้ถูกเลือก
+                className={`order-flex ${selected === item.p_id ? 'selected' : ''}`}
                 onClick={() => handleSelected(item.p_id)}
                 key={item.p_id || index}>
                 <p className="item-box">{item.p_name}</p>
@@ -90,7 +98,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
           </section>
           <section className="change">
             <p>Change</p>
-            <p>0</p>
+            <p>{change !== null && change !== '' ? change : 0}</p>
           </section>
         </section>
       </div>

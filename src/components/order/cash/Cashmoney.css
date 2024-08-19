@@ -4,7 +4,6 @@
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: solid;
 }
 
 .labelCash {
@@ -22,6 +21,31 @@
     width: 200px;
     height: 30px;
 }
+
+.flexChange {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.labelChange {
+    margin: 5px;
+    background-color: #FFE8A3;
+    text-align: center;
+    height: 50px;
+    align-items: center;
+    padding-top: 15px;
+    width: 100px;
+}
+
+.inputChange {
+    transform: translate(0%, 50%);
+    width: 200px;
+    height: 30px;
+}
+
 
 
 

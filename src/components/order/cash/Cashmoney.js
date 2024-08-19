@@ -5,20 +5,19 @@ import { useUser } from '../../user/UserContext';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
-function Cashmoney({ onCashChange, products }) {
-    const [orderId, setOrderId] = useState('')
-    const [orderNo, setOrderNo] = useState('')
+function Cashmoney({ onCashChange, products, sumCash, onChange }) {
+    const [orderId, setOrderId] = useState('');
+    const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
     const { user } = useUser();
+    const [cash, setCash] = useState('');
+    const [change, setChange] = useState('')
+
     useEffect(() => {
         if (!user || user.role === 'O') {
             navigate('/protected');
         }
     }, [user, navigate]);
-    console.log(user)
-
-
-    const [cash, setCash] = useState('');
 
     const countNum = () => {
         const number = [];
@@ -34,31 +33,31 @@ function Cashmoney({ onCashChange, products }) {
         onCashChange(newCash);
     };
 
+
+
+    useEffect(() => {
+        if (cash && sumCash) {
+            const changeAmount = cash - sumCash;
+            setChange(changeAmount > 0 ? changeAmount : 0);
+            onChange(changeAmount > 0 ? changeAmount : 0);
+        }
+    }, [cash, sumCash, onChange]);
+
+    const handleDelete = () => {
+        const newCash = cash.slice(0, -1);
+        setCash(newCash);
+        onCashChange(newCash);
+    };
+
     useEffect(() => {
         const fetchOrderId = async () => {
             try {
                 const res = await axios.get("http://localhost:5000/api/readorder");
-
                 const filterOrderId = res.data.map(order => parseInt(order.order_id, 10)).filter(id => !isNaN(id));
                 const filterOrderNo = res.data.map(order => parseInt(order.order_no, 10)).filter(no => !isNaN(no));
 
-
-                if (filterOrderId.length === 0) {
-                    setOrderId('0001');
-                } else {
-                    const maxId = Math.max(...filterOrderId);
-                    const newId = (maxId + 1).toString().padStart(4, '0');
-                    setOrderId(newId);
-                }
-
-                // คำนวณ order_no
-                if (filterOrderNo.length === 0) {
-                    setOrderNo('001');
-                } else {
-                    const maxNo = Math.max(...filterOrderNo);
-                    const newNo = (maxNo + 1).toString().padStart(3, '0');
-                    setOrderNo(newNo);
-                }
+                setOrderId(filterOrderId.length === 0 ? '0001' : (Math.max(...filterOrderId) + 1).toString().padStart(4, '0'));
+                setOrderNo(filterOrderNo.length === 0 ? '001' : (Math.max(...filterOrderNo) + 1).toString().padStart(3, '0'));
             } catch (error) {
                 console.log("Cannot fetch order", error);
             }
@@ -67,44 +66,29 @@ function Cashmoney({ onCashChange, products }) {
         fetchOrderId();
     }, []);
 
-
-
-    console.log('eee', orderId)
-    console.log(orderNo)
-
-
-
-
-    const setOrderData = () => {
-        return {
-            order_id: orderId,
-            order_no: orderNo,
-            order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-            payment_type: 'cash',
-            user_id: user.user_id,
-            c_id: null,
-            products: products.map(product => ({
-                p_id: product.p_id,
-                p_price: product.p_price,
-                quantity: product.quantity
-            }))
-        };
-    };
-    // console.log(order)
+    const setOrderData = () => ({
+        order_id: orderId,
+        order_no: orderNo,
+        order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+        payment_type: 'cash',
+        user_id: user.user_id,
+        c_id: null,
+        products: products.map(product => ({
+            p_id: product.p_id,
+            p_price: product.p_price,
+            quantity: product.quantity
+        }))
+    });
 
     const createOrder = async () => {
-        const orderData = setOrderData();
         try {
-            const res = await axios.post('http://localhost:5000/api/createOrder', orderData);
-            console.log('Order created successfully:', res.data);
+            const orderData = setOrderData();
+            await axios.post('http://localhost:5000/api/createOrder', orderData);
+            console.log('Order created successfully');
         } catch (error) {
             console.error('Error creating order:', error);
         }
     };
-
-
-
-
 
     return (
         <div>
@@ -118,6 +102,16 @@ function Cashmoney({ onCashChange, products }) {
                 />
             </section>
 
+            <section className='flexChange'>
+                <label className='labelChange'>Change</label>
+                <input
+                    type='text'
+                    className='inputChange'
+                    value={change}
+                    readOnly
+                />
+            </section>
+
             <section>
                 <div className="flexNum">
                     {countNum().map(num => (
@@ -125,11 +119,11 @@ function Cashmoney({ onCashChange, products }) {
                             {num}
                         </button>
                     ))}
-                    <button className="butN">Delete</button>
+                    <button className="butN" onClick={handleDelete}>Delete</button>
                     <button className="butN" value={0} onClick={() => calNum(0)}>0</button>
-                    <button className="butN"
-                        onClick={createOrder}
-                    >Enter</button>
+                    <button className="butN" onClick={() => {
+                        createOrder()
+                    }}>Enter</button>
                 </div>
             </section>
         </div>
