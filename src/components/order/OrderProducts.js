@@ -21,6 +21,7 @@ function OrderProducts() {
   const { user } = useUser();
   const handleLogout = useLogout();
   const [carts, setCarts] = useState([]);
+  const [cashAmount, setCashAmount] = useState('')
 
   useEffect(() => {
     if (!user || user.role === 'O') {
@@ -78,7 +79,6 @@ function OrderProducts() {
   const handleCash = () => {
     console.log(carts)
     if (carts.length > 0) {
-
       setCash(true)
       setSelectedType('Cash');
     } else {
@@ -86,10 +86,12 @@ function OrderProducts() {
       setSelectedType('Coffee');
     }
 
-
   }
 
-
+  const handleCashAmount = (cash) => {
+    setCashAmount(cash)
+    console.log(cashAmount)
+  }
 
 
 
@@ -102,6 +104,7 @@ function OrderProducts() {
           onUpdateCart={handleUpdateCart}
           onDeleteAll={handleDeletedAll}
           onCash={handleCash}
+          cash={cashAmount}
         />
 
         <section className="menu">
@@ -134,7 +137,9 @@ function OrderProducts() {
           )}
 
           {selectedType === 'Cash' && (
-            <Cash />
+            <Cash
+              onCashChange={handleCashAmount}
+            />
           )}
 
           <section className="exit-box">

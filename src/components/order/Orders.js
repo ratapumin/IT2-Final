@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 
-function Orders({ user, products, onUpdateCart, onDeleteAll, onCash }) {
+function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash }) {
   const [productCart, setProductCart] = useState([]);
   const [selected, setSelected] = useState()
   const orderBoxRef = useRef(null)
@@ -86,7 +86,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash }) {
           </section>
           <section className="cash">
             <p>Cash</p>
-            <p>0</p>
+            <p>{cash !== null && cash !== '' ? cash : 0}</p>
           </section>
           <section className="change">
             <p>Change</p>
