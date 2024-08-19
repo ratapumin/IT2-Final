@@ -56,8 +56,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange }) {
                 const filterOrderId = res.data.map(order => parseInt(order.order_id, 10)).filter(id => !isNaN(id));
                 const filterOrderNo = res.data.map(order => parseInt(order.order_no, 10)).filter(no => !isNaN(no));
 
-                setOrderId(filterOrderId.length === 0 ? '0001' : (Math.max(...filterOrderId) + 1).toString().padStart(4, '0'));
-                setOrderNo(filterOrderNo.length === 0 ? '001' : (Math.max(...filterOrderNo) + 1).toString().padStart(3, '0'));
+                setOrderId(filterOrderId.length === 0 ? '1' : (Math.max(...filterOrderId) + 1).toString().padStart(4, '0'));
+                setOrderNo(filterOrderNo.length === 0 ? '1' : (Math.max(...filterOrderNo) + 1).toString().padStart(3, '0'));
             } catch (error) {
                 console.log("Cannot fetch order", error);
             }
