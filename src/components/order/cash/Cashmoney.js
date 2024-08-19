@@ -39,11 +39,10 @@ function Cashmoney({ onCashChange, products }) {
             try {
                 const res = await axios.get("http://localhost:5000/api/readorder");
 
-                // แปลงค่าเป็นตัวเลขก่อนคำนวณ
                 const filterOrderId = res.data.map(order => parseInt(order.order_id, 10)).filter(id => !isNaN(id));
                 const filterOrderNo = res.data.map(order => parseInt(order.order_no, 10)).filter(no => !isNaN(no));
 
-                // คำนวณ order_id
+
                 if (filterOrderId.length === 0) {
                     setOrderId('0001');
                 } else {
@@ -80,9 +79,9 @@ function Cashmoney({ onCashChange, products }) {
         return {
             order_id: orderId,
             order_no: orderNo,
-            order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),  // ตั้งค่าเวลาให้เป็นปัจจุบัน
-            payment_type: 'cash',  // ตั้งค่าแบบชำระเงิน
-            user_id: user.user_id,  // ใช้ user.user_id แทน
+            order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            payment_type: 'cash',
+            user_id: user.user_id,
             c_id: null,
             products: products.map(product => ({
                 p_id: product.p_id,

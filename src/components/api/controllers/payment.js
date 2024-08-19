@@ -24,7 +24,8 @@ exports.payment = (req, res) => {
                 });
             }
 
-            const newOrderId = result.insertId;  // ใช้ค่าใหม่ที่แทรก
+            const newOrderId = result.insertId;
+
 
             const orderDetailData = products.map(product => [newOrderId, product.p_id, product.quantity, product.p_price]);
 
@@ -53,6 +54,7 @@ exports.payment = (req, res) => {
                     }
                 });
             });
+
         });
     });
 };
