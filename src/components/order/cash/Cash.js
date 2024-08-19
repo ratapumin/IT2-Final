@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import './Cash.css';
 import Cashmoney from './Cashmoney';
 
-function Cash({onCashChange}) {
-
+function Cash({ onCashChange, products }) {
 
 
 
@@ -11,7 +9,8 @@ function Cash({onCashChange}) {
         <div className="flexCash">
             <button className="btnClick">CASH</button>
             <Cashmoney
-            onCashChange={onCashChange}
+                onCashChange={onCashChange}
+                products={products}
             />
             <button className="btnClick">PROMPTPAY</button>
             <button className="btnClick">MEMBER</button>

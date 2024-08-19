@@ -6,6 +6,8 @@ const productRoutes = require('./routes/products');
 const loginRoutes = require('./routes/login')
 const usersRoutes = require('./routes/owner')
 const membersRoutes = require('./routes/member')
+const paymentRoutes = require('./routes/payment')
+const orderRoutes = require('./routes/order')
 
 
 
@@ -16,6 +18,9 @@ app.use('/api', productRoutes)
 app.use('/api', loginRoutes)
 app.use('/api', usersRoutes)
 app.use('/api', membersRoutes)
+app.use('/api', paymentRoutes)
+app.use('/api', orderRoutes)
+
 
 
 app.listen(5000, () => {

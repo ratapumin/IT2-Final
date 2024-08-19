@@ -139,6 +139,7 @@ function OrderProducts() {
           {selectedType === 'Cash' && (
             <Cash
               onCashChange={handleCashAmount}
+              products={carts}
             />
           )}
 
