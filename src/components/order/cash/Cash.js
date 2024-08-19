@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import './Cash.css';
 import Cashmoney from './Cashmoney';
 

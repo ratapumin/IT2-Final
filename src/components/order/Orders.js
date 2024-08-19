@@ -10,7 +10,6 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
   const orderBoxRef = useRef(null)
   const [showsum, setShowSum] = useState();
 
-  console.log('change', change)
 
   useEffect(() => {
     if (products && products.length > 0) {
@@ -117,6 +116,8 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
           onClick={() => {
             setProductCart([])
             onDeleteAll([])
+
+
           }}
         >
           DELETE ALL

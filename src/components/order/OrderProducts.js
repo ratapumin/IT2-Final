@@ -76,6 +76,8 @@ function OrderProducts() {
 
   const handleDeletedAll = () => {
     setCarts([]);
+    setCashAmount(null)
+    setChange(null)
   }
 
   const handleCash = () => {
@@ -97,7 +99,6 @@ function OrderProducts() {
 
   const handleSetSum = (sum) => {
     setSumCash(sum);
-    // console.log(sumCash)
   }
   const handleChange = (change) => {
     setChange(change)
@@ -122,7 +123,6 @@ function OrderProducts() {
             selectedType={selectedType}
             onTypeClick={setSelectedType}
           />
-          {/* {cash && <Cash />} */}
 
 
           {selectedType !== 'Another' && selectedType !== 'Cash' && (
