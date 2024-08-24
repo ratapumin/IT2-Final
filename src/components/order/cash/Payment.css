@@ -1,0 +1,17 @@
+
+
+.btnCollect{
+    min-width: 150px;
+    max-width: 150px;
+    background-color: aquamarine;
+    height: 100px;
+    margin: 10px;
+}
+
+.btnRedeem{
+    min-width: 150px;
+    max-width: 150px;
+    background-color: rgb(76, 167, 232);
+    height: 100px;
+    margin: 10px;
+}

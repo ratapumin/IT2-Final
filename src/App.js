@@ -16,7 +16,8 @@ import EditProduct from "./components/admin/products/Edit_products";
 import DeleteProducts from "./components/admin/products/Delete_products";
 import Sidebar from "./components/Sidebar";
 import Members from "./components/order/Members";
-import Cash from "./components/order/cash/Cash";
+import Cash from "./components/order/cash/Payment";
+import Points from "./components/member/Points";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -52,10 +53,11 @@ function App() {
 
             {/* Members */}
             <Route path="/members" element={<Members />} />
+            <Route path='/points' element={<Points />} />
 
             {/*Cash */}
-            <Route path="/cash" element={<Cash/>}/>
-            
+            <Route path="/cash" element={<Cash />} />
+
           </Route>
 
           <Route element={<LayoutWithSidebar />}>

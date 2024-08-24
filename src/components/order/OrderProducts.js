@@ -8,7 +8,7 @@ import DrinkType from "./DrinkType";
 import IceHot from "./IceHot";
 import ProductList from './ProductList';
 import Another from "./Another";
-import Cash from "./cash/Cash";
+import Cash from "./cash/Payment";
 
 
 
@@ -173,10 +173,10 @@ function OrderProducts() {
               EXIT
             </h1>
           </section>
-
+{/* 
           <section className="closeSales-box">
             <h3>Close daily Sales</h3>
-          </section>
+          </section> */}
         </section>
       </div>
     </>

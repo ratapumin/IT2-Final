@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal } from 'antd';
 
-function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,selectedType }) {
+function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
@@ -29,18 +29,22 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,sele
         return number;
     };
 
-//    useEffect(() => {
-//         console.log("Cash:", cash);
-//         console.log("SumCash:", sumCash);
-//         console.log("Change:", change);
-//     }, [cash, sumCash, change]);
+
+ 
+
+
+    //    useEffect(() => {
+    //         console.log("Cash:", cash);
+    //         console.log("SumCash:", sumCash);
+    //         console.log("Change:", change);
+    //     }, [cash, sumCash, change]);
 
     useEffect(() => {
         if (!modal2Open) {
-          // ตรวจสอบสถานะที่รีเซ็ต
-          console.log("porducts:", products);
-          console.log("SumCash:", sumCash);
-          console.log("Change:", change);
+            // ตรวจสอบสถานะที่รีเซ็ต
+            console.log("porducts:", products);
+            console.log("SumCash:", sumCash);
+            console.log("Change:", change);
         }
     }, [modal2Open]);
 
@@ -112,7 +116,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,sele
     return (
         <div>
             <section className='flexinput'>
-                <label className='labelCash'>Points</label>
+                <label className='labelCash'>Cash</label>
                 <input
                     type="text"
                     className='inputCash'
@@ -148,6 +152,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,sele
             </section>
 
             <Modal
+
                 style={{ textAlign: "center" }}
                 centered
                 open={modal2Open}
@@ -157,7 +162,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,sele
                     setChange(''); // Reset change to empty string
                     onDeleteAll(); // ใช้ onDeleteAll ที่ส่งมาจาก props
                     selectedType('Coffee')
-           
+
                 }}
                 cancelButtonProps={{ style: { display: 'none' } }}
                 closable={false}

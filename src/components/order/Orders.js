@@ -15,7 +15,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
     if (products && products.length > 0) {
       setProductCart(products);
     }
-    else{
+    else {
       setProductCart(products)
     }
   }, [products]);
@@ -39,7 +39,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
   }
 
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(products)
   })
 

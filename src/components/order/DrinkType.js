@@ -1,7 +1,7 @@
 
 function DrinkType({ selectedType, onTypeClick }) {
 
-    const types = ['Coffee', 'Tea', 'Choc', 'Member'];
+    const types = ['Coffee', 'Tea', 'Chocolate', 'Member','Close Daily'];
 
 
 
