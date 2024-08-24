@@ -40,6 +40,11 @@ function OrderProducts() {
     }
   }, [token, navigate]);
 
+
+useEffect(()=>{
+  console.log(carts)
+})
+
   const handleProductSelect = (product) => {
     const currentProduct = product;
     const inCart = carts.find(cart => cart.p_id === product.p_id);
@@ -76,9 +81,12 @@ function OrderProducts() {
 
   const handleDeletedAll = () => {
     setCarts([]);
-    setCashAmount(null)
-    setChange(null)
-  }
+    setCashAmount('');
+    setSumCash('');
+    setChange('');
+  };
+  
+
 
   const handleCash = () => {
     console.log(carts)
@@ -125,7 +133,7 @@ function OrderProducts() {
           />
 
 
-          {selectedType !== 'Another' && selectedType !== 'Cash' && (
+          {selectedType !== 'Member' && selectedType !== 'Cash' && (
             <>
               <section className="flex-box">
                 <IceHot
@@ -142,7 +150,7 @@ function OrderProducts() {
             </>
           )}
 
-          {selectedType === 'Another' && (
+          {selectedType === 'Member' && (
             <Another />
           )}
 
@@ -152,6 +160,7 @@ function OrderProducts() {
               products={carts}
               sumCash={sumCash}
               onChange={handleChange}
+              onDeleteAll={handleDeletedAll}
             />
           )}
 

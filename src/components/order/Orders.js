@@ -15,6 +15,9 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
     if (products && products.length > 0) {
       setProductCart(products);
     }
+    else{
+      setProductCart(products)
+    }
   }, [products]);
 
 
@@ -35,6 +38,10 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
     onUpdateCart(updatedCart);
   }
 
+
+  useEffect(()=>{
+    console.log(products)
+  })
 
 
   const countItem = useCallback(() => {
@@ -115,14 +122,17 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
           className="delete-all"
           onClick={() => {
             setProductCart([])
-            onDeleteAll([])
-
-
+            onDeleteAll([]) // ส่งค่าเป็น array ว่างไปยัง onDeleteAll
           }}
         >
           DELETE ALL
         </button>
-        <button className='cashh' onClick={() => onCash()}>CASH</button>
+        <button
+          className='payment'
+          onClick={() => onCash()}
+        >
+          PAYMENT
+        </button>
       </section>
     </section >
   );
