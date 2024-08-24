@@ -5,13 +5,13 @@ import { Modal, Form, Input, Button } from 'antd';
 import './Payment.css';
 import axios from 'axios';
 
-function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType }) {
+function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, OnsaveMember }) {
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
     const [tel, setTel] = useState('');
     const [contactName, setContactName] = useState('');
     const [members, setMembers] = useState([])
-    const [memberCollect, setMemberCollect] = useState()
+    const [currentMember, setCurrentMember] = useState()
 
 
 
@@ -42,7 +42,7 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
     const handleSearch = () => {
         // ค้นหาชื่อจากเบอร์โทร
         const member = members.find(member => member.c_tel === tel);
-        setMemberCollect(member)
+        setCurrentMember(member)
         setContactName(member ? `${member.c_fname}  ${member.c_lname} Points: ${member.c_points}` : 'ไม่พบข้อมูล');
         console.log('findmember', member)
         // ยังคงเปิด modal ไว้
@@ -51,10 +51,10 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
     const handleSelectMember = () => {
         // ค้นหาชื่อจากเบอร์โทร
         const member = members.find(member => member.c_tel === tel);
-        setMemberCollect(member)
+        setCurrentMember(member)
         // setContactName(member ? `${member.c_fname}  ${member.c_lname} Points: ${member.c_points}` : 'ไม่พบข้อมูล');
         console.log('findmember', member)
-        // ยังคงเปิด modal ไว้
+        OnsaveMember(member)
         setCollect(false)
     };
 
@@ -82,6 +82,7 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
                 onChange={onChange}
                 onDeleteAll={onDeleteAll}
                 selectedType={selectedType}
+                sentMember={currentMember}
             />
             <button className="btnClick">CASH</button>
             <button className="btnClick">PROMPTPAY</button>

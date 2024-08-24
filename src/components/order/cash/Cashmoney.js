@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal } from 'antd';
 
-function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType }) {
+function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, sentMember }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
     const [cash, setCash] = useState('');
     const [change, setChange] = useState('');
     const [modal2Open, setModal2Open] = useState(false);
+    const [currentMember, setCurrentMember] = useState()
 
     useEffect(() => {
         if (!user || user.role === 'O') {
@@ -30,7 +31,15 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
     };
 
 
- 
+    // useEffect(() => {
+    //     if (sentMember) {
+    //         console.log(sentMember.c_tel);
+    //         setCurrentMember(sentMember)
+    //         console.log(currentMember.c_tel)
+    //     } else {
+    //         console.log('sentMember is undefined or null');
+    //     }
+    // }, [sentMember])
 
 
     //    useEffect(() => {
@@ -88,19 +97,31 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
         fetchOrderId();
     }, []);
 
-    const setOrderData = () => ({
-        order_id: orderId,
-        order_no: orderNo,
-        order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-        payment_type: 'cash',
-        user_id: user.user_id,
-        c_id: null,
-        products: products.map(product => ({
-            p_id: product.p_id,
-            p_price: product.p_price,
-            quantity: product.quantity
-        }))
-    });
+
+    // console.log(sentMember.c_tel)
+    const setOrderData = () => {
+        let c_id = null
+
+        if (sentMember && sentMember.c_tel) {
+            // console.log(sentMember.c_tel);
+            c_id = `${sentMember.c_id}`;
+        }
+        console.log(sentMember.c_tel)
+
+        return {
+            order_id: orderId,
+            order_no: orderNo,
+            order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            payment_type: 'cash',
+            user_id: user.user_id,
+            c_id: c_id,
+            products: products.map(product => ({
+                p_id: product.p_id,
+                p_price: product.p_price,
+                quantity: product.quantity
+            }))
+        }
+    }
 
     const createOrder = async () => {
         try {
@@ -145,7 +166,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
                     <button className="butN" onClick={handleDelete}>Delete</button>
                     <button className="butN" value={0} onClick={() => calNum(0)}>0</button>
                     <button className="butN" onClick={() => {
-                        // createOrder();
+                        createOrder();
                         setModal2Open(true);
                     }}>Enter</button>
                 </div>

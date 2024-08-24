@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 
-function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change }) {
+function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember }) {
   const [productCart, setProductCart] = useState([]);
   const [selected, setSelected] = useState()
   const orderBoxRef = useRef(null)
@@ -43,6 +43,10 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
     console.log(products)
   })
 
+  useEffect(() => {
+    console.log(OnsaveMember)
+  })
+
 
   const countItem = useCallback(() => {
     let sum = 0;
@@ -67,7 +71,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
     <section className="orders">
       <div className="content-order">
         <h1>New Orders</h1>
-        {user && user.user_fname}
+        {/* {user && user.user_fname} */}
 
         <section className="bg-order">
           <section className="order-box" ref={orderBoxRef}>
@@ -106,7 +110,36 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
             <p>Change</p>
             <p>{change !== null && change !== '' ? change : 0}</p>
           </section>
+
         </section>
+
+        <section className="memberName">
+          <p>
+            Member
+          </p>
+          <p>{OnsaveMember !== null && OnsaveMember !== ''
+            ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname} ${OnsaveMember.c_points}`
+            : ''}</p>
+        </section>
+
+        <section className="currentPoints">
+          <p>
+            Current Points
+          </p>
+          <p>{OnsaveMember !== null && OnsaveMember !== ''
+            ? ` ${OnsaveMember.c_points}`
+            : ''}</p>
+        </section>
+
+        <section className="getPoints">
+          <p>
+            Get Points
+          </p>
+          <p>{OnsaveMember !== null && OnsaveMember !== ''
+            ? ` ${OnsaveMember.c_points}`
+            : ''}</p>
+        </section>
+
       </div>
       <section className="order-bottom">
 

@@ -8,7 +8,7 @@ import DrinkType from "./DrinkType";
 import IceHot from "./IceHot";
 import ProductList from './ProductList';
 import Another from "./Another";
-import Cash from "./cash/Payment";
+import Payment from "./cash/Payment";
 
 
 
@@ -24,6 +24,7 @@ function OrderProducts() {
   const [cashAmount, setCashAmount] = useState('')
   const [sumCash, setSumCash] = useState('')
   const [change, setChange] = useState('')
+  const [member, setMember] = useState('')
 
   useEffect(() => {
     if (!user || user.role === 'O') {
@@ -44,6 +45,11 @@ function OrderProducts() {
   useEffect(() => {
     console.log(carts)
   })
+
+  useEffect(() => {
+    console.log(member)
+  })
+
 
   const handleProductSelect = (product) => {
     const currentProduct = product;
@@ -114,6 +120,10 @@ function OrderProducts() {
     setChange(change)
   }
 
+  const handleSetMember = (member) => {
+    setMember(member)
+  }
+
   return (
     <>
       <div className="flex-content">
@@ -126,6 +136,7 @@ function OrderProducts() {
           cash={cashAmount}
           sumCash={handleSetSum}
           change={change}
+          OnsaveMember={member}
         />
 
         <section className="menu">
@@ -157,15 +168,16 @@ function OrderProducts() {
           )}
 
           {selectedType === 'Cash' && (
-          <Cash
-          onCashChange={handleCashAmount}
-          products={carts}
-          sumCash={sumCash}
-          onChange={handleChange}
-          onDeleteAll={handleDeletedAll}
-          selectedType={(type) => setSelectedType(type)} // ส่งฟังก์ชันไป
-        />
-        
+            <Payment
+              onCashChange={handleCashAmount}
+              products={carts}
+              sumCash={sumCash}
+              onChange={handleChange}
+              onDeleteAll={handleDeletedAll}
+              selectedType={(type) => setSelectedType(type)} // ส่งฟังก์ชันไป
+              OnsaveMember={handleSetMember}
+            />
+
           )}
 
           <section className="exit-box">
@@ -173,7 +185,7 @@ function OrderProducts() {
               EXIT
             </h1>
           </section>
-{/* 
+          {/* 
           <section className="closeSales-box">
             <h3>Close daily Sales</h3>
           </section> */}

@@ -100,7 +100,7 @@
 }
 
 .product-box:hover {
-        /* color: #ffee10;
+    /* color: #ffee10;
         box-shadow: 0 0 5px #ffee10;
         text-shadow: 0 0 5px #ffee10; */
     border-radius: 20px;
@@ -159,7 +159,7 @@
     left: 50%;
     top: 50%;
     /* จัดให้อยู่ตรงกลางแนวนอน */
-    transform: translate(-50% ,-40%);
+    transform: translate(-50%, -40%);
     /* ขยับให้อยู่ตรงกลาง */
 }
 
@@ -311,7 +311,7 @@
 }
 
 /* Another page   */
-.btn-member{
+.btn-member {
     position: absolute;
     border: none;
     background-color: #E4CCFF;
@@ -321,8 +321,37 @@
     top: 150px;
 }
 
-.memberLink{
-    text-decoration:none;
+.memberLink {
+    text-decoration: none;
     color: black;
     font-size: 30px;
+}
+
+.memberName {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    bottom: -10%;
+
+}
+
+.currentPoints {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    bottom: -15%;
+
+}
+
+.getPoints {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px;
+    bottom: -20%;
 }
