@@ -41,9 +41,9 @@ function OrderProducts() {
   }, [token, navigate]);
 
 
-useEffect(()=>{
-  console.log(carts)
-})
+  useEffect(() => {
+    console.log(carts)
+  })
 
   const handleProductSelect = (product) => {
     const currentProduct = product;
@@ -75,6 +75,8 @@ useEffect(()=>{
     }
   }
 
+
+
   const handleUpdateCart = (updatedCart) => {
     setCarts(updatedCart);
   }
@@ -85,7 +87,7 @@ useEffect(()=>{
     setSumCash('');
     setChange('');
   };
-  
+
 
 
   const handleCash = () => {
@@ -155,13 +157,15 @@ useEffect(()=>{
           )}
 
           {selectedType === 'Cash' && (
-            <Cash
-              onCashChange={handleCashAmount}
-              products={carts}
-              sumCash={sumCash}
-              onChange={handleChange}
-              onDeleteAll={handleDeletedAll}
-            />
+          <Cash
+          onCashChange={handleCashAmount}
+          products={carts}
+          sumCash={sumCash}
+          onChange={handleChange}
+          onDeleteAll={handleDeletedAll}
+          selectedType={(type) => setSelectedType(type)} // ส่งฟังก์ชันไป
+        />
+        
           )}
 
           <section className="exit-box">

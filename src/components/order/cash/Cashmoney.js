@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal } from 'antd';
 
-function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll }) {
+function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,selectedType }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
@@ -156,6 +156,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll }) {
                     setCash('');   // Reset cash to empty string
                     setChange(''); // Reset change to empty string
                     onDeleteAll(); // ใช้ onDeleteAll ที่ส่งมาจาก props
+                    selectedType('Coffee')
            
                 }}
                 cancelButtonProps={{ style: { display: 'none' } }}
