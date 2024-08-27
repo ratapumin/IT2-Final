@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { types } from './DrinkType';
 
 function ProductList({ selectedType, selectedCategory, onProductSelect }) {
     const [productList, setProductList] = useState([]);
@@ -34,7 +35,7 @@ function ProductList({ selectedType, selectedCategory, onProductSelect }) {
         }
     };
 
-
+    const selectedTypeColor = types.find(type => type.name === selectedType)?.color || '#FFFFFF';
 
     return (
         <section className="product-section">
@@ -44,6 +45,7 @@ function ProductList({ selectedType, selectedCategory, onProductSelect }) {
                         <button
                             className="product-box"
                             onClick={() => handleFindProduct(product.p_id)}
+                            style={{ backgroundColor: selectedTypeColor }}
                         >
                             {product.p_name}
                         </button>
