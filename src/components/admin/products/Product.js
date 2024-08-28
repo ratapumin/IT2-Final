@@ -127,13 +127,7 @@ function Product() {
             </div>
 
             {editProductId && (
-                // <Modal
-                //     visible={true}
-                //     title="Edit Product"
-                //     onCancel={() => setEditProductId(null)}
-                //     footer={null}
-                // >
-                //</Modal> 
+
 
                 <EditProduct
                     product={products.find((p) => p.p_id === editProductId)}
@@ -142,13 +136,7 @@ function Product() {
             )}
 
             {deleteProductId && (
-                // <Modal
-                //     visible={true}
-                //     title="Delete Product"
-                //     onCancel={() => setDeleteProductId(null)}
-                //     footer={null}
-                // >
-                // </Modal>
+
 
                 <DeleteProducts
                     product={products.find((p) => p.p_id === deleteProductId)}
@@ -160,14 +148,7 @@ function Product() {
                 <InsertProduct
                     insertProduct={handleInsertProduct}
                 />
-                // <Modal
-                //     visible={true}
-                //     title="Insert Product"
-                //     onCancel={() => setInsertOwner(false)}
-                //     footer={null}
-                // >
-                //     <InsertProduct insertProduct={handleInsertProduct} />
-                // </Modal>
+
             )}
         </>
     );
