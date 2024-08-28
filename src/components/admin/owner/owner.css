@@ -57,5 +57,18 @@
 
 .table th:nth-child(7),
 .table td:nth-child(7) {
-    width: auto; /* คอลัมน์ Actions */
+    width: 15%; 
+}
+.table th:nth-child(8),
+.table td:nth-child(8) {
+    width: 0%; 
+}
+
+.table th:nth-child(9),
+.table td:nth-child(9) {
+    width: 5%; 
+}
+.table th:nth-child(10),
+.table td:nth-child(10) {
+    width: 15%; 
 }

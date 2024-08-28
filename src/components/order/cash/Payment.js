@@ -5,7 +5,7 @@ import { Modal, Form, Input, Button } from 'antd';
 import './Payment.css';
 import axios from 'axios';
 
-function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, OnsaveMember }) {
+function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, OnsaveMember,resetMember }) {
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
     const [tel, setTel] = useState('');
@@ -14,22 +14,19 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
     const [currentMember, setCurrentMember] = useState()
 
 
-
-    const contacts = [
-        { phone: '1234567890', name: 'Alice' },
-        { phone: '0987654321', name: 'Bob' },
-        { phone: '5555555555', name: 'Charlie' },
-    ];
-
     const fetchMembers = async () => {
         try {
             const res = await axios.get('http://localhost:5000/api/members')
             console.log(res.data)
             setMembers(res.data)
         } catch (error) {
-
+            console.log("Cannot fetch Members", error);
         }
     }
+    useEffect(() => {
+        console.log('qqq', OnsaveMember)
+    })
+
 
     useEffect(() => {
         fetchMembers()
@@ -40,33 +37,30 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
     };
 
     const handleSearch = () => {
-        // ค้นหาชื่อจากเบอร์โทร
         const member = members.find(member => member.c_tel === tel);
         setCurrentMember(member)
         setContactName(member ? `${member.c_fname}  ${member.c_lname} Points: ${member.c_points}` : 'ไม่พบข้อมูล');
         console.log('findmember', member)
-        // ยังคงเปิด modal ไว้
     };
 
     const handleSelectMember = () => {
-        // ค้นหาชื่อจากเบอร์โทร
         const member = members.find(member => member.c_tel === tel);
         setCurrentMember(member)
-        // setContactName(member ? `${member.c_fname}  ${member.c_lname} Points: ${member.c_points}` : 'ไม่พบข้อมูล');
         console.log('findmember', member)
         OnsaveMember(member)
         setCollect(false)
     };
 
 
-
-
+    // const resetMember = () => {
+    //     setCurrentMember(null);
+    // };
 
 
     const handleCollect = () => {
         setCollect(false);
-        setTel(''); // ล้างค่า tel
-        setContactName(''); // ล้างชื่อที่แสดง
+        setTel('');
+        setContactName('');
     };
 
     return (
@@ -83,6 +77,7 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
                 onDeleteAll={onDeleteAll}
                 selectedType={selectedType}
                 sentMember={currentMember}
+                resetMember={resetMember}
             />
             <button className="btnClick">CASH</button>
             <button className="btnClick">PROMPTPAY</button>

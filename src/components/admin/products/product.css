@@ -13,7 +13,7 @@
     min-width: 70px;
 }
 
- .table {
+.table {
     width: 80%;
     margin: auto;
     overflow-x: auto;
@@ -71,8 +71,6 @@
 }
 
 .bntEdit:hover {
-    background-color: #e0a800 !important; 
-    /* ใช้ !important เพื่อให้แน่ใจว่าสีถูกใช้ */
-    border-color: #e0a800 !important;
-    /* เปลี่ยนสีข้อความเพื่อให้ตรงกับสีพื้นหลังใหม่ */
+    background-color: #f8d15e !important;
+
 }

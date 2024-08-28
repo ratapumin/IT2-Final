@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal } from 'antd';
 
-function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, sentMember }) {
+function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, sentMember, resetMember }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
@@ -30,32 +30,10 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
         return number;
     };
 
-
-    // useEffect(() => {
-    //     if (sentMember) {
-    //         console.log(sentMember.c_tel);
-    //         setCurrentMember(sentMember)
-    //         console.log(currentMember.c_tel)
-    //     } else {
-    //         console.log('sentMember is undefined or null');
-    //     }
-    // }, [sentMember])
-
-
-    //    useEffect(() => {
-    //         console.log("Cash:", cash);
-    //         console.log("SumCash:", sumCash);
-    //         console.log("Change:", change);
-    //     }, [cash, sumCash, change]);
-
     useEffect(() => {
-        if (!modal2Open) {
-            // ตรวจสอบสถานะที่รีเซ็ต
-            console.log("porducts:", products);
-            console.log("SumCash:", sumCash);
-            console.log("Change:", change);
-        }
-    }, [modal2Open]);
+        console.log('qqq', sentMember)
+    })
+
 
     const calNum = (num) => {
         const newCash = cash + num.toString();
@@ -98,12 +76,9 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
     }, []);
 
 
-    // console.log(sentMember.c_tel)
     const setOrderData = () => {
         let c_id = null
-
         if (sentMember && sentMember.c_tel) {
-            // console.log(sentMember.c_tel);
             c_id = `${sentMember.c_id}`;
         }
         console.log(sentMember.c_tel)
@@ -182,7 +157,9 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
                     setCash('');   // Reset cash to empty string
                     setChange(''); // Reset change to empty string
                     onDeleteAll(); // ใช้ onDeleteAll ที่ส่งมาจาก props
+                    resetMember()
                     selectedType('Coffee')
+                   
 
                 }}
                 cancelButtonProps={{ style: { display: 'none' } }}

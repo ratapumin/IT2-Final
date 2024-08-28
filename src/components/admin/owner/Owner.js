@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from "../../user/UserContext";
-import './owner.css'
-import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
+import { Table, Button } from "antd";  // นำเข้า Table และ Button จาก Ant Design
 import axios from "axios";
 import EditOwner from './Edit_owner'
 import DeleteOwner from './Delete_owner'
 import InsertOwner from './Inser_owner'
+import './owner.css';
 
 function Owner() {
-
-    const [owners, setOwners] = useState([])
+    const [owners, setOwners] = useState([]);
     const [editOwnerId, setEditOwnerId] = useState(null);
     const [deleteOwnerId, setDeleteOwnerId] = useState(null);
     const [insertOwner, setInsertOwner] = useState(false);
     const navigate = useNavigate();
-    const { user } = useUser()
+    const { user } = useUser();
 
     useEffect(() => {
         if (!user || user.role === 'A') {
@@ -38,87 +36,110 @@ function Owner() {
         fetchOwners();
     }, []);
 
-
     const handleSaveEdit = async () => {
         await fetchOwners();
         setEditOwnerId(null);
-        console.log(editOwnerId)
-
     };
-
 
     const handleonDelete = async () => {
         await fetchOwners();
         setDeleteOwnerId(null);
-        console.log(deleteOwnerId)
-
     };
 
     const handleInsertOwner = async () => {
-        await fetchOwners()
+        await fetchOwners();
         setInsertOwner(!insertOwner);
+    };
 
-    }
+    // กำหนดคอลัมน์สำหรับตาราง
+    const columns = [
+        {
+            title: '#',
+            dataIndex: 'index',
+            key: 'index',
+            render: (text, record, index) => index + 1,
+        },
+        {
+            title: 'ID',
+            dataIndex: 'user_id',
+            key: 'user_id',
+        },
+        {
+            title: 'Password',
+            dataIndex: 'user_password',
+            key: 'user_password',
+        },
+        {
+            title: 'First Name',
+            dataIndex: 'user_fname',
+            key: 'user_fname',
+        },
+        {
+            title: 'Last Name',
+            dataIndex: 'user_lname',
+            key: 'user_lname',
+        },
+        {
+            title: 'Tel',
+            dataIndex: 'user_tel',
+            key: 'user_tel',
+        },
+        {
+            title: 'ID Card',
+            dataIndex: 'user_id_card',
+            key: 'user_id_card',
+        },
+        {
+            title: 'Role',
+            dataIndex: 'role_type',
+            key: 'role_type',
+        },
+        {
+            title: 'Status',
+            dataIndex: 'user_status',
+            key: 'user_status',
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (text, record) => (
+                <>
+                    <Button
+                        className="bntEdit "
+                        type="primary"
+                        onClick={() => setEditOwnerId(record.user_id)}
+                        style={{ marginRight: 8 }}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        danger
+                        type="primary"
+                        onClick={() => setDeleteOwnerId(record.user_id)}
+                    >
+                        Delete
+                    </Button>
+                </>
+            ),
+        },
+    ];
 
     return (
         <>
             <div className="box-table">
-                <div className="btn-add " >
-                    <Button variant="primary"
-                        className="btn-item"
-                        onClick={handleInsertOwner}
-                    >
+                <div className="btn-add">
+                    <Button type="primary" className="btn-item" onClick={handleInsertOwner}>
                         Add Owners
                     </Button>
                 </div>
                 <div className="table">
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ID</th>
-                                <th>Password</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Tel</th>
-                                <th>ID Card</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {owners.map((owner, index) => (
-                                <tr key={owner.user_id}>
-                                    <td>{index + 1}</td>
-                                    <td>{owner.user_id}</td>
-                                    <td>{owner.user_password}</td>
-                                    <td>{owner.user_fname}</td>
-                                    <td>{owner.user_lname}</td>
-                                    <td>{owner.user_tel}</td>
-                                    <td>{owner.user_id_card}</td>
-                                    <td>{owner.role_type}</td>
-                                    <td>{owner.user_status}</td>
-                                    <td>
-                                        <Button
-                                            variant="warning"
-                                            className="btn-item"
-                                            onClick={() => setEditOwnerId(owner.user_id)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            className="btn-item"
-                                            onClick={() => setDeleteOwnerId(owner.user_id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+
+                    <Table
+                        columns={columns}
+                        dataSource={owners}
+                        rowKey="user_id"
+                        bordered
+                    />
                 </div>
             </div>
             {editOwnerId && (
@@ -138,9 +159,8 @@ function Owner() {
             {insertOwner && (
                 <InsertOwner insertOwner={handleInsertOwner} />
             )}
-
         </>
-    )
+    );
 }
 
-export default Owner
+export default Owner;

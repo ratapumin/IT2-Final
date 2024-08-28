@@ -46,11 +46,12 @@ function Insert_products({ insertProduct }) {
         updateProductId(productIdPrefix, categoryPrefix);
     };
 
-    const handlePart = (value) => {
+    const handlePart = (e) => {
+        const value = e.target.value;
         setPartId(value);
         console.log('set value', value);
         const categoryPrefix = form.getFieldValue('category') === 'ICE' ? '1' : '2';
-        updateProductId(productIdPrefix, categoryPrefix);
+        // updateProductId(productIdPrefix, categoryPrefix);
     };
 
     useEffect(() => {
@@ -67,7 +68,7 @@ function Insert_products({ insertProduct }) {
     }, [form]);
 
     const updateProductId = (typePrefix, categoryPrefix) => {
-        const newProductId = `${typePrefix}${categoryPrefix}${partId}`;
+        const newProductId = `${typePrefix}${categoryPrefix}`;
         console.log('set value', partId);
         form.setFieldsValue({
             p_id: newProductId
@@ -135,11 +136,11 @@ function Insert_products({ insertProduct }) {
                 form={form}
                 layout="vertical"
                 initialValues={{ p_type: 'Coffee', category: 'ICE', editablePart: '' }}
-                onValuesChange={(changedValues) => {
-                    if (changedValues.editablePart) {
-                        handlePart(changedValues.editablePart);
-                    }
-                }}
+            // onValuesChange={(changedValues) => {
+            //     if (changedValues.editablePart) {
+            //         handlePart(changedValues.editablePart);
+            //     }
+            // }}
             >
                 <Row gutter={16}>
                     <Col span={12}>
@@ -181,6 +182,7 @@ function Insert_products({ insertProduct }) {
                     </Col>
                     <Col span={12}>
                         <Form.Item
+                            onChange={handlePart}
                             name="editablePart"
                             label="Editable Part"
                             rules={[{ required: true, message: 'Please input the last 2 digits!' }]}

@@ -122,7 +122,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
             : ''}</p>
         </section>
 
-        <section className="currentPoints">
+        {/* <section className="currentPoints">
           <p>
             Current Points
           </p>
@@ -138,7 +138,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
           <p>{OnsaveMember !== null && OnsaveMember !== ''
             ? ` ${OnsaveMember.c_points}`
             : ''}</p>
-        </section>
+        </section> */}
 
       </div>
       <section className="order-bottom">

@@ -117,11 +117,8 @@ function OrderProducts() {
       warning()
       setModalLogout(true);
     }
-    else {
-      // setModalLogout(false)
-      // setSelectedType('Coffee');
-    }
-  }, [selectedType]); // useEffect จะทำงานเมื่อ selectedType เปลี่ยน
+
+  }, [selectedType]);
 
 
 
@@ -154,7 +151,9 @@ function OrderProducts() {
     });
   };
 
-
+  const handleResetMember = () => {
+    setMember(null); // รีเซ็ตข้อมูลสมาชิก
+  };
 
 
   return (
@@ -179,25 +178,35 @@ function OrderProducts() {
           />
 
 
-          {selectedType !== 'Member' && selectedType !== 'Cash' && (
-            <>
-              <section className="flex-box">
-                <IceHot
-                  selectedCategory={selectedCategory}
-                  onCategoryClick={setSelectedCategory}
-                />
-              </section>
+          {
+            selectedType !== 'Member' &&
+            selectedType !== 'Cash' &&
+            selectedType !== 'CloseDaily' &&
+            (
+              <>
+                <section className="flex-box">
+                  <IceHot
+                    selectedCategory={selectedCategory}
+                    onCategoryClick={setSelectedCategory}
+                  />
+                </section>
 
-              <ProductList
-                selectedCategory={selectedCategory}
-                selectedType={selectedType}
-                onProductSelect={handleProductSelect}
-              />
-            </>
-          )}
+                <ProductList
+                  selectedCategory={selectedCategory}
+                  selectedType={selectedType}
+                  onProductSelect={handleProductSelect}
+                />
+              </>
+            )}
 
           {selectedType === 'Member' && (
             <Another />
+          )}
+
+          {selectedType === 'CloseDaily' && (
+            <p>
+              CloseDaily
+            </p>
           )}
 
           {selectedType === 'Cash' && (
@@ -209,6 +218,7 @@ function OrderProducts() {
               onDeleteAll={handleDeletedAll}
               selectedType={(type) => setSelectedType(type)} // ส่งฟังก์ชันไป
               OnsaveMember={handleSetMember}
+              resetMember={handleResetMember}
             />
 
           )}
