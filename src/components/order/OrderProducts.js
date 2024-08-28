@@ -9,7 +9,7 @@ import IceHot from "./IceHot";
 import ProductList from './ProductList';
 import Another from "./Another";
 import Payment from "./cash/Payment";
-
+import { Button, Modal } from 'antd';
 
 
 function OrderProducts() {
@@ -25,6 +25,10 @@ function OrderProducts() {
   const [sumCash, setSumCash] = useState('')
   const [change, setChange] = useState('')
   const [member, setMember] = useState('')
+  const [modalLogout, setModalLogout] = useState(false);
+
+
+
 
   useEffect(() => {
     if (!user || user.role === 'O') {
@@ -108,6 +112,19 @@ function OrderProducts() {
 
   }
 
+  useEffect(() => {
+    if (selectedType === 'Logout') {
+      warning()
+      setModalLogout(true);
+    }
+    else {
+      // setModalLogout(false)
+      // setSelectedType('Coffee');
+    }
+  }, [selectedType]); // useEffect จะทำงานเมื่อ selectedType เปลี่ยน
+
+
+
   const handleCashAmount = (cash) => {
     setCashAmount(cash)
     console.log(cashAmount)
@@ -123,6 +140,22 @@ function OrderProducts() {
   const handleSetMember = (member) => {
     setMember(member)
   }
+
+
+
+
+  const warning = () => {
+    Modal.confirm({
+      title: "Logout",
+      content: "Are you sure you want to logout?",
+      centered: true,
+      onOk: handleLogout,
+      onCancel: () => setSelectedType('Coffee'), // ปิดวงเล็บที่ถูกต้อง
+    });
+  };
+
+
+
 
   return (
     <>
@@ -179,16 +212,6 @@ function OrderProducts() {
             />
 
           )}
-
-          <section className="exit-box">
-            <h1 onClick={handleLogout} style={{ cursor: "pointer" }}>
-              EXIT
-            </h1>
-          </section>
-          {/* 
-          <section className="closeSales-box">
-            <h3>Close daily Sales</h3>
-          </section> */}
         </section>
       </div>
     </>

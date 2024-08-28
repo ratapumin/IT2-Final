@@ -52,7 +52,7 @@
     display: flex;
     justify-content: space-evenly;
     /* border: solid; */
-    width: 50%;
+    width: 25%;
 }
 
 .icehot-box {
@@ -157,7 +157,7 @@
     background-color: #FFE8A3;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 45%;
     /* จัดให้อยู่ตรงกลางแนวนอน */
     transform: translate(-50%, -40%);
     /* ขยับให้อยู่ตรงกลาง */
@@ -333,7 +333,7 @@
     width: 100%;
     justify-content: space-between;
     padding: 10px;
-    bottom: -10%;
+    bottom: -5%;
 
 }
 
@@ -343,7 +343,7 @@
     width: 100%;
     justify-content: space-between;
     padding: 10px;
-    bottom: -15%;
+    bottom: -12%;
 
 }
 
@@ -353,5 +353,5 @@
     width: 100%;
     justify-content: space-between;
     padding: 10px;
-    bottom: -20%;
+    bottom: -19%;
 }

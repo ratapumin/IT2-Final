@@ -13,10 +13,11 @@
     min-width: 70px;
 }
 
-.table {
-    width: 80%; /* ลดความกว้างของตารางจาก 100% เป็น 80% */
-    margin: auto; /* จัดตารางให้อยู่กลาง */
-    overflow-x: auto; /* ทำให้ตารางสามารถเลื่อนในแนวนอนได้ */
+ .table {
+    width: 80%;
+    margin: auto;
+    overflow-x: auto;
+    height: 650px;
 }
 
 .table th,
@@ -37,7 +38,7 @@
 
 .table th:nth-child(3),
 .table td:nth-child(3) {
-    width: 15%; /* ลดความกว้างของคอลัมน์ Name */
+    width: 15%;
 }
 
 .table th:nth-child(4),
@@ -57,5 +58,21 @@
 
 .table th:nth-child(7),
 .table td:nth-child(7) {
-    width: 10%; /* คอลัมน์ Actions */
+    width: 15%;
+}
+
+
+.bntEdit {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #ffffff;
+    margin: 0 5px;
+    min-width: 70px;
+}
+
+.bntEdit:hover {
+    background-color: #e0a800 !important; 
+    /* ใช้ !important เพื่อให้แน่ใจว่าสีถูกใช้ */
+    border-color: #e0a800 !important;
+    /* เปลี่ยนสีข้อความเพื่อให้ตรงกับสีพื้นหลังใหม่ */
 }

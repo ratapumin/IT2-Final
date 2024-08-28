@@ -2,12 +2,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useUser } from "../../user/UserContext";
-import Table from "react-bootstrap/Table";
-import Button from "react-bootstrap/Button";
+import { Table, Button, Modal } from 'antd';
 import EditProduct from './Edit_products';
 import DeleteProducts from "./Delete_products";
-import InsertProduct from './Insert_products'
-import './product.css'
+import InsertProduct from './Insert_products';
+import './product.css';
 
 function Product() {
     const [products, setProducts] = useState([]);
@@ -15,19 +14,18 @@ function Product() {
     const [deleteProductId, setDeleteProductId] = useState(null);
     const [insertOwner, setInsertOwner] = useState(false);
     const navigate = useNavigate();
-    const { user } = useUser()
+    const { user } = useUser();
 
     useEffect(() => {
         if (!user || user.role === 'A') {
             navigate('/protected');
         }
     }, [user, navigate]);
-    
+
     const fetchProducts = async () => {
         try {
             const res = await axios.get("http://localhost:5000/api/products");
             setProducts(res.data);
-            console.log(res.data)
         } catch (error) {
             console.log("Cannot fetch products", error);
         }
@@ -43,90 +41,126 @@ function Product() {
     };
 
     const handleonDelete = async () => {
-        // console.log(deleteProductId)
         await fetchProducts();
         setDeleteProductId(null);
     };
 
-
     const handleInsertProduct = async () => {
-        await fetchProducts()
+        await fetchProducts();
         setInsertOwner(!insertOwner);
+    };
 
-    }
+    const columns = [
+        {
+            title: '#',
+            render: (_, __, index) => index + 1,
+        },
+        {
+            title: 'ID',
+            dataIndex: 'p_id',
+            key: 'p_id',
+        },
+        {
+            title: 'Name',
+            dataIndex: 'p_name',
+            key: 'p_name',
+        },
+        {
+            title: 'Price',
+            dataIndex: 'p_price',
+            key: 'p_price',
+        },
+        {
+            title: 'Type',
+            dataIndex: 'p_type',
+            key: 'p_type',
+        },
+        {
+            title: 'Category',
+            dataIndex: 'category',
+            key: 'category',
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (_, record) => (
+                <>
+                    <Button
+                        className="bntEdit "
+                        type="primary"
+                        onClick={() => setEditProductId(record.p_id)}
+                        style={{ marginRight: 8 }}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        className="btn-item "
+                        danger
+                        type="primary"
+                        onClick={() => setDeleteProductId(record.p_id)}
+                    >
+                        Delete
+                    </Button>
+                </>
+            ),
+        },
+    ];
+
     return (
         <>
-
             <div className="box-table">
-                <div className="btn-add " >
-                    <Button variant="primary" className="btn-item" onClick={handleInsertProduct}>
+                <div className="btn-add">
+                    <Button type="primary" onClick={handleInsertProduct}>
                         Add Product
                     </Button>
                 </div>
                 <div className="table">
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Type</th>
-                                <th>Category</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((product, index) => (
-                                <tr key={product.p_id}>
-                                    <td>{index + 1}</td>
-                                    <td>{product.p_id}</td>
-                                    <td>{product.p_name}</td>
-                                    <td>{product.p_price}</td>
-                                    <td>{product.p_type}</td>
-                                    <td>{product.category}</td>
-                                    <td>
-                                        <Button
-                                            variant="warning"
-                                            className="btn-item"
-                                            onClick={() => setEditProductId(product.p_id)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            className="btn-item"
-                                            onClick={() => setDeleteProductId(product.p_id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                    <Table
+                        dataSource={products}
+                        columns={columns}
+                        rowKey="p_id"
+                    />
                 </div>
             </div>
 
             {editProductId && (
-                <EditProduct
-
-                    product={products.find((p) => p.p_id === editProductId)}
-                    saveEdit={handleSaveEdit}
-                />
+                <Modal
+                    visible={true}
+                    title="Edit Product"
+                    onCancel={() => setEditProductId(null)}
+                    footer={null}
+                >
+                    <EditProduct
+                        product={products.find((p) => p.p_id === editProductId)}
+                        saveEdit={handleSaveEdit}
+                    />
+                </Modal>
             )}
 
             {deleteProductId && (
-                <DeleteProducts
-                    product={products.find((p) => p.p_id === deleteProductId)}
-                    onDelete={handleonDelete}
-                />
+                <Modal
+                    visible={true}
+                    title="Delete Product"
+                    onCancel={() => setDeleteProductId(null)}
+                    footer={null}
+                >
+                    <DeleteProducts
+                        product={products.find((p) => p.p_id === deleteProductId)}
+                        onDelete={handleonDelete}
+                    />
+                </Modal>
             )}
 
             {insertOwner && (
-                <InsertProduct insertProduct={handleInsertProduct} />
+                <Modal
+                    visible={true}
+                    title="Insert Product"
+                    onCancel={() => setInsertOwner(false)}
+                    footer={null}
+                >
+                    <InsertProduct insertProduct={handleInsertProduct} />
+                </Modal>
             )}
-
         </>
     );
 }
