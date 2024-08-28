@@ -45,10 +45,13 @@ function Product() {
         setDeleteProductId(null);
     };
 
-    const handleInsertProduct = async () => {
-        await fetchProducts();
+    const handleInsertProduct = async (refresh) => {
+        if (refresh) {
+            await fetchProducts(); // Fetch products after inserting a new one
+        }
         setInsertOwner(!insertOwner);
     };
+
 
     const columns = [
         {
@@ -124,42 +127,47 @@ function Product() {
             </div>
 
             {editProductId && (
-                <Modal
-                    visible={true}
-                    title="Edit Product"
-                    onCancel={() => setEditProductId(null)}
-                    footer={null}
-                >
-                    <EditProduct
-                        product={products.find((p) => p.p_id === editProductId)}
-                        saveEdit={handleSaveEdit}
-                    />
-                </Modal>
+                // <Modal
+                //     visible={true}
+                //     title="Edit Product"
+                //     onCancel={() => setEditProductId(null)}
+                //     footer={null}
+                // >
+                //</Modal> 
+
+                <EditProduct
+                    product={products.find((p) => p.p_id === editProductId)}
+                    saveEdit={handleSaveEdit}
+                />
             )}
 
             {deleteProductId && (
-                <Modal
-                    visible={true}
-                    title="Delete Product"
-                    onCancel={() => setDeleteProductId(null)}
-                    footer={null}
-                >
-                    <DeleteProducts
-                        product={products.find((p) => p.p_id === deleteProductId)}
-                        onDelete={handleonDelete}
-                    />
-                </Modal>
+                // <Modal
+                //     visible={true}
+                //     title="Delete Product"
+                //     onCancel={() => setDeleteProductId(null)}
+                //     footer={null}
+                // >
+                // </Modal>
+
+                <DeleteProducts
+                    product={products.find((p) => p.p_id === deleteProductId)}
+                    onDelete={handleonDelete}
+                />
             )}
 
             {insertOwner && (
-                <Modal
-                    visible={true}
-                    title="Insert Product"
-                    onCancel={() => setInsertOwner(false)}
-                    footer={null}
-                >
-                    <InsertProduct insertProduct={handleInsertProduct} />
-                </Modal>
+                <InsertProduct
+                    insertProduct={handleInsertProduct}
+                />
+                // <Modal
+                //     visible={true}
+                //     title="Insert Product"
+                //     onCancel={() => setInsertOwner(false)}
+                //     footer={null}
+                // >
+                //     <InsertProduct insertProduct={handleInsertProduct} />
+                // </Modal>
             )}
         </>
     );

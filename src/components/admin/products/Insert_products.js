@@ -1,137 +1,217 @@
-import axios from "axios"
+import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
-import Swal from "sweetalert2";
+import { Modal, Form, Input, Select, Button, notification, Row, Col } from "antd";
+const { Option } = Select;
 
 function Insert_products({ insertProduct }) {
-    //state products
-    const [product, setProduct] = useState({
-        p_id: '',
-        p_name: '',
-        p_price: '',
-        p_type: '',
-        category: ''
-    })
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [form] = Form.useForm();
+    const [productIdPrefix, setProductIdPrefix] = useState('');
+    const [partId, setPartId] = useState('');
 
+    const productTypes = {
+        Coffee: "Coffee",
+        Tea: "Tea",
+        Chocolate: "Chocolate",
+    };
 
-    console.log('insert', product)
-    const createId = () => {
+    const categories = {
+        ICE: "ICE",
+        HOT: "HOT",
+    };
 
-
-    }
-
-
-    const addProduct = useCallback(async () => {
-        let prodId;
-        let prodCate
-
-        const productTypes = {
-            Coffee: "Coffee",
-            Tea: "Tea",
-            Chocolate: "Chocolate",
-            // Another: "Another",
-        };
-
-        const categories = {
-            ICE: "ICE",
-            HOT: "HOT",
-        };
-
-        const { value: formValues } = await Swal.fire({
-            title: "Insert Product",
-            html: `
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="p_id" style="width: 30%;">Product ID</label>
-                <input id="p_id" class="swal2-input" style="width: 65%;" value="">
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="p_name" style="width: 30%;">Product Name</label>
-                <input id="p_name" class="swal2-input" style="width: 65%;" value="${product.p_name}">
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="p_price" style="width: 30%;">Price</label>
-                <input id="p_price" class="swal2-input" style="width: 65%;" value="${product.p_price}">
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="p_type" style="width: 30%;">Product Type</label>
-                <select id="p_type" class="swal2-input" style="width: 65%;">
-                    ${Object.entries(productTypes)
-                    .map(([key, value]) =>
-                        `<option value="${key}" ${product.p_type === key ? "selected" : ""}>${key}</option>`
-                    )
-                    .join("")}
-                </select>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <label for="category" style="width: 30%;">Category</label>
-                <select id="category" class="swal2-input" style="width: 65%;">
-                    ${Object.entries(categories)
-                    .map(([key, value]) =>
-                        `<option value="${key}" ${product.category === key ? "selected" : ""}>${key}</option>`
-                    )
-                    .join("")}
-                </select>
-            </div>
-            `,
-            focusConfirm: false,
-            showCancelButton: true,
-            preConfirm: () => {
-                return {
-                    p_id: document.getElementById("p_id").value,
-                    p_name: document.getElementById("p_name").value,
-                    p_price: document.getElementById("p_price").value,
-                    p_type: document.getElementById("p_type").value,
-                    category: document.getElementById("category").value,
-                };
-            },
-        });
-
-        if (formValues) {
-            // ตรวจสอบค่า formValues.p_type เพื่อกำหนดค่า prodId
-            if (formValues.p_type === "Coffee") {
-                prodId = 10;
-            } else if (formValues.p_type === "Tea") {
-                prodId = 20;
-            } else if (formValues.p_type === "Chocolate") {
-                prodId = 30;
-            }
-
-            if (formValues.category === 'ICE') {
-                prodCate = 1
-            } else if (formValues.category === 'HOT') {
-                prodCate = 2
-            }
-
-            // รวมรหัสสินค้าจาก prodId และ p_id ที่ได้จาก Swal
-            formValues.p_id = `${prodId}${prodCate}${formValues.p_id}`;
-
-            try {
-                await axios.post(`http://localhost:5000/api/products`, formValues);
-                Swal.fire("Saved!", "Your product has been updated.", "success");
-                setProduct({
-                    p_id: "",
-                    p_name: "",
-                    p_price: "",
-                    p_type: "",
-                    category: "",
-                });
-                insertProduct(false);
-            } catch (error) {
-                console.log("Cannot edit product", error);
-                Swal.fire("Error!", "There was a problem updating the product.", "error");
-            }
-        } else {
-            insertProduct(false);
+    const handleProductTypeChange = (value) => {
+        let prefix;
+        switch (value) {
+            case 'Coffee':
+                prefix = '10';
+                break;
+            case 'Tea':
+                prefix = '20';
+                break;
+            case 'Chocolate':
+                prefix = '30';
+                break;
+            default:
+                prefix = '';
+                break;
         }
-    }, [product, insertProduct]);
+        setProductIdPrefix(prefix);
+        const categoryPrefix = form.getFieldValue('category') === 'ICE' ? '1' : '2';
+        updateProductId(prefix, categoryPrefix);
+    };
 
+    const handleCategoryChange = (value) => {
+        const categoryPrefix = value === 'ICE' ? '1' : '2';
+        updateProductId(productIdPrefix, categoryPrefix);
+    };
+
+    const handlePart = (value) => {
+        setPartId(value);
+        console.log('set value', value);
+        const categoryPrefix = form.getFieldValue('category') === 'ICE' ? '1' : '2';
+        updateProductId(productIdPrefix, categoryPrefix);
+    };
 
     useEffect(() => {
-        if (product) {
-            addProduct();
+        setIsModalVisible(true);
+
+        const defaultTypePrefix = '10';
+        const defaultCategoryPrefix = '1';
+        form.setFieldsValue({
+            p_id: `${defaultTypePrefix}${defaultCategoryPrefix}`,
+            editablePart: ''
+        });
+
+        setProductIdPrefix(defaultTypePrefix);
+    }, [form]);
+
+    const updateProductId = (typePrefix, categoryPrefix) => {
+        const newProductId = `${typePrefix}${categoryPrefix}${partId}`;
+        console.log('set value', partId);
+        form.setFieldsValue({
+            p_id: newProductId
+        });
+        console.log('set newProductId', newProductId);
+    };
+
+    const addProduct = useCallback(async (values) => {
+        values.p_id = `${form.getFieldValue('p_id')}${partId}`;
+
+        console.log('set  values.p_id', values.p_id);
+
+
+
+        try {
+            await axios.post(`http://localhost:5000/api/products`, values);
+            notification.success({
+                message: "Saved!",
+                description: "Your product has been updated.",
+            });
+            form.resetFields();
+            setIsModalVisible(false);
+            insertProduct(true);
+        } catch (error) {
+            console.log("Cannot edit product", error);
+            notification.error({
+                message: "Error!",
+                description: "There was a problem updating the product.",
+            });
         }
-    }, [product, addProduct]);
+    }, [form, insertProduct, partId]);
 
-    return null
+    const handleOk = () => {
+        form
+            .validateFields()
+            .then(values => {
+                addProduct(values);
+            })
+            .catch(info => {
+                console.log('Validate Failed:', info);
+            });
+    };
 
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        insertProduct(false);
+    };
+
+    return (
+        <Modal
+            title="Insert Product"
+            open={isModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={[
+                <Button key="back" onClick={handleCancel}>
+                    Cancel
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleOk}>
+                    Save
+                </Button>,
+            ]}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                initialValues={{ p_type: 'Coffee', category: 'ICE', editablePart: '' }}
+                onValuesChange={(changedValues) => {
+                    if (changedValues.editablePart) {
+                        handlePart(changedValues.editablePart);
+                    }
+                }}
+            >
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            name="p_type"
+                            label="Product Type"
+                            rules={[{ required: true, message: 'Please select the product type!' }]}
+                        >
+                            <Select onChange={handleProductTypeChange}>
+                                {Object.keys(productTypes).map(type => (
+                                    <Option key={type} value={type}>{productTypes[type]}</Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="category"
+                            label="Category"
+                            rules={[{ required: true, message: 'Please select the category!' }]}
+                        >
+                            <Select onChange={handleCategoryChange}>
+                                {Object.keys(categories).map(cat => (
+                                    <Option key={cat} value={cat}>{categories[cat]}</Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            name="p_id"
+                            label="Product ID"
+                            rules={[{ required: true, message: 'Please input the product ID!' }]}
+                        >
+                            <Input disabled />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="editablePart"
+                            label="Editable Part"
+                            rules={[{ required: true, message: 'Please input the last 2 digits!' }]}
+                        >
+                            <Input maxLength={2} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            name="p_name"
+                            label="Product Name"
+                            rules={[{ required: true, message: 'Please input the product name!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="p_price"
+                            label="Price"
+                            rules={[{ required: true, message: 'Please input the price!' }]}
+                        >
+                            <Input type="number" />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
+    );
 }
-export default Insert_products
+
+export default Insert_products;
