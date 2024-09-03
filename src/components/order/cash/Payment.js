@@ -5,7 +5,11 @@ import { Modal, Form, Input, Button } from 'antd';
 import './Payment.css';
 import axios from 'axios';
 
-function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, OnsaveMember,resetMember }) {
+function Cash({
+    onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
+    OnsaveMember, resetMember, collectPonits
+
+}) {
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
     const [tel, setTel] = useState('');
@@ -25,6 +29,7 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
     }
     useEffect(() => {
         console.log('qqq', OnsaveMember)
+        console.log('collectPonits', collectPonits)
     })
 
 
@@ -48,13 +53,10 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
         setCurrentMember(member)
         console.log('findmember', member)
         OnsaveMember(member)
+        // collectPonits(membe)
         setCollect(false)
     };
 
-
-    // const resetMember = () => {
-    //     setCurrentMember(null);
-    // };
 
 
     const handleCollect = () => {
@@ -78,6 +80,7 @@ function Cash({ onCashChange, products, sumCash, onChange, onDeleteAll, selected
                 selectedType={selectedType}
                 sentMember={currentMember}
                 resetMember={resetMember}
+                collectPonits={collectPonits}
             />
             <button className="btnClick">CASH</button>
             <button className="btnClick">PROMPTPAY</button>

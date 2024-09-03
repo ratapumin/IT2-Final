@@ -4,7 +4,10 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 
-function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember }) {
+function Orders({
+  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, collectPoints
+
+}) {
   const [productCart, setProductCart] = useState([]);
   const [selected, setSelected] = useState()
   const orderBoxRef = useRef(null)
@@ -45,6 +48,8 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
 
   useEffect(() => {
     console.log(OnsaveMember)
+    console.log('collectPoints', collectPoints)
+
   })
 
 
@@ -113,32 +118,38 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
 
         </section>
 
-        <section className="memberName">
-          <p>
-            Member
-          </p>
-          <p>{OnsaveMember !== null && OnsaveMember !== ''
-            ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname} ${OnsaveMember.c_points}`
-            : ''}</p>
-        </section>
 
-        {/* <section className="currentPoints">
-          <p>
-            Current Points
-          </p>
-          <p>{OnsaveMember !== null && OnsaveMember !== ''
-            ? ` ${OnsaveMember.c_points}`
-            : ''}</p>
-        </section>
+        {OnsaveMember && (
+          <>
+            <section className="memberName">
+              <p>
+                Member
+              </p>
+              <p>{OnsaveMember !== null && OnsaveMember !== ''
+                ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname}`
+                : ''}</p>
+            </section>
 
-        <section className="getPoints">
-          <p>
-            Get Points
-          </p>
-          <p>{OnsaveMember !== null && OnsaveMember !== ''
-            ? ` ${OnsaveMember.c_points}`
-            : ''}</p>
-        </section> */}
+            <section className="currentPoints">
+              <p>
+                Current Points
+              </p>
+              <p>{OnsaveMember !== null && OnsaveMember !== ''
+                ? ` ${OnsaveMember.c_points}`
+                : ''}</p>
+            </section>
+
+            <section className="getPoints">
+              <p>
+                Get Points
+              </p>
+              <p>{collectPoints !== null && collectPoints !== ''
+                ? ` ${collectPoints}`
+                : ''}</p>
+            </section>
+          </>
+        )}
+
 
       </div>
       <section className="order-bottom">
@@ -155,7 +166,7 @@ function Orders({ user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCa
           className="delete-all"
           onClick={() => {
             setProductCart([])
-            onDeleteAll([]) // ส่งค่าเป็น array ว่างไปยัง onDeleteAll
+            onDeleteAll([])
           }}
         >
           DELETE ALL

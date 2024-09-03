@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal } from 'antd';
 
-function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, selectedType, sentMember, resetMember }) {
+function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
+    selectedType, sentMember, resetMember, collectPonits
+}) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const navigate = useNavigate();
@@ -14,7 +16,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
     const [cash, setCash] = useState('');
     const [change, setChange] = useState('');
     const [modal2Open, setModal2Open] = useState(false);
-    const [currentMember, setCurrentMember] = useState()
+    // const [currentMember, setCurrentMember] = useState()
 
     useEffect(() => {
         if (!user || user.role === 'O') {
@@ -29,10 +31,10 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
         }
         return number;
     };
-
     useEffect(() => {
-        console.log('qqq', sentMember)
-    })
+        console.log('sentMember:', sentMember);
+        console.log('collectPonits', collectPonits)
+    }, [sentMember]);
 
 
     const calNum = (num) => {
@@ -57,7 +59,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
         onCashChange(newCash);
         console.log("Updated Cash after Delete:", newCash);
     };
-
+    // const currentDate = moment().format('YYYYMMDD');
+    // console.log(currentDate)
     useEffect(() => {
         const fetchOrderId = async () => {
             try {
@@ -78,11 +81,17 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
 
     const setOrderData = () => {
         let c_id = null
+        let points = null
+
         if (sentMember && sentMember.c_tel) {
             c_id = `${sentMember.c_id}`;
         }
-        console.log(sentMember.c_tel)
 
+        if (collectPonits) {
+            points = collectPonits;
+        }
+        console.log('c_id', c_id)
+        console.log('points', points)
         return {
             order_id: orderId,
             order_no: orderNo,
@@ -94,7 +103,18 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
                 p_id: product.p_id,
                 p_price: product.p_price,
                 quantity: product.quantity
-            }))
+            })),
+            history: {
+                c_id: c_id,
+                points: points,
+                type: 'earn',
+                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
+            },
+            customer: {
+                c_id: c_id,
+                c_points: points
+            }
+
         }
     }
 
@@ -154,12 +174,12 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll, sel
                 open={modal2Open}
                 onOk={() => {
                     setModal2Open(false);
-                    setCash('');   // Reset cash to empty string
-                    setChange(''); // Reset change to empty string
-                    onDeleteAll(); // ใช้ onDeleteAll ที่ส่งมาจาก props
+                    setCash('');
+                    setChange('');
+                    onDeleteAll();
                     resetMember()
                     selectedType('Coffee')
-                   
+
 
                 }}
                 cancelButtonProps={{ style: { display: 'none' } }}

@@ -26,6 +26,7 @@ function OrderProducts() {
   const [change, setChange] = useState('')
   const [member, setMember] = useState('')
   const [modalLogout, setModalLogout] = useState(false);
+  const [currentPoints, setCurrentPorints] = useState('')
 
 
 
@@ -52,6 +53,9 @@ function OrderProducts() {
 
   useEffect(() => {
     console.log(member)
+    console.log(sumCash)
+    // console.log(sumCash / 25)
+
   })
 
 
@@ -129,6 +133,7 @@ function OrderProducts() {
 
   const handleSetSum = (sum) => {
     setSumCash(sum);
+    collectPonits()
   }
   const handleChange = (change) => {
     setChange(change)
@@ -138,8 +143,20 @@ function OrderProducts() {
     setMember(member)
   }
 
+  const collectPonits = () => {
+    if (member) {
+      const currentPoints = member.c_points
+      const dividePoints = Math.floor(sumCash / 25);
+      const sunPoints = currentPoints + dividePoints
+      setCurrentPorints(sunPoints)
+      console.log(sunPoints);
+    }
+  }
 
+  // useEffect(() => {
+  //   collectPonits()
 
+  // },[sumCash,member])
 
   const warning = () => {
     Modal.confirm({
@@ -147,13 +164,15 @@ function OrderProducts() {
       content: "Are you sure you want to logout?",
       centered: true,
       onOk: handleLogout,
-      onCancel: () => setSelectedType('Coffee'), // ปิดวงเล็บที่ถูกต้อง
+      onCancel: () => setSelectedType('Coffee'),
     });
   };
 
   const handleResetMember = () => {
-    setMember(null); // รีเซ็ตข้อมูลสมาชิก
+    setMember(null);
   };
+
+
 
 
   return (
@@ -169,6 +188,7 @@ function OrderProducts() {
           sumCash={handleSetSum}
           change={change}
           OnsaveMember={member}
+          collectPoints={currentPoints}
         />
 
         <section className="menu">
@@ -216,9 +236,10 @@ function OrderProducts() {
               sumCash={sumCash}
               onChange={handleChange}
               onDeleteAll={handleDeletedAll}
-              selectedType={(type) => setSelectedType(type)} // ส่งฟังก์ชันไป
+              selectedType={(type) => setSelectedType(type)} 
               OnsaveMember={handleSetMember}
               resetMember={handleResetMember}
+              collectPonits={currentPoints}
             />
 
           )}
