@@ -26,7 +26,10 @@ function OrderProducts() {
   const [change, setChange] = useState('')
   const [member, setMember] = useState('')
   const [modalLogout, setModalLogout] = useState(false);
-  const [currentPoints, setCurrentPorints] = useState('')
+  const [currentPoints, setCurrentPoints] = useState('');
+  const [collectPoints, setCollectPoints] = useState('');
+
+
 
 
 
@@ -51,12 +54,16 @@ function OrderProducts() {
     console.log(carts)
   })
 
-  useEffect(() => {
-    console.log(member)
-    console.log(sumCash)
-    // console.log(sumCash / 25)
+  // useEffect(() => {
+  //   console.log(member)
+  //   console.log(sumCash)
+  //   console.log(currentPoints)
+  //   console.log(collectPoints)
+  //   // console.log(sumCash / 25)
 
-  })
+  // })
+
+
 
 
   const handleProductSelect = (product) => {
@@ -133,7 +140,7 @@ function OrderProducts() {
 
   const handleSetSum = (sum) => {
     setSumCash(sum);
-    collectPonits()
+    handlecollectPonits()
   }
   const handleChange = (change) => {
     setChange(change)
@@ -143,13 +150,14 @@ function OrderProducts() {
     setMember(member)
   }
 
-  const collectPonits = () => {
+  const handlecollectPonits = () => {
     if (member) {
       const currentPoints = member.c_points
       const dividePoints = Math.floor(sumCash / 25);
       const sunPoints = currentPoints + dividePoints
-      setCurrentPorints(sunPoints)
-      console.log(sunPoints);
+      setCurrentPoints(dividePoints)
+      setCollectPoints(sunPoints)
+      console.log(sunPoints + dividePoints);
     }
   }
 
@@ -188,7 +196,7 @@ function OrderProducts() {
           sumCash={handleSetSum}
           change={change}
           OnsaveMember={member}
-          collectPoints={currentPoints}
+          collectPoints={collectPoints}
         />
 
         <section className="menu">
@@ -236,11 +244,13 @@ function OrderProducts() {
               sumCash={sumCash}
               onChange={handleChange}
               onDeleteAll={handleDeletedAll}
-              selectedType={(type) => setSelectedType(type)} 
+              selectedType={(type) => setSelectedType(type)}
               OnsaveMember={handleSetMember}
               resetMember={handleResetMember}
-              collectPonits={currentPoints}
+              collectPoints={collectPoints} // Make sure this matches in Payment
+              currentPoints={currentPoints} // Make sure this matches in Payment
             />
+
 
           )}
         </section>

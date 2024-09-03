@@ -7,7 +7,7 @@ import moment from 'moment';
 import { Modal } from 'antd';
 
 function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
-    selectedType, sentMember, resetMember, collectPonits
+    selectedType, sentMember, resetMember, collectPoints, currentPoints
 }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
@@ -33,7 +33,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     };
     useEffect(() => {
         console.log('sentMember:', sentMember);
-        console.log('collectPonits', collectPonits)
+        console.log('collectPonits', collectPoints)
+        console.log('currentPoints', currentPoints)
     }, [sentMember]);
 
 
@@ -80,18 +81,24 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
 
 
     const setOrderData = () => {
-        let c_id = null
-        let points = null
+        let c_id = null;
+        let points = null;
+        let oldPoints = null;
 
         if (sentMember && sentMember.c_tel) {
             c_id = `${sentMember.c_id}`;
         }
 
-        if (collectPonits) {
-            points = collectPonits;
+        if (collectPoints) {
+            points = collectPoints;
         }
-        console.log('c_id', c_id)
-        console.log('points', points)
+        if (currentPoints) {
+            oldPoints = currentPoints;
+        }
+        console.log('c_id', c_id);
+        console.log('points', points);
+        console.log('oldPoints', oldPoints);
+
         return {
             order_id: orderId,
             order_no: orderNo,
@@ -106,7 +113,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             })),
             history: {
                 c_id: c_id,
-                points: points,
+                points: oldPoints,
                 type: 'earn',
                 transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
             },
@@ -114,7 +121,6 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 c_id: c_id,
                 c_points: points
             }
-
         }
     }
 
