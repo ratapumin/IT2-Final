@@ -7,7 +7,7 @@ import moment from 'moment';
 import { Modal } from 'antd';
 
 function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
-    selectedType, sentMember, resetMember, getPoints
+    selectedType, sentMember, resetMember, getPoints, redeemPoints
 }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
@@ -17,7 +17,6 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     const [change, setChange] = useState('');
     const [modal2Open, setModal2Open] = useState(false);
     // const [currentMember, setCurrentMember] = useState()
-
     useEffect(() => {
         if (!user || user.role === 'O') {
             navigate('/protected');
@@ -34,6 +33,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     useEffect(() => {
         // console.log('collectPoints', collectPoints);
         console.log('getPoints', getPoints);
+        console.log('redeemPoints', redeemPoints);
     }, [getPoints]);
 
 
@@ -82,9 +82,29 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     const setOrderData = () => {
         let c_id = sentMember ? `${sentMember.c_id}` : null;
         let newPoints = getPoints || 0;
+        let minusPoints = redeemPoints || 0;
 
-        console.log('c_id:', c_id);
-        console.log('newPoints:', newPoints);
+        const historyEntries = [];
+
+        // Add earn entry if newPoints exists
+        if (newPoints > 0) {
+            historyEntries.push({
+                c_id: c_id,
+                points: newPoints,
+                type: 'earn',
+                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
+            });
+        }
+
+        // Add redeem entry if minusPoints exists
+        if (minusPoints > 0) {
+            historyEntries.push({
+                c_id: c_id,
+                points: -minusPoints,
+                type: 'redeem',
+                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
+            });
+        }
 
         return {
             order_id: orderId,
@@ -98,18 +118,14 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 p_price: product.p_price,
                 quantity: product.quantity
             })),
-            history: {
-                c_id: c_id,
-                points: newPoints,
-                type: 'earn',
-                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
-            },
+            history: historyEntries, // Store an array of history entries
             customer: {
                 c_id: c_id,
-                c_points: newPoints
+                c_points: newPoints - minusPoints // Adjust points balance
             }
         };
     };
+
 
 
     const createOrder = async () => {

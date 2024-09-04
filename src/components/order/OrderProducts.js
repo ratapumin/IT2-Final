@@ -28,6 +28,7 @@ function OrderProducts() {
   const [modalLogout, setModalLogout] = useState(false);
   const [getPoints, setGetPoints] = useState('');
   const [redeemPoints, setRedeemPoints] = useState('')
+  const [minusSumcash, setMinusSumcash] = useState('')
 
 
 
@@ -141,6 +142,7 @@ function OrderProducts() {
   const handleSetSum = (sum) => {
     setSumCash(sum);
     handleGetPonits()
+    handleRedeemPoints()
   }
   const handleChange = (change) => {
     setChange(change)
@@ -163,8 +165,11 @@ function OrderProducts() {
       const currentPoints = member.c_points
       if (currentPoints >= 10) {
         const minusPoints = currentPoints - 10
+        // const minusCash = sumCash - 5
         setRedeemPoints(minusPoints)
+        // setMinusSumcash(minusCash)
         console.log('redeemPoints', redeemPoints)
+        // console.log('minusCash', minusCash)
       }
     }
   }
@@ -172,10 +177,7 @@ function OrderProducts() {
 
 
 
-  // useEffect(() => {
-  //   collectPonits()
 
-  // },[sumCash,member])
 
   const warning = () => {
     Modal.confirm({
@@ -259,6 +261,7 @@ function OrderProducts() {
               OnsaveMember={handleSetMember}
               resetMember={handleResetMember}
               getPoints={getPoints}
+              redeemPoints={redeemPoints}
             // currentPoints={currentPoints}
             />
 

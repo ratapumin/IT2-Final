@@ -10,7 +10,7 @@ exports.payment = (req, res) => {
         user_id,
         c_id,
         products,
-        history,
+        history, // Expecting an array now
         customer
     } = req.body;
 
@@ -25,6 +25,7 @@ exports.payment = (req, res) => {
     const sqlOrderDetail = 'INSERT INTO order_detail (order_id, p_id, quantity, price) VALUES (?, ?, ?, ?)';
     const sqlPointsHistory = 'INSERT INTO points_history (c_id, points, type, transaction_date) VALUES (?, ?, ?, ?)';
     const sqlUpdateCustomer = `UPDATE customers SET c_points = COALESCE(c_points, 0) + ? WHERE c_id = ?`;
+
     conn.beginTransaction((err) => {
         if (err) {
             return res.status(500).json({ error: 'Error starting transaction', details: err });
@@ -52,34 +53,32 @@ exports.payment = (req, res) => {
                 });
             });
 
-            // Insert into Points_history and Update Customer points if needed
-            const historyData = [history.c_id, history.points, history.type, history.transaction_data];
-            const updateCustomerData = [customer.c_points, customer.c_id];
+            // Insert into Points_history for each history entry
+            const insertHistoryEntries = history.map(entry => {
+                return new Promise((resolve, reject) => {
+                    conn.query(sqlPointsHistory, [entry.c_id, entry.points, entry.type, entry.transaction_data], (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+            });
+
+            // Update customer points
+            const updateCustomer = new Promise((resolve, reject) => {
+                conn.query(sqlUpdateCustomer, [customer.c_points, customer.c_id], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
 
             // Use Promise.all to wait for all inserts to complete
-            Promise.all(insertOrderDetails)
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        conn.query(sqlPointsHistory, historyData, (err) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    });
-                })
-                .then(() => {
-                    return new Promise((resolve, reject) => {
-                        conn.query(sqlUpdateCustomer, updateCustomerData, (err) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    });
-                })
+            Promise.all([...insertOrderDetails, ...insertHistoryEntries, updateCustomer])
                 .then(() => {
                     conn.commit((err) => {
                         if (err) {

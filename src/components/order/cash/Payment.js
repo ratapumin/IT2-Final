@@ -7,11 +7,12 @@ import axios from 'axios';
 
 function Cash({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
-    OnsaveMember, resetMember, getPoints, collectPoints
+    OnsaveMember, resetMember, getPoints, redeemPoints
 
 }) {
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
+    const [redeem, setRedee,] = useState(false);
     const [tel, setTel] = useState('');
     const [contactName, setContactName] = useState('');
     const [members, setMembers] = useState([])
@@ -31,7 +32,8 @@ function Cash({
     useEffect(() => {
         // console.log('collectPoints', collectPoints);
         console.log('getPoints', getPoints);
-    }, [getPoints]);
+        console.log('redeemPoints', redeemPoints);
+    }, [getPoints, redeemPoints]);
 
 
     useEffect(() => {
@@ -56,12 +58,19 @@ function Cash({
         OnsaveMember(member)
         // collectPonits(membe)
         setCollect(false)
+        setRedee(false)
     };
 
 
 
     const handleCollect = () => {
         setCollect(false);
+        setTel('');
+        setContactName('');
+    };
+
+    const handleRedeem = () => {
+        setRedee(false);
         setTel('');
         setContactName('');
     };
@@ -83,6 +92,7 @@ function Cash({
                 resetMember={resetMember}
                 // collectPoints={collectPoints}
                 getPoints={getPoints}
+                redeemPoints={redeemPoints}
             />
             <button className="btnClick">CASH</button>
             <button className="btnClick">PROMPTPAY</button>
@@ -101,7 +111,10 @@ function Cash({
                 >
                     Collect
                 </button>
-                <button className='btnRedeem'>
+                <button
+                    className='btnRedeem'
+                    onClick={() => setRedee(true)}
+                >
                     Redeem
                 </button>
             </Modal>
@@ -137,6 +150,43 @@ function Cash({
                     {contactName && <p>Name: {contactName}</p>}
                 </Form>
             </Modal>
+
+
+            <Modal
+                title="Redeem Points"
+                style={{ textAlign: "center" }}
+                centered
+                open={redeem}
+                onOk={handleSearch}
+                footer={[
+                    <Button key="search" onClick={handleSearch}>
+                        Search
+                    </Button>,
+                    <Button key="select" type="primary" onClick={handleSelectMember}>
+                        Submit
+                    </Button>
+                ]}
+                onCancel={() => handleRedeem()}
+                cancelButtonProps={{ style: { display: 'none' } }}
+            // closable={false}
+            >
+                <Form>
+                    <Form.Item>
+                        <Input
+                            placeholder='Tel.'
+                            type='text'
+                            name='tel'
+                            value={tel}
+                            onChange={handleTelChange}
+                        />
+                    </Form.Item>
+                    {contactName && <p>Name: {contactName}</p>}
+                </Form>
+            </Modal>
+
+
+
+
         </div>
     );
 }
