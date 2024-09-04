@@ -7,7 +7,7 @@ import moment from 'moment';
 import { Modal } from 'antd';
 
 function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
-    selectedType, sentMember, resetMember, collectPoints, currentPoints
+    selectedType, sentMember, resetMember, getPoints
 }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
@@ -32,10 +32,9 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         return number;
     };
     useEffect(() => {
-        console.log('sentMember:', sentMember);
-        console.log('collectPonits', collectPoints)
-        console.log('currentPoints', currentPoints)
-    }, [sentMember]);
+        // console.log('collectPoints', collectPoints);
+        console.log('getPoints', getPoints);
+    }, [getPoints]);
 
 
     const calNum = (num) => {
@@ -81,23 +80,11 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
 
 
     const setOrderData = () => {
-        let c_id = null;
-        let points = null;
-        let oldPoints = null;
+        let c_id = sentMember ? `${sentMember.c_id}` : null;
+        let newPoints = getPoints || 0;
 
-        if (sentMember && sentMember.c_tel) {
-            c_id = `${sentMember.c_id}`;
-        }
-
-        if (collectPoints) {
-            points = collectPoints;
-        }
-        if (currentPoints) {
-            oldPoints = currentPoints;
-        }
-        console.log('c_id', c_id);
-        console.log('points', points);
-        console.log('oldPoints', oldPoints);
+        console.log('c_id:', c_id);
+        console.log('newPoints:', newPoints);
 
         return {
             order_id: orderId,
@@ -113,16 +100,17 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             })),
             history: {
                 c_id: c_id,
-                points: oldPoints,
+                points: newPoints,
                 type: 'earn',
                 transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
             },
             customer: {
                 c_id: c_id,
-                c_points: points
+                c_points: newPoints
             }
-        }
-    }
+        };
+    };
+
 
     const createOrder = async () => {
         try {

@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 function Orders({
-  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, collectPoints
+  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, getPoints
 
 }) {
   const [productCart, setProductCart] = useState([]);
@@ -48,7 +48,7 @@ function Orders({
 
   useEffect(() => {
     console.log(OnsaveMember)
-    console.log('collectPoints', collectPoints)
+    console.log('getPoints', getPoints)
 
   })
 
@@ -135,7 +135,11 @@ function Orders({
                 Current Points
               </p>
               <p>{OnsaveMember !== null && OnsaveMember !== ''
-                ? ` ${OnsaveMember.c_points}`
+                ? (
+                  OnsaveMember.c_points === null
+                    ? '0'
+                    : OnsaveMember.c_points ?? '0'
+                )
                 : ''}</p>
             </section>
 
@@ -143,8 +147,8 @@ function Orders({
               <p>
                 Get Points
               </p>
-              <p>{collectPoints !== null && collectPoints !== ''
-                ? ` ${collectPoints}`
+              <p>{getPoints !== null && getPoints !== ''
+                ? `+${getPoints}`
                 : ''}</p>
             </section>
           </>

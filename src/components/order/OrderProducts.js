@@ -26,8 +26,8 @@ function OrderProducts() {
   const [change, setChange] = useState('')
   const [member, setMember] = useState('')
   const [modalLogout, setModalLogout] = useState(false);
-  const [currentPoints, setCurrentPoints] = useState('');
-  const [collectPoints, setCollectPoints] = useState('');
+  const [getPoints, setGetPoints] = useState('');
+  const [redeemPoints, setRedeemPoints] = useState('')
 
 
 
@@ -140,7 +140,7 @@ function OrderProducts() {
 
   const handleSetSum = (sum) => {
     setSumCash(sum);
-    handlecollectPonits()
+    handleGetPonits()
   }
   const handleChange = (change) => {
     setChange(change)
@@ -150,16 +150,27 @@ function OrderProducts() {
     setMember(member)
   }
 
-  const handlecollectPonits = () => {
+  const handleGetPonits = () => {
     if (member) {
-      const currentPoints = member.c_points
+      // const currentPoints = member.c_points
       const dividePoints = Math.floor(sumCash / 25);
-      const sunPoints = currentPoints + dividePoints
-      setCurrentPoints(dividePoints)
-      setCollectPoints(sunPoints)
-      console.log(sunPoints + dividePoints);
+      setGetPoints(dividePoints)
     }
   }
+
+  const handleRedeemPoints = () => {
+    if (member) {
+      const currentPoints = member.c_points
+      if (currentPoints >= 10) {
+        const minusPoints = currentPoints - 10
+        setRedeemPoints(minusPoints)
+        console.log('redeemPoints', redeemPoints)
+      }
+    }
+  }
+
+
+
 
   // useEffect(() => {
   //   collectPonits()
@@ -196,7 +207,7 @@ function OrderProducts() {
           sumCash={handleSetSum}
           change={change}
           OnsaveMember={member}
-          collectPoints={collectPoints}
+          getPoints={getPoints}
         />
 
         <section className="menu">
@@ -247,8 +258,8 @@ function OrderProducts() {
               selectedType={(type) => setSelectedType(type)}
               OnsaveMember={handleSetMember}
               resetMember={handleResetMember}
-              collectPoints={collectPoints} // Make sure this matches in Payment
-              currentPoints={currentPoints} // Make sure this matches in Payment
+              getPoints={getPoints}
+            // currentPoints={currentPoints}
             />
 
 

@@ -7,7 +7,7 @@ import axios from 'axios';
 
 function Cash({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
-    OnsaveMember, resetMember, collectPonits, currentPoints,collectPoints
+    OnsaveMember, resetMember, getPoints, collectPoints
 
 }) {
     const [points, setPoints] = useState(false);
@@ -16,6 +16,7 @@ function Cash({
     const [contactName, setContactName] = useState('');
     const [members, setMembers] = useState([])
     const [currentMember, setCurrentMember] = useState()
+
 
 
     const fetchMembers = async () => {
@@ -28,9 +29,9 @@ function Cash({
         }
     }
     useEffect(() => {
-        console.log('collectPoints', collectPoints);
-        console.log('currentPoints', currentPoints);
-    }, [collectPoints, currentPoints]);
+        // console.log('collectPoints', collectPoints);
+        console.log('getPoints', getPoints);
+    }, [getPoints]);
 
 
     useEffect(() => {
@@ -80,8 +81,8 @@ function Cash({
                 selectedType={selectedType}
                 sentMember={currentMember}
                 resetMember={resetMember}
-                collectPonits={collectPonits}
-                currentPoints={currentPoints}
+                // collectPoints={collectPoints}
+                getPoints={getPoints}
             />
             <button className="btnClick">CASH</button>
             <button className="btnClick">PROMPTPAY</button>

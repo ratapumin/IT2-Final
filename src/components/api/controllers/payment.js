@@ -24,8 +24,7 @@ exports.payment = (req, res) => {
     const sqlOrder = 'INSERT INTO orders (order_id, order_no, order_date_time, payment_type, user_id, c_id) VALUES (?, ?, ?, ?, ?, ?)';
     const sqlOrderDetail = 'INSERT INTO order_detail (order_id, p_id, quantity, price) VALUES (?, ?, ?, ?)';
     const sqlPointsHistory = 'INSERT INTO points_history (c_id, points, type, transaction_date) VALUES (?, ?, ?, ?)';
-    const sqlUpdateCustomer = 'UPDATE customers SET c_points = c_points + ? WHERE c_id = ?';
-
+    const sqlUpdateCustomer = `UPDATE customers SET c_points = COALESCE(c_points, 0) + ? WHERE c_id = ?`;
     conn.beginTransaction((err) => {
         if (err) {
             return res.status(500).json({ error: 'Error starting transaction', details: err });
