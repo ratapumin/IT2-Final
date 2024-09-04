@@ -141,9 +141,10 @@ function OrderProducts() {
 
   const handleSetSum = (sum) => {
     setSumCash(sum);
-    handleGetPonits()
-    handleRedeemPoints()
-  }
+    // handleGetPoints();
+    // handleRedeemPoints();
+  };
+
   const handleChange = (change) => {
     setChange(change)
   }
@@ -152,28 +153,30 @@ function OrderProducts() {
     setMember(member)
   }
 
-  const handleGetPonits = () => {
+  const handleGetPoints = (member) => {
+    console.log('handleGetPoints called');
+    console.log('Current member:', member);
     if (member) {
-      // const currentPoints = member.c_points
       const dividePoints = Math.floor(sumCash / 25);
-      setGetPoints(dividePoints)
+      setGetPoints(dividePoints);
+      console.log('getPoints', dividePoints);
+    } else {
+      console.log('No member found');
     }
-  }
+  };
 
-  const handleRedeemPoints = () => {
+  const handleRedeemPoints = (member) => {
+    console.log('handleRedeemPoints called');
+    console.log('Current member:', member);
     if (member) {
-      const currentPoints = member.c_points
+      const currentPoints = member.c_points;
       if (currentPoints >= 10) {
-        const minusPoints = currentPoints - 10
-        // const minusCash = sumCash - 5
-        setRedeemPoints(minusPoints)
-        // setMinusSumcash(minusCash)
-        console.log('redeemPoints', redeemPoints)
-        // console.log('minusCash', minusCash)
+        const minusPoints = 10;
+        setRedeemPoints(minusPoints);
+        console.log('redeemPoints', minusPoints);
       }
     }
-  }
-
+  };
 
 
 
@@ -260,6 +263,8 @@ function OrderProducts() {
               selectedType={(type) => setSelectedType(type)}
               OnsaveMember={handleSetMember}
               resetMember={handleResetMember}
+              onGetPoints={handleGetPoints}
+              onRedeemPoints={handleRedeemPoints}
               getPoints={getPoints}
               redeemPoints={redeemPoints}
             // currentPoints={currentPoints}

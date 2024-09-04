@@ -7,12 +7,13 @@ import axios from 'axios';
 
 function Cash({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
-    OnsaveMember, resetMember, getPoints, redeemPoints
+    OnsaveMember, resetMember, onGetPoints, redeemPoints, getPoints, onRedeemPoints
 
 }) {
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
-    const [redeem, setRedee,] = useState(false);
+    const [redeem, setRedeem,] = useState(false);
+
     const [tel, setTel] = useState('');
     const [contactName, setContactName] = useState('');
     const [members, setMembers] = useState([])
@@ -31,9 +32,9 @@ function Cash({
     }
     useEffect(() => {
         // console.log('collectPoints', collectPoints);
-        console.log('getPoints', getPoints);
+        // console.log('getPoints', onGetPoints);
         console.log('redeemPoints', redeemPoints);
-    }, [getPoints, redeemPoints]);
+    }, [redeemPoints]);
 
 
     useEffect(() => {
@@ -51,16 +52,28 @@ function Cash({
         console.log('findmember', member)
     };
 
-    const handleSelectMember = () => {
+    const handleSelectMemberCollect = () => {
         const member = members.find(member => member.c_tel === tel);
         setCurrentMember(member)
         console.log('findmember', member)
         OnsaveMember(member)
-        // collectPonits(membe)
+        if (member) {
+            onGetPoints(member)
+        }
         setCollect(false)
-        setRedee(false)
     };
 
+
+    const handleSelectMemberRedeem = () => {
+        const member = members.find(member => member.c_tel === tel);
+        setCurrentMember(member)
+        console.log('findmember', member)
+        OnsaveMember(member)
+        if (member) {
+            onRedeemPoints(member)
+        }
+        setRedeem(false)
+    };
 
 
     const handleCollect = () => {
@@ -70,7 +83,7 @@ function Cash({
     };
 
     const handleRedeem = () => {
-        setRedee(false);
+        setRedeem(false);
         setTel('');
         setContactName('');
     };
@@ -79,7 +92,11 @@ function Cash({
         <div className="flexCash">
             <button
                 className="btnClick"
-                onClick={() => setPoints(true)}
+                onClick={() => {
+                    setPoints(true);
+
+                }
+                }
             >POINTS</button>
             <Cashmoney
                 onCashChange={onCashChange}
@@ -113,7 +130,7 @@ function Cash({
                 </button>
                 <button
                     className='btnRedeem'
-                    onClick={() => setRedee(true)}
+                    onClick={() => setRedeem(true)}
                 >
                     Redeem
                 </button>
@@ -129,7 +146,7 @@ function Cash({
                     <Button key="search" onClick={handleSearch}>
                         Search
                     </Button>,
-                    <Button key="select" type="primary" onClick={handleSelectMember}>
+                    <Button key="select" type="primary" onClick={handleSelectMemberCollect}>
                         Submit
                     </Button>
                 ]}
@@ -162,7 +179,7 @@ function Cash({
                     <Button key="search" onClick={handleSearch}>
                         Search
                     </Button>,
-                    <Button key="select" type="primary" onClick={handleSelectMember}>
+                    <Button key="select" type="primary" onClick={handleSelectMemberRedeem}>
                         Submit
                     </Button>
                 ]}
