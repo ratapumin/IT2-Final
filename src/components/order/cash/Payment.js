@@ -20,10 +20,10 @@ function Payment({
     const [paymentType, setPaymentType] = useState('cash')
     const [isModalPromtpay, setIsModalPromtpay] = useState(false)
 
-    // useEffect(() => {
-    //     console.log('paymentTpye', paymentType)
+    useEffect(() => {
+        console.log('sumCash', sumCash)
 
-    // }, paymentType)
+    }, sumCash)
 
     const fetchMembers = async () => {
         try {
@@ -154,9 +154,15 @@ function Payment({
                     width={500}
                     height={10}
                 >
-                    <Promtpay />
+                    <Promtpay 
+                    sumCash={sumCash}
+                    
+                    
+                    />
                 </Modal >
             )}
+
+
             <Modal
                 title="Points"
                 style={{ textAlign: "center" }}
