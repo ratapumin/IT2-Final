@@ -19,6 +19,7 @@ import Members from "./components/order/Members";
 import Payment from "./components/order/cash/Payment";
 import Points from "./components/member/Points";
 import Qrcode from './components/order/cash/Promtpay'
+import CloseDaily from "./components/order/cash/CloseDaily";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -60,6 +61,8 @@ function App() {
             <Route path="/payment" element={<Payment />} />
 
             <Route path='/qrcode' element={<Qrcode />} />
+
+            <Route path='/closedaily' element={<CloseDaily />} />
 
           </Route>
 
