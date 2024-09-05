@@ -10,7 +10,7 @@ function Promtpay({ sumCash }) {
     // useEffect(() => {
     //     console.log('sumCash', sumCash)
     // }, [sumCash])
-    
+
     const handleSetQrcode = () => {
         if (sumCash) {
             setAmount(sumCash)
@@ -23,7 +23,7 @@ function Promtpay({ sumCash }) {
     }
     useEffect(() => {
         handleSetQrcode()
-    }, [amount])
+    }, [])
     return (
         <div className="promtpay"> {/* จัดตำแหน่งตรงกลาง */}
             {qrcode && (

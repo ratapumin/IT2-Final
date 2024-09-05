@@ -28,7 +28,7 @@ function OrderProducts() {
   const [modalLogout, setModalLogout] = useState(false);
   const [getPoints, setGetPoints] = useState('');
   const [redeemPoints, setRedeemPoints] = useState('')
-  const [minusSumcash, setMinusSumcash] = useState('')
+  const [minusCash, setMinusCash] = useState('')
 
 
 
@@ -108,6 +108,11 @@ function OrderProducts() {
     setCashAmount('');
     setSumCash('');
     setChange('');
+    setMember('')
+    setGetPoints('')
+    setRedeemPoints('')
+    setSelectedType('Coffee');
+    setMinusCash('')
   };
 
 
@@ -174,7 +179,9 @@ function OrderProducts() {
       setGetPoints(dividePoints);
       if (currentPoints >= 10) {
         const minusPoints = 10;
+        const minusMoney = sumCash - 5
         setRedeemPoints(minusPoints);
+        setMinusCash(minusMoney)
         console.log('redeemPoints', minusPoints);
       }
     } else {
@@ -217,6 +224,7 @@ function OrderProducts() {
           change={change}
           OnsaveMember={member}
           getPoints={getPoints}
+          minusCash={minusCash}
         />
 
         <section className="menu">

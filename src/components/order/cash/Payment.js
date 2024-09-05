@@ -20,10 +20,18 @@ function Payment({
     const [paymentType, setPaymentType] = useState('cash')
     const [isModalPromtpay, setIsModalPromtpay] = useState(false)
 
-    useEffect(() => {
-        console.log('sumCash', sumCash)
+    // useEffect(() => {
+    //     console.log('sumCash', sumCash)
 
-    }, sumCash)
+    // }, [sumCash])
+    
+   // useEffect(() => {
+    //     console.log('collectPoints', collectPoints);
+    //     console.log('getPoints', onGetPoints);
+    //     console.log('redeemPoints', redeemPoints);
+    // }, [redeemPoints]);
+
+
 
     const fetchMembers = async () => {
         try {
@@ -34,12 +42,7 @@ function Payment({
             console.log("Cannot fetch Members", error);
         }
     }
-    useEffect(() => {
-        // console.log('collectPoints', collectPoints);
-        // console.log('getPoints', onGetPoints);
-        console.log('redeemPoints', redeemPoints);
-    }, [redeemPoints]);
-
+ 
 
     useEffect(() => {
         fetchMembers()

@@ -5,7 +5,8 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 
 function Orders({
-  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, getPoints
+  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, getPoints,
+  minusCash
 
 }) {
   const [productCart, setProductCart] = useState([]);
@@ -103,9 +104,11 @@ function Orders({
           </section>
           <section className="total">
             <p>Total</p>
+
             <p>
-              {showsum !== false ? showsum : 0}
+              {minusCash !== null && minusCash !== '' ? `${minusCash}` : showsum !== false ? showsum : 0}
             </p>
+
           </section>
           <section className="cash">
             <p>Cash</p>
@@ -150,6 +153,12 @@ function Orders({
               <p>{getPoints !== null && getPoints !== ''
                 ? `+${getPoints}`
                 : ''}</p>
+              {/* <p>
+                {minusCash !== null && minusCash !== ''
+                  ? `${minusCash}`
+                  : ''
+                }
+              </p> */}
             </section>
           </>
         )}
@@ -169,7 +178,7 @@ function Orders({
         <button
           className="delete-all"
           onClick={() => {
-            setProductCart([])
+            // setProductCart([])
             onDeleteAll([])
           }}
         >
