@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import './Cash.css';
 import Cashmoney from './Cashmoney';
 import { Modal, Form, Input, Button } from 'antd';
 import './Payment.css';
 import axios from 'axios';
+import Promtpay from './Promtpay';
 
-function Cash({
+function Payment({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
     OnsaveMember, resetMember, onGetPoints, redeemPoints, getPoints, onRedeemPoints
 
@@ -13,13 +13,17 @@ function Cash({
     const [points, setPoints] = useState(false);
     const [collect, setCollect] = useState(false);
     const [redeem, setRedeem,] = useState(false);
-
     const [tel, setTel] = useState('');
     const [contactName, setContactName] = useState('');
     const [members, setMembers] = useState([])
     const [currentMember, setCurrentMember] = useState()
+    const [paymentType, setPaymentType] = useState('cash')
+    const [isModalPromtpay, setIsModalPromtpay] = useState(false)
 
+    // useEffect(() => {
+    //     console.log('paymentTpye', paymentType)
 
+    // }, paymentType)
 
     const fetchMembers = async () => {
         try {
@@ -88,16 +92,9 @@ function Cash({
         setContactName('');
     };
 
+
     return (
         <div className="flexCash">
-            <button
-                className="btnClick"
-                onClick={() => {
-                    setPoints(true);
-
-                }
-                }
-            >POINTS</button>
             <Cashmoney
                 onCashChange={onCashChange}
                 products={products}
@@ -107,18 +104,69 @@ function Cash({
                 selectedType={selectedType}
                 sentMember={currentMember}
                 resetMember={resetMember}
-                // collectPoints={collectPoints}
                 getPoints={getPoints}
                 redeemPoints={redeemPoints}
             />
-            <button className="btnClick">CASH</button>
-            <button className="btnClick">PROMPTPAY</button>
+
+            <button
+                className={`btnClick ${paymentType === 'points' ? 'active' : ''}`}
+                onClick={() => {
+                    setPaymentType('points')
+                    setPoints(true);
+
+                }
+                }
+            >POINTS</button>
+
+            <button
+                className={`btnClick ${paymentType === 'cash' ? 'active' : ''}`}
+                onClick={() => {
+                    setPaymentType('cash')
+                }}
+            >
+                CASH
+            </button>
+
+
+            <button
+                className={`btnClick ${paymentType === 'promtpay' ? 'active' : ''}`}
+                onClick={() => {
+                    setPaymentType('promtpay')
+                    setIsModalPromtpay(true)
+                }}
+
+            >PROMPTPAY</button>
+
+
+
+            {paymentType === 'promtpay' && (
+                <Modal
+                    title="QR Code สำหรับชำระเงิน"
+                    open={isModalPromtpay}
+                    onOk={() => {
+                        setPaymentType('cash')
+                        setIsModalPromtpay(false)
+
+                    }}
+                    cancelButtonProps={{ style: { display: 'none' } }}
+                    closable={false}
+                    style={{ textAlign: "center" }}
+                    width={500}
+                    height={10}
+                >
+                    <Promtpay />
+                </Modal >
+            )}
             <Modal
                 title="Points"
                 style={{ textAlign: "center" }}
                 centered
                 open={points}
-                onOk={() => setPoints(false)}
+                onOk={() => {
+                    setPoints(false)
+                    setPaymentType('cash')
+                }
+                }
                 cancelButtonProps={{ style: { display: 'none' } }}
                 closable={false}
             >
@@ -130,7 +178,13 @@ function Cash({
                 </button>
                 <button
                     className='btnRedeem'
-                    onClick={() => setRedeem(true)}
+                    onClick={() => {
+
+                        setRedeem(true)
+
+                    }
+
+                    }
                 >
                     Redeem
                 </button>
@@ -208,4 +262,4 @@ function Cash({
     );
 }
 
-export default Cash;
+export default Payment;

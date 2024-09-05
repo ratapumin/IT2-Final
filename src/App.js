@@ -16,7 +16,7 @@ import EditProduct from "./components/admin/products/Edit_products";
 import DeleteProducts from "./components/admin/products/Delete_products";
 import Sidebar from "./components/Sidebar";
 import Members from "./components/order/Members";
-import Cash from "./components/order/cash/Payment";
+import Payment from "./components/order/cash/Payment";
 import Points from "./components/member/Points";
 import Qrcode from './components/order/cash/Promtpay'
 // Layout ที่มี Sidebar
@@ -57,7 +57,7 @@ function App() {
             <Route path='/points' element={<Points />} />
 
             {/*Cash */}
-            <Route path="/cash" element={<Cash />} />
+            <Route path="/payment" element={<Payment />} />
 
             <Route path='/qrcode' element={<Qrcode />} />
 

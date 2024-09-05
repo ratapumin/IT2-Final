@@ -1,6 +1,26 @@
+.flexCash {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: relative;
+    height: 80%;
+}
+
+.btnClick {
+    width: 15%;
+    height: 100px;
+    margin: 5px;
+    border: 1px gray solid;
+    background-color: white;
 
 
-.btnCollect{
+}
+
+.btnClick.active {
+    background-color: yellow; /* สีเมื่อปุ่มถูกเลือก */
+}
+
+.btnCollect {
     min-width: 150px;
     max-width: 150px;
     background-color: aquamarine;
@@ -8,10 +28,16 @@
     margin: 10px;
 }
 
-.btnRedeem{
+.btnRedeem {
     min-width: 150px;
     max-width: 150px;
     background-color: rgb(76, 167, 232);
     height: 100px;
     margin: 10px;
+}
+
+
+.promtpay {
+    display: flex;
+    justify-content: center;
 }

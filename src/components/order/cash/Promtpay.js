@@ -5,7 +5,7 @@ const generatePayload = require('promptpay-qr')
 function Promtpay() {
     const [phoneNumber, setPhoneNumber] = useState('0621645650')
     const [amount, setAmount] = useState(20)
-    const [qrcode, setQrcode] = useState()
+    const [qrcode, setQrcode] = useState(null)
 
 
     const handleSetQrcode = () => {
@@ -16,16 +16,18 @@ function Promtpay() {
         handleSetQrcode()
     }, [amount])
     return (
-        <QRCode
-            errorLevel="Q"
-            value={qrcode}
-            icon="/logo-kathong.png"
-            iconSize={100}
-            size={300}
-        />
-
-    )
-
+        <div className="promtpay"> {/* จัดตำแหน่งตรงกลาง */}
+            {qrcode && (
+                <QRCode
+                    errorLevel="Q"
+                    value={qrcode}
+                    icon="/logo-kathong.png"
+                    iconSize={100}
+                    size={300}
+                />
+            )}
+        </div>
+    );
 
 }
 
