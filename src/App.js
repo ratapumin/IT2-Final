@@ -18,6 +18,7 @@ import Sidebar from "./components/Sidebar";
 import Members from "./components/order/Members";
 import Cash from "./components/order/cash/Payment";
 import Points from "./components/member/Points";
+import Qrcode from './components/order/cash/Promtpay'
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -57,6 +58,8 @@ function App() {
 
             {/*Cash */}
             <Route path="/cash" element={<Cash />} />
+
+            <Route path='/qrcode' element={<Qrcode />} />
 
           </Route>
 
