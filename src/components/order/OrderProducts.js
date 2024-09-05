@@ -170,11 +170,15 @@ function OrderProducts() {
     console.log('Current member:', member);
     if (member) {
       const currentPoints = member.c_points;
+      const dividePoints = Math.floor(sumCash / 25);
+      setGetPoints(dividePoints);
       if (currentPoints >= 10) {
         const minusPoints = 10;
         setRedeemPoints(minusPoints);
         console.log('redeemPoints', minusPoints);
       }
+    } else {
+      console.log('No member found');
     }
   };
 
