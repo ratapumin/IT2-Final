@@ -10,6 +10,7 @@ import ProductList from './ProductList';
 import Another from "./Another";
 import Payment from "./cash/Payment";
 import { Button, Modal } from 'antd';
+import CloseDaily from "./cash/CloseDaily";
 
 
 function OrderProducts() {
@@ -29,6 +30,7 @@ function OrderProducts() {
   const [getPoints, setGetPoints] = useState('');
   const [redeemPoints, setRedeemPoints] = useState('')
   const [minusCash, setMinusCash] = useState('')
+  const [isModalCloseDaily, setIsModalCloseDaily] = useState(false)
 
 
 
@@ -137,6 +139,13 @@ function OrderProducts() {
 
   }, [selectedType]);
 
+  useEffect(() => {
+    if (selectedType === 'CloseDaily') {
+      handleCloseDaily(true)
+    }
+
+  }, [selectedType]);
+
 
 
   const handleCashAmount = (cash) => {
@@ -189,6 +198,12 @@ function OrderProducts() {
     }
   };
 
+  const handleCloseDaily = (param) => {
+    setIsModalCloseDaily(param)
+    if (param === false) {
+      setSelectedType('Coffee');
+    }
+  }
 
 
 
@@ -238,6 +253,7 @@ function OrderProducts() {
             selectedType !== 'Member' &&
             selectedType !== 'Cash' &&
             selectedType !== 'CloseDaily' &&
+            selectedType !== 'Logout' &&
             (
               <>
                 <section className="flex-box">
@@ -260,9 +276,19 @@ function OrderProducts() {
           )}
 
           {selectedType === 'CloseDaily' && (
-            <p>
-              CloseDaily
-            </p>
+            <>
+              <CloseDaily
+                CloseDaily={isModalCloseDaily}
+                handleCloseDaily={handleCloseDaily}
+              />
+            </>
+          )}
+
+          {selectedType === 'Logout' && (
+            <>
+
+
+            </>
           )}
 
           {selectedType === 'Cash' && (

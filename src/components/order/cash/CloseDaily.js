@@ -1,46 +1,25 @@
-import { Modal, Form, Input, Button } from 'antd';
-import { useState } from 'react';
+import { Modal, Form, Input, Button, Space } from 'antd';
+import { useEffect } from 'react';
 
+function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
-
-function CloseDaily() {
-
-    const [isModalClose, setIsModalClose] = useState(false)
-
-    const tel = 20
+    useEffect(() => {
+        console.log('Modal state:', CloseDaily);
+    }, [CloseDaily]);
 
     return (
         <>
-            <Button
-                type="primary"
-                onClick={() => {
-                    setIsModalClose(true)
-
-                }}
-            >Primary Button</Button>
             <Modal
-                title="Close Dailly Sales"
-                style={{ textAlign: "center" }}
+                title="Close Daily Sales"
+                style={{
+                    textAlign: "center",
+                    maxWidth: 450,
+                }}
                 centered
-                open={isModalClose}
-                // onOk={handleSearch}
-                footer={[
-                    <Button
-                        key="search"
-                    // onClick={handleSearch}
-                    >
-                        Search
-                    </Button>,
-                    <Button
-                        key="select" type="primary"
-                    //  onClick={handleSelectMemberRedeem}
-                    >
-                        Submit
-                    </Button>
-                ]}
-                // onCancel={() => handleRedeem()}
+                open={CloseDaily}
+                footer={[]}
                 cancelButtonProps={{ style: { display: 'none' } }}
-            // closable={false}
+                closable={false}
             >
                 <Form
                     name="wrap"
@@ -53,37 +32,59 @@ function CloseDaily() {
                         flex: 1,
                     }}
                     colon={false}
-                    style={{
-                        maxWidth: 600,
-                    }}
+                    style={{ paddingBlock: 32, margin: 0 }}
                 >
                     <Form.Item
                         label="CASH"
                         name="cash"
+                    >
+                        <Input readOnly />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="PROMPTPAY"
+                        name="promtpay"
                         rules={[
-                            {
-                                required: true,
-                            },
+                            { required: true, message: 'Please input PROMPTPAY!' },
                         ]}
                     >
                         <Input />
                     </Form.Item>
-                    <Form.Item
-                        label="PROMTPAY"
-                        name="password"
-                        rules={[
-                            {
-                                required: true, message: 'eie'
-                            },
-                        ]}
+
+                    <span
+                        className="ant-form-text"
+                        style={{ marginInlineStart: 8, padding: 15 }}
                     >
-                        <Input />
+                        Total Cash In Machine
+                    </span>
+
+                    <Form.Item
+                        label="Cash"
+                        name="Cash"
+                        rules={[{ required: true, message: 'Please input Cash!' }]}
+                    >
+                        <Input type="number" />
                     </Form.Item>
                 </Form>
+
+                <Space>
+                    <Button
+                        key="select"
+                        type="primary"
+                        onClick={() => handleCloseDaily(false)} // ปิด modal เมื่อกด Ok
+                    >
+                        Ok
+                    </Button>
+                    <Button
+                        key="search"
+                        onClick={() => handleCloseDaily(false)} // ปิด modal เมื่อกด Cancel
+                    >
+                        Cancel
+                    </Button>
+                </Space>
             </Modal>
-
         </>
-    )
-
+    );
 }
-export default CloseDaily
+
+export default CloseDaily;
