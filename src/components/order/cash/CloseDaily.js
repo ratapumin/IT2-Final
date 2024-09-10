@@ -1,11 +1,31 @@
 import { Modal, Form, Input, Button, Space } from 'antd';
-import { useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 function CloseDaily({ CloseDaily, handleCloseDaily }) {
+    const [totalcash, setTotalCash] = useState('');
+    const [totalpromtpay, setTotalPromtpay] = useState('');
 
     useEffect(() => {
-        console.log('Modal state:', CloseDaily);
-    }, [CloseDaily]);
+        const fetchTotalPrice = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/api/sales');
+                console.log('price', res.data);
+
+                // แยกค่าออกตาม payment_type
+                const cashData = res.data.find(item => item.payment_type === 'cash') || { 'SUM(order_detail.price)': '' };
+                const promtpayData = res.data.find(item => item.payment_type === 'promtpay') || { 'SUM(order_detail.price)': '' };
+
+                // ตั้งค่า state
+                setTotalCash(cashData['SUM(order_detail.price)'] || '');
+                setTotalPromtpay(promtpayData['SUM(order_detail.price)'] || '');
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchTotalPrice();
+    }, []);
 
     return (
         <>
@@ -36,19 +56,17 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                 >
                     <Form.Item
                         label="CASH"
-                        name="cash"
                     >
-                        <Input readOnly />
+                        <Input value={totalcash} disabled />
                     </Form.Item>
 
                     <Form.Item
                         label="PROMPTPAY"
-                        name="promtpay"
                         rules={[
                             { required: true, message: 'Please input PROMPTPAY!' },
                         ]}
                     >
-                        <Input />
+                        <Input value={totalpromtpay} disabled />
                     </Form.Item>
 
                     <span
@@ -60,7 +78,6 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
                     <Form.Item
                         label="Cash"
-                        name="Cash"
                         rules={[{ required: true, message: 'Please input Cash!' }]}
                     >
                         <Input type="number" />
