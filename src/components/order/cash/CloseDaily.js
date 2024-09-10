@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 function CloseDaily({ CloseDaily, handleCloseDaily }) {
     const [totalcash, setTotalCash] = useState('');
     const [totalpromtpay, setTotalPromtpay] = useState('');
+    const [cashInput, setCashInput] = useState('');
 
     useEffect(() => {
         const fetchTotalPrice = async () => {
@@ -26,6 +27,18 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
         };
         fetchTotalPrice();
     }, []);
+
+    const handleCashChange = (e) => {
+        setCashInput(e.target.value);
+        console.log(cashInput)
+    };
+
+    const handleCheckTotal = () => {
+        if (cashInput !== totalcash) {
+            console.log('total Not equal')
+        }
+    }
+
 
     return (
         <>
@@ -77,10 +90,14 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                     </span>
 
                     <Form.Item
-                        label="Cash"
+                        label="total"
                         rules={[{ required: true, message: 'Please input Cash!' }]}
                     >
-                        <Input type="number" />
+                        <Input
+                            type="number"
+                            value={cashInput}
+                            onChange={handleCashChange}
+                        />
                     </Form.Item>
                 </Form>
 
@@ -88,13 +105,13 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                     <Button
                         key="select"
                         type="primary"
-                        onClick={() => handleCloseDaily(false)} // ปิด modal เมื่อกด Ok
+                        onClick={handleCheckTotal}
                     >
                         Ok
                     </Button>
                     <Button
                         key="search"
-                        onClick={() => handleCloseDaily(false)} // ปิด modal เมื่อกด Cancel
+                        onClick={() => handleCloseDaily(false)}
                     >
                         Cancel
                     </Button>
