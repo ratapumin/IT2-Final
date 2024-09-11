@@ -9,7 +9,7 @@ function SidebarDashboard() {
         <div
             className='sidebardashboard'
         >
-            <Flex gap="middle" vertical span={5}>
+            <Flex gap="middle" vertical>
 
                 <Button ghost >
                     Report Sales

@@ -15,3 +15,10 @@
 .solid {
     border: solid;
 }
+
+
+.flexCard {
+    display: flex;
+    /* justify-content: space-evenly; */
+    align-content: flex-end;
+}
