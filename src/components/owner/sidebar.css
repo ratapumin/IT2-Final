@@ -19,6 +19,7 @@
 
 .flexCard {
     display: flex;
-    /* justify-content: space-evenly; */
-    align-content: flex-end;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 250px;
 }

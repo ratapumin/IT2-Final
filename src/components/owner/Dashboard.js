@@ -8,12 +8,12 @@ function Dashboard() {
         <div>
 
             <p className='solid'>
-                <Flex
-                    gap="middle"
+                <div
                     className='flexCard'
                 >
 
                     <Card
+                        className='solid'
                         title="Daily sales"
                         bordered={false}
                         style={{ width: 300, height: 200 }}
@@ -24,6 +24,7 @@ function Dashboard() {
 
 
                     <Card
+                        className='solid'
                         title="Monthly sales"
                         bordered={false}
                         style={{ width: 300, height: 200 }}
@@ -33,6 +34,7 @@ function Dashboard() {
 
 
                     <Card
+                        className='solid'
                         title="Annual sales"
                         bordered={false}
                         style={{ width: 300, height: 200 }}
@@ -41,7 +43,7 @@ function Dashboard() {
                     </Card>
 
 
-                </Flex>
+                </div>
             </p>
         </div>
     );
