@@ -35,8 +35,9 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
     const handleCheckTotal = () => {
         const onCash = parseFloat(cashInput)
-        if (onCash != totalcash) {
+        if (onCash !== parseFloat(totalcash)) {
             console.log('total Not equal')
+
         } else {
             console.log('total equal')
 

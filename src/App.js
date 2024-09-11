@@ -20,12 +20,26 @@ import Payment from "./components/order/cash/Payment";
 import Points from "./components/member/Points";
 import Qrcode from './components/order/cash/Promtpay'
 import CloseDaily from "./components/order/cash/CloseDaily";
+import Dashboard from "./components/owner/Dashboard";
+import SidebarDashboard from "./components/owner/SidebarDashboard";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
     <div style={{ display: 'flex' }}>
       <Sidebar />
       <div style={{ marginLeft: '150px', width: '100%' }}>
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
+
+function LayoutWithSidebarDashborad() {
+  return (
+    <div style={{ display: 'flex' }}>
+      <SidebarDashboard />
+      <div style={{ marginLeft: '200px', width: '100%' }}>
         <Outlet />
       </div>
     </div>
@@ -65,6 +79,13 @@ function App() {
             <Route path='/closedaily' element={<CloseDaily />} />
 
           </Route>
+          {/* Layout Dashboard Sidebar */}
+          <Route element={<LayoutWithSidebarDashborad />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+
+          </Route>
+
+
 
           <Route element={<LayoutWithSidebar />}>
 
@@ -73,6 +94,7 @@ function App() {
             <Route path="/insert_owner" element={<InsertOwner />} />
             <Route path="/edit_owner" element={<EditOwner />} />
             <Route path="/delete_owner" element={<DeleteOwner />} />
+
 
             {/*Products */}
             <Route path="/products" element={<Product />} />
