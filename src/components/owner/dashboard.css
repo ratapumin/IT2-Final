@@ -1,0 +1,44 @@
+.solid {
+    border: solid;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+
+.flexCard {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 200px;
+}
+
+.flexChart {
+    display: flex;
+    border: solid black;
+    /* height: 65vh; */
+    align-items: stretch;
+    justify-content: space-around;
+}
+
+.border {
+    border: solid black;
+
+}
+
+.chartPopularChart {
+
+    margin: 20px;
+    width: 30%;
+    /* height: 80%; */
+    border: solid;
+}
+
+
+.cardSalesChart {
+    margin: 20px;
+    width: 70%;
+    border: solid;
+    height: 80%;
+}

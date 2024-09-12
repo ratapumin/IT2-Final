@@ -12,14 +12,3 @@
     z-index: 100;
 }
 
-.solid {
-    border: solid;
-}
-
-
-.flexCard {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    height: 250px;
-}
