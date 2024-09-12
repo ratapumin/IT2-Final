@@ -11,7 +11,7 @@ function Dashboard() {
 
 
     return (
-        <div>
+        <div className='bgDashboard' >
             <p>welcome Owner</p>
             <div className='solid'>
 

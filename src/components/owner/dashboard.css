@@ -1,29 +1,33 @@
 .solid {
-    border: solid;
+    /* border: solid; */
     display: flex;
     flex-direction: column;
 }
 
 
+.bgDashboard {
 
+    background-color: #F5F7FF;
+    height: 100vh
+}
 
 .flexCard {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     align-items: center;
     height: 200px;
 }
 
 .flexChart {
     display: flex;
-    border: solid black;
+    /* border: solid ; */
     /* height: 65vh; */
     align-items: stretch;
     justify-content: space-around;
 }
 
 .border {
-    border: solid black;
+    /* border: solid black; */
 
 }
 
@@ -32,13 +36,13 @@
     margin: 20px;
     width: 30%;
     /* height: 80%; */
-    border: solid;
+    /* border: solid; */
 }
 
 
 .cardSalesChart {
     margin: 20px;
     width: 70%;
-    border: solid;
+    /* border: solid; */
     height: 80%;
 }

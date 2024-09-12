@@ -1,30 +1,36 @@
-
 import React from 'react';
-import { Col, Row } from 'antd';
-import { Flex, Radio } from 'antd';
-import './sidebar.css'
-import Button from 'antd-button-color';
+import { Layout, Menu } from 'antd';
+import { DashboardOutlined, FileTextOutlined, TeamOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import './sidebar.css';
+
+const { Sider } = Layout;
+
 function SidebarDashboard() {
     return (
-        <div
-            className='sidebardashboard'
+        <Sider
+            // width={200}
+            className="sidebardashboard"
         >
-            <Flex gap="middle" vertical>
-
-                <Button ghost >
-                    Report Sales
-                </Button>
-                <Button ghost >
+            <Menu
+                mode="inline"
+                defaultSelectedKeys={['1']}
+                style={{ height: '100%', borderRight: 0 }}
+            >
+                <Menu.Item key="1" icon={<DashboardOutlined />}>
+                    Dashboard
+                </Menu.Item>
+                <Menu.Item key="2" icon={<FileTextOutlined />}>
+                    Report Sale
+                </Menu.Item>
+                <Menu.Item key="3" icon={<TeamOutlined />}>
                     Employee
-                </Button>
-
-                <Button ghost >
+                </Menu.Item>
+                <Menu.Item key="4" icon={<ArrowLeftOutlined />}>
                     Back
-                </Button>
-
-            </Flex>
-        </div>
-    )
+                </Menu.Item>
+            </Menu>
+        </Sider>
+    );
 }
 
-export default SidebarDashboard
+export default SidebarDashboard;

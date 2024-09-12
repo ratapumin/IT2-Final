@@ -1,14 +1,21 @@
 .sidebardashboard {
-    background-color: #242526;
+    background-color: #fff;
     height: 100vh;
     /* border-radius: 30px; */
-    color: #ccc;
+    color: #000000;
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     width: 200px;
-    padding: 10px 14px;
-    z-index: 100;
+    
+ 
 }
 
+.sidebardashboard,
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+}
