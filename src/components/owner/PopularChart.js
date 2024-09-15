@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
-import { PieChart, Pie, Sector, ResponsiveContainer, Cell,Tooltip } from 'recharts';
+import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card } from 'antd'; // Import Card component from Ant Design
 import './dashboard.css';
+import axios from 'axios';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function PopularChart() {
-    // const [activeIndex, setActiveIndex] = useState(0);
+    const [topProduct, setTopProduct] = useState([]);
 
-    const data = [
-        { name: 'Group A', value: 400 },
-        { name: 'Group B', value: 300 },
-        { name: 'Group C', value: 300 },
-        { name: 'Group D', value: 200 },
-    ];
+    useEffect(() => {
+        const fetchTopProduct = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/api/topproduct');
+                const formattedData = res.data.map(item => ({
+                    name: item.Product_Name,
+                    value: parseFloat(item.quantity) // ใช้ parseFloat เพื่อให้แน่ใจว่าเป็นตัวเลข
+                }));
+                setTopProduct(formattedData);
+            } catch (error) {
+                console.log(error.response);
+            }
+        };
+        fetchTopProduct();
+    }, []);
 
     const RADIAN = Math.PI / 180;
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -28,14 +38,12 @@ function PopularChart() {
         );
     };
 
-
     return (
         <Card title="Popular Sales" className="chartPopularChart">
             <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                     <Pie
-
-                        data={data}
+                        data={topProduct} // ใช้ข้อมูลจริงจาก topProduct
                         cx="50%"
                         cy="50%"
                         innerRadius={30}
@@ -45,7 +53,7 @@ function PopularChart() {
                         label={renderCustomizedLabel}
                         dataKey="value"
                     >
-                        {data.map((entry, index) => (
+                        {topProduct.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>

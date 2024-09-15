@@ -1,3 +1,4 @@
+const { query } = require('express');
 const conn = require('../db')
 const moment = require('moment-timezone');
 
@@ -137,3 +138,34 @@ exports.readYear = (req, res) => {
         }
     })
 }
+
+exports.topProduct = (req,res)=>{
+    const sqlTop = `
+                   SELECT
+                        order_detail.p_id AS product_id,
+                        products.p_name AS Product_Name,
+                        SUM(order_detail.price * order_detail.quantity) AS total_sales,
+                        SUM(order_detail.quantity) AS quantity
+                    FROM
+                        order_detail
+                    JOIN
+                        orders ON order_detail.order_id = orders.order_id
+                    JOIN 
+                        products ON order_detail.p_id = products.p_id
+                    GROUP BY
+                        order_detail.p_id
+                    ORDER BY
+                        total_sales DESC
+                    LIMIT 5;
+
+                   `
+    conn.query(sqlTop,(error,results)=>{
+        if(error){
+            res.status(400).json({error})
+        }else{
+            res.json(results)
+        }
+    })
+}
+
+
