@@ -6,7 +6,7 @@ import './dashboard.css';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function PopularChart() {
-    const [activeIndex, setActiveIndex] = useState(0);
+    // const [activeIndex, setActiveIndex] = useState(0);
 
     const data = [
         { name: 'Group A', value: 400 },

@@ -19,7 +19,7 @@ function SalesChart() {
     useEffect(() => {
         const fetchMonthlySales = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/monthly');
+                const res = await axios.get('http://localhost:5000/api/graphmonthly');
                 console.log(res.data);
                 setMonthlySales(res.data);
             } catch (error) {

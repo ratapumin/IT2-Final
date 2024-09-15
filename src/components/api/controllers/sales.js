@@ -1,6 +1,12 @@
 const conn = require('../db')
+const moment = require('moment-timezone');
 
-exports.readSales = (req, res) => {
+const convertToBangkokTime = (date) => moment(date).tz('Asia/Bangkok').format('YYYY-MM-DD');
+const convertToBangkokTimeforMonth = (date) => moment(date).tz('Asia/Bangkok').format('YYYY-MM');
+
+
+
+exports.readTypeSales = (req, res) => {
 
     const sqlPrice = ` SELECT SUM(order_detail.price), orders.payment_type 
                         FROM order_detail 
@@ -21,23 +27,113 @@ exports.readSales = (req, res) => {
 
 
 
-exports.readMonthly = (req, res) => {
-    const sqlMonthly = `
-                        SELECT SUM(order_detail.price) AS total_price, DATE_FORMAT(orders.order_date_time, '%Y-%m') AS monthly
-                        FROM order_detail
-                        JOIN orders
-                        ON order_detail.order_id = orders.order_id
-                        GROUP BY monthly
-                        ORDER BY monthly;
+exports.readGraphMonthly = (req, res) => {
+    const sqlGraphMonthly = `
+                    SELECT DATE_FORMAT(orders.order_date_time, '%Y-%m') AS monthly, 
+                    SUM(order_detail.price * order_detail.quantity) AS total_price
+                    FROM order_detail
+                    JOIN orders
+                    ON order_detail.order_id = orders.order_id
+                    GROUP BY monthly
+                    ORDER BY monthly;
+
                       `
 
-    conn.query(sqlMonthly, (error, results) => {
+    conn.query(sqlGraphMonthly, (error, results) => {
         if (error) {
             res.status(400).json({ error })
         }
         else {
-            res.json(results)
+            results = results.map(result => ({
+                monthly: convertToBangkokTimeforMonth(result.monthly),
+                total_price: result.total_price
+            }));
+            res.json(results);
         }
 
+    })
+}
+
+
+exports.readDaily = (req, res) => {
+    // ดึงค่าจาก URL parameter
+    const { id } = req.params;
+
+    // กำหนดคำสั่ง SQL พร้อมการใช้ตัวแปร
+    const SqlDaily = `
+        SELECT DATE(order_date_time) as Date, SUM(order_detail.price * order_detail.quantity) as TotalSales
+        FROM orders
+        JOIN order_detail ON order_detail.order_id = orders.order_id
+        WHERE DATE_FORMAT(order_date_time, '%Y-%m-%d') = ?
+        GROUP BY DATE(order_date_time)
+    `;
+
+    // ค่าที่ใช้ในคำสั่ง SQL
+    const values = [id];
+
+    // คิวรีฐานข้อมูล
+    conn.query(SqlDaily, values, (error, results) => {
+        if (error) {
+            res.status(400).json({ error });
+        } else {
+            // แปลงวันที่เป็นเวลาในเขตเวลา Bangkok
+            // results = results.map(result => ({
+            //     Date: convertToBangkokTimeforMonth(result.Date),
+            //     TotalSales: result.TotalSales
+            // }));
+            res.json(results);
+        }
+    });
+};
+
+exports.readMonthly = (req, res) => {
+
+    const { id } = req.params
+    const sqlMonthly = `
+                    SELECT DATE_FORMAT(orders.order_date_time, '%Y-%m') AS monthly, 
+                    SUM(order_detail.price * order_detail.quantity) AS total_price
+                    FROM order_detail
+                    JOIN orders
+                    ON order_detail.order_id = orders.order_id
+                    WHERE  DATE_FORMAT(orders.order_date_time, '%Y-%m') = ?
+                    GROUP BY monthly
+                    ORDER BY monthly
+                    `
+    const value = [id]
+    conn.query(sqlMonthly, value, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        } else {
+            results = results.map(result => ({
+                Date: convertToBangkokTimeforMonth(result.monthly),
+                TotalSales: result.total_price
+            }));
+            res.json(results);
+        }
+    })
+}
+
+exports.readYear = (req, res) => {
+    const { id } = req.params
+    const sqlYear = `
+                        SELECT YEAR(orders.order_date_time) AS year, 
+                        SUM(order_detail.price * order_detail.quantity) AS total_price
+                        FROM order_detail
+                        JOIN orders ON order_detail.order_id = orders.order_id
+                        WHERE YEAR(orders.order_date_time) = ?
+                        GROUP BY YEAR(orders.order_date_time)
+                    `
+    const value = [id]
+
+    conn.query(sqlYear, value, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        } else {
+            results = results.map(result => ({
+                Date: convertToBangkokTimeforMonth(result.sqlYear),
+                TotalSales: result.total_price
+            }))
+            res.json(results)
+        }
     })
 }

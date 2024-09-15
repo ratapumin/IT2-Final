@@ -78,7 +78,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         fetchOrderId();
     }, []);
 
-
+    const utcDate = moment().format('YYYY-MM-DD HH:mm:ss');
     const setOrderData = () => {
         let c_id = sentMember ? `${sentMember.c_id}` : null;
         let newPoints = getPoints || 0;
@@ -92,7 +92,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 c_id: c_id,
                 points: newPoints,
                 type: 'earn',
-                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
+                transaction_data: utcDate
             });
         }
 
@@ -102,14 +102,14 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 c_id: c_id,
                 points: -minusPoints,
                 type: 'redeem',
-                transaction_data: moment().format('YYYY-MM-DD HH:mm:ss'),
+                transaction_data: utcDate
             });
         }
 
         return {
             order_id: orderId,
             order_no: orderNo,
-            order_date_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+            order_date_time: utcDate,
             payment_type: 'cash',
             user_id: user.user_id,
             c_id: c_id,
