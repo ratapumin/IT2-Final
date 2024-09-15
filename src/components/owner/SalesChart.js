@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ComposedChart,
     Line,
@@ -11,24 +11,52 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import { Card } from 'antd'; // Import Card component from Ant Design
-// import './salesChart.css'; // Import CSS file for styling
+import axios from 'axios';
 
 function SalesChart() {
-    const data = [
-        { name: 'Page A', uv: 590, pv: 800, amt: 1400 },
-        { name: 'Page B', uv: 868, pv: 967, amt: 1506 },
-        { name: 'Page C', uv: 1397, pv: 1098, amt: 989 },
-        { name: 'Page D', uv: 1480, pv: 1200, amt: 1228 },
-        { name: 'Page E', uv: 1520, pv: 1108, amt: 1100 },
-        { name: 'Page F', uv: 1400, pv: 680, amt: 1700 },
+    const [monthlySales, setMonthlySales] = useState([]);
+
+    useEffect(() => {
+        const fetchMonthlySales = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/api/monthly');
+                console.log(res.data);
+                setMonthlySales(res.data);
+            } catch (error) {
+                console.log(error.response);
+                return error.response;
+            }
+        };
+        fetchMonthlySales();
+    }, []);
+
+    // สร้าง array ของเดือนทั้ง 12 เดือน
+    const allMonths = [
+        { name: 'Jan', monthly: '2024-01', total_price: 0 },
+        { name: 'Feb', monthly: '2024-02', total_price: 0 },
+        { name: 'Mar', monthly: '2024-03', total_price: 0 },
+        { name: 'Apr', monthly: '2024-04', total_price: 0 },
+        { name: 'May', monthly: '2024-05', total_price: 0 },
+        { name: 'Jun', monthly: '2024-06', total_price: 0 },
+        { name: 'Jul', monthly: '2024-07', total_price: 0 },
+        { name: 'Aug', monthly: '2024-08', total_price: 0 },
+        { name: 'Sept', monthly: '2024-09', total_price: 0 },
+        { name: 'Oct', monthly: '2024-10', total_price: 0 },
+        { name: 'Nov', monthly: '2024-11', total_price: 0 },
+        { name: 'Dec', monthly: '2024-12', total_price: 0 },
     ];
 
-    return (
+    // ผสานข้อมูลยอดขายกับเดือนทั้งหมด
+    const mergedSalesData = allMonths.map((month) => {
+        const salesData = monthlySales.find((sale) => sale.monthly === month.monthly);
+        return salesData ? { ...month, total_price: parseFloat(salesData.total_price) } : month;
+    });
 
-        <Card title="Sales Data" className="cardSalesChart">
+    return (
+        <Card title="Sales Monthly" className="cardSalesChart">
             <ResponsiveContainer width="100%" height={300}>
                 <ComposedChart
-                    data={data}
+                    data={mergedSalesData} // กำหนดข้อมูลที่แปลงแล้วให้กราฟ
                     margin={{
                         top: 20,
                         right: 20,
@@ -37,12 +65,12 @@ function SalesChart() {
                     }}
                 >
                     <CartesianGrid stroke="#f5f5f5" />
-                    <XAxis dataKey="name" scale="band" />
+                    <XAxis dataKey="name" /> {/* แสดงชื่อเดือนทั้งหมด */}
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="uv" barSize={20} fill="#413ea0" />
-                    <Line type="monotone" dataKey="uv" stroke="#ff7300" />
+                    <Bar dataKey="total_price" barSize={20} fill="#413ea0" /> {/* กำหนดยอดขาย */}
+                    <Line type="monotone" dataKey="total_price" stroke="#ff7300" /> {/* เส้นกราฟยอดขาย */}
                 </ComposedChart>
             </ResponsiveContainer>
         </Card>

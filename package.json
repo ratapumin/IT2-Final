@@ -37,7 +37,7 @@
     "react-router-dom": "^6.24.0",
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
-    "recharts": "^2.12.7",
+    "recharts": "^2.13.0-alpha.3",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.12.3",
     "sweetalert2-react-content": "^5.0.7",
