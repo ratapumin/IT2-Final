@@ -13,7 +13,7 @@ function Dashboard() {
     return (
         <div className='bgDashboard' >
             <p>welcome Owner</p>
-            <div className='solid'>
+            <div className='contentDashboard'>
 
                 <div className='flexCard'>
                     <CardSales />

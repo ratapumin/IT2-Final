@@ -2,34 +2,35 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { DashboardOutlined, FileTextOutlined, TeamOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import './sidebar.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const { Sider } = Layout;
 
 function SidebarDashboard() {
     const navigate = useNavigate();
+    const location = useLocation(); // ใช้ตรวจสอบ path ปัจจุบัน
 
     const menuItems = [
         {
-            key: '1',
+            key: '/dashboard',
             icon: <DashboardOutlined />,
             label: 'Dashboard',
             onClick: () => navigate("/dashboard")
         },
         {
-            key: '2',
+            key: '/report',
             icon: <FileTextOutlined />,
             label: 'Report Sale',
-            onClick: () => navigate("/report-sale")
+            onClick: () => navigate("/report")
         },
         {
-            key: '3',
+            key: '/employee',
             icon: <TeamOutlined />,
             label: 'Employee',
             onClick: () => navigate("/employee")
         },
         {
-            key: '4',
+            key: '/orders',
             icon: <ArrowLeftOutlined />,
             label: 'Back',
             onClick: () => navigate("/orders")
@@ -40,7 +41,7 @@ function SidebarDashboard() {
         <Sider className="sidebardashboard">
             <Menu
                 mode="inline"
-                defaultSelectedKeys={['1']}
+                selectedKeys={[location.pathname]} // ใช้ location.pathname เพื่อตั้งเมนูที่ active
                 style={{ height: '100%', borderRight: 0 }}
                 items={menuItems}
             />

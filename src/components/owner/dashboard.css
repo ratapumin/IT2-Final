@@ -1,5 +1,4 @@
-.solid {
-    /* border: solid; */
+.contentDashboard {
     display: flex;
     flex-direction: column;
 }
