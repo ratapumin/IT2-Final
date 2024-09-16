@@ -65,11 +65,11 @@ function CardSales() {
                 bordered={false}
                 style={{ width: 300, height: 150 }}
             >
-                {dailySales && (
-                    <p>
-                        {dailySales.TotalSales}
-                    </p>
-                )}
+                <p>
+                    {dailySales
+                        ? `${dailySales.TotalSales}`
+                        : '0'}
+                </p>
             </Card>
             <Card
                 className='solid'
@@ -77,11 +77,13 @@ function CardSales() {
                 bordered={false}
                 style={{ width: 300, height: 150 }}
             >
-                {monthlySales && (
-                    <p>
-                        {monthlySales.TotalSales}
-                    </p>
-                )}
+
+                <p>
+                    {monthlySales
+                        ?
+                        ` ${monthlySales.TotalSales}`
+                        : '0'
+                    }   </p>
             </Card>
             <Card
                 className='solid'
@@ -89,11 +91,11 @@ function CardSales() {
                 bordered={false}
                 style={{ width: 300, height: 150 }}
             >
-          {yearSales&&(
-            <p>
-                {yearSales.TotalSales}
-            </p>
-          )}
+                <p>
+                    {yearSales
+                        ? `${yearSales.TotalSales}`
+                        : '0'}
+                </p>
             </Card>
         </>
 

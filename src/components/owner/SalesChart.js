@@ -10,11 +10,14 @@ import {
     Legend,
     ResponsiveContainer,
 } from 'recharts';
-import { Card } from 'antd'; // Import Card component from Ant Design
+import { Card, Select } from 'antd'; // Import Card และ Select จาก Ant Design
 import axios from 'axios';
+
+const { Option } = Select;
 
 function SalesChart() {
     const [monthlySales, setMonthlySales] = useState([]);
+    const [chartType, setChartType] = useState('monthly'); // สร้าง state สำหรับเลือกประเภทกราฟ
 
     useEffect(() => {
         const fetchMonthlySales = async () => {
@@ -52,8 +55,28 @@ function SalesChart() {
         return salesData ? { ...month, total_price: parseFloat(salesData.total_price) } : month;
     });
 
+    // ฟังก์ชันเปลี่ยนประเภทกราฟ
+    const handleChartTypeChange = (value) => {
+        setChartType(value);
+    };
+
     return (
-        <Card title="Sales Monthly" className="cardSalesChart">
+        <Card
+            title={
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Sales Chart</span>
+                    <Select
+                        defaultValue="monthly"
+                        style={{ width: 200 }}
+                        onChange={handleChartTypeChange}
+                    >
+                        <Option value="monthly">Monthly</Option>
+                        <Option value="yearly">Yearly</Option>
+                    </Select>
+                </div>
+            }
+            className="cardSalesChart"
+        >
             <ResponsiveContainer width="100%" height={300}>
                 <ComposedChart
                     data={mergedSalesData} // กำหนดข้อมูลที่แปลงแล้วให้กราฟ
@@ -69,8 +92,15 @@ function SalesChart() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="total_price" barSize={20} fill="#413ea0" /> {/* กำหนดยอดขาย */}
-                    <Line type="monotone" dataKey="total_price" stroke="#ff7300" /> {/* เส้นกราฟยอดขาย */}
+                    {chartType === 'monthly' && (
+                        <>
+                            <Bar dataKey="total_price" barSize={20} fill="#413ea0" /> {/* กำหนดยอดขาย */}
+                            <Line type="monotone" dataKey="total_price" stroke="#ff7300" /> {/* เส้นกราฟยอดขาย */}
+                        </>
+                    )}
+                    {chartType === 'yearly' && (
+                        <Line type="monotone" dataKey="total_price" stroke="#00aaff" />
+                    )}
                 </ComposedChart>
             </ResponsiveContainer>
         </Card>
