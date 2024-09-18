@@ -77,3 +77,9 @@
     /* background: transparent; */
     background: #f1f1f1;
 }
+
+
+.contentPdf {
+    display: flex;
+    flex-direction: column;
+}
