@@ -15,7 +15,7 @@ import InsertProduct from "./components/admin/products/Insert_products";
 import EditProduct from "./components/admin/products/Edit_products";
 import DeleteProducts from "./components/admin/products/Delete_products";
 import Sidebar from "./components/Sidebar";
-import Members from "./components/order/Members";
+import Members from "./components/member/Members"
 import Payment from "./components/order/cash/Payment";
 import Points from "./components/member/Points";
 import Qrcode from './components/order/cash/Promtpay'

@@ -3,6 +3,9 @@ import './Members.css'
 import { Space, Table } from 'antd';
 import axios from 'axios';
 import { Button } from 'antd';
+import InsertMember from './InsertMember';
+import EditMember from './EditMember';
+import DeleteMember from './DeleteMember';
 
 
 function Members() {
@@ -51,12 +54,8 @@ function Members() {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button className='btnAction' type="primary" ghost>
-                        EDIT
-                    </Button>
-                    <Button className='btnAction' type="primary" danger ghost>
-                        DELETE
-                    </Button>
+                    <EditMember />
+                    <DeleteMember />
 
                 </Space >
             ),
@@ -95,9 +94,7 @@ function Members() {
                 MEMBER LIST
             </section>
 
-            <button className='btnAdd'>
-                ADD MEMBER
-            </button>
+            <InsertMember />
 
             <button className='btnSearch'>
                 SEARCH
