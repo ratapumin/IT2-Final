@@ -23,6 +23,7 @@ import CloseDaily from "./components/order/cash/CloseDaily";
 import Dashboard from "./components/owner/Dashboard";
 import SidebarDashboard from "./components/owner/SidebarDashboard";
 import ReportSales from "./components/owner/ReportSales";
+import Employee from "./components/employee/Employee";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -84,6 +85,7 @@ function App() {
           <Route element={<LayoutWithSidebarDashborad />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/report" element={<ReportSales />} />
+            <Route path="/employee" element={<Employee/>}/>
           </Route>
 
 

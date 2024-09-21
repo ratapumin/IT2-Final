@@ -3,39 +3,15 @@ import { Modal, Form, Input, InputNumber, Button, notification } from 'antd';
 import axios from "axios";
 
 
-function InsertMember({ refreshMembers }) {
+
+function InsertEmployee() {
     const [openModalInsert, setOpeModalInsert] = useState(false)
     const [form] = Form.useForm()
-
     const onFinish = async (values) => {
-        values.c_points = 0;  // เพิ่มค่าในรูปแบบของ key-value
-        values.c_status = 'Active';
+        values.role_type = 'E'
+        values.user_status = 'Active';
         console.log('Success:', values);
-        // setMemberValues(values)
-        if (values) {
-            try {
-                await axios.post(`http://localhost:5000/api/members`, values)
-                notification.success({
-                    message: "Saved!",
-                    description: "Your Member has been Insert.",
-                });
-                form.resetFields()
-                setOpeModalInsert(false)
-                refreshMembers()
-
-            } catch (error) {
-                console.log("Cannot Insert Member", error);
-                notification.error({
-                    message: "Error!",
-                    description: "There was a problem inserting the member.",
-                });
-            }
-
-        }
-    };
-
-
-
+    }
     return (
         <>
             <button className='btnAdd'
@@ -43,12 +19,14 @@ function InsertMember({ refreshMembers }) {
                     setOpeModalInsert(true)
                 }}
             >
-                ADD MEMBER
+                ADD EMPLOYEE
             </button>
+
+
 
             <Modal
                 centered
-                title="Insert Members"
+                title="Insert Employee"
                 open={openModalInsert}
                 style={{
                     textAlign: "center",
@@ -60,7 +38,7 @@ function InsertMember({ refreshMembers }) {
                 <Form
                     form={form}
                     labelCol={{ span: 6 }}
-                    wrapperCol={{ span: 14 }}
+                    wrapperCol={{ span: 18 }}
                     layout="horizontal"
                     size='default'
                     style={{ maxWidth: 600 }}
@@ -68,25 +46,44 @@ function InsertMember({ refreshMembers }) {
                 >
                     <Form.Item
                         label="First Name"
-                        name='c_fname'  // ชื่อ key ที่จะอยู่ใน values
+                        name='user_fname'  // ชื่อ key ที่จะอยู่ใน values
                         rules={[{ required: true, message: 'Please input your First Name!' }]}  // validation
                     >
                         <Input />
                     </Form.Item>
                     <Form.Item
-                        name='c_lname'
+                        name='user_lname'
                         label="Last Name"
                         rules={[{ required: true, message: 'Please input your Last Name!' }]}
                     >
                         <Input />
                     </Form.Item>
+                    <Form.Item
+                        name='user_password'
+                        label="Pasword"
+                        rules={[{ required: true, message: 'Please input your Password!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
 
                     <Form.Item
-                        name='c_tel'
+                        name='user_tel'
                         label="TEL"
                         rules={[{ required: true, message: 'Please input your phone number!' }]}
                     >
-                        <Input style={{ width: '100%' }} minLength={10} maxLength={10} />
+                        <Input style={{ width: '100%' }}
+                            type="number"
+                            minLength={10} maxLength={10} />
+                    </Form.Item>
+
+                    <Form.Item
+                        name='user_id_card'
+                        label="ID Card"
+                        rules={[{ required: true, message: 'Please input your Id Card!' }]}
+                    >
+                        <Input style={{ width: '100%' }}
+                            type="number"
+                            minLength={13} maxLength={13} />
                     </Form.Item>
 
                     <Button type="primary" htmlType="submit">
@@ -95,6 +92,7 @@ function InsertMember({ refreshMembers }) {
                     <Button type="danger"
                         onClick={() => {
                             setOpeModalInsert(false)
+                            form.resetFields()
                         }}>
                         Cancel
                     </Button>
@@ -104,4 +102,4 @@ function InsertMember({ refreshMembers }) {
     )
 }
 
-export default InsertMember
+export default InsertEmployee
