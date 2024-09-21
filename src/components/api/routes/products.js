@@ -58,7 +58,7 @@ router.delete('/products/:id', (req, res) => {
             res.status(500).json({ error });
         } else {
             if (results.affectedRows > 0) {
-                res.status(200).json({ message: 'Update success' });
+                res.status(200).json({ message: 'Delete success' });
             } else {
                 res.status(404).json({ message: 'Product not found' });
             }

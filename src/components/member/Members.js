@@ -1,31 +1,67 @@
 import { useEffect, useState } from 'react';
-import './Members.css'
-import { Space, Table } from 'antd';
+import './Members.css';
+import { Space, Table, Modal } from 'antd';
 import axios from 'axios';
 import { Button } from 'antd';
 import InsertMember from './InsertMember';
 import EditMember from './EditMember';
-import DeleteMember from './DeleteMember';
-
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 function Members() {
-    const [memberList, setMemberList] = useState([])
+    const [memberList, setMemberList] = useState([]);
+    const [member, setMember] = useState();
+    const [updateMember, setUpdateMember] = useState()
 
     const fecthMembers = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/members')
-            setMemberList(res.data)
-            // console.log(res.data[0].c_id)
+            const res = await axios.get('http://localhost:5000/api/members');
+            setMemberList(res.data);
         } catch (error) {
-            console.error('Error fetching members:', error)
+            console.error('Error fetching members:', error);
         }
-    }
+    };
 
     useEffect(() => {
-        fecthMembers()
-    }, [])
+        fecthMembers();
+        // console.log(memberList)
+    }, []);
 
+    const showDeleteConfirm = (value) => {
+        Modal.confirm({
+            title: `Are you sure delete Member?`,
+            icon: <ExclamationCircleFilled />,
+            content: `Member : ${value.c_fname} ${value.c_lname}`,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            async onOk() {
+                try {
+                    await axios.delete(`http://localhost:5000/api/members/${value.c_id}`);
+                    console.log('OK');
+                    // Update member list after deletion
+                    fecthMembers();
+                } catch (error) {
+                    console.error('Error deleting member:', error);
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
+    };
 
+    const handleFindmember = (values) => {
+        const findmember = memberList.find((member) => member.c_tel === values);
+        if (findmember) {
+            showDeleteConfirm(findmember);
+        }
+    };
+
+    const handleUpdateMember = async () => {
+        // console.log(values)
+        await fecthMembers()
+        setUpdateMember(null)
+    }
 
     const columns = [
         {
@@ -54,10 +90,25 @@ function Members() {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <EditMember />
-                    <DeleteMember />
-
-                </Space >
+                    <Button
+                        className='btnAction'
+                        type="primary" ghost
+                        onClick={() => {
+                            setUpdateMember(record.tel);
+                        }}
+                    >
+                        EDIT
+                    </Button>
+                    <Button
+                        className='btnAction'
+                        danger
+                        onClick={() => {
+                            handleFindmember(record.tel);
+                        }}
+                    >
+                        Delete
+                    </Button>
+                </Space>
             ),
         },
     ];
@@ -72,18 +123,6 @@ function Members() {
         id: member.c_id,
     }));
 
-
-
-    // const data = [];
-    // for (let i = 0; i < 100; i++) {
-    //   data.push({
-    //     key: i,
-    //     name: `Edward King ${i}`,
-    //     age: 32,
-    //     address: `London, Park Lane no. ${i}`,
-    //   });
-    // }
-
     return (
         <div className="content-box">
             <section className='members'>
@@ -94,27 +133,29 @@ function Members() {
                 MEMBER LIST
             </section>
 
-            <InsertMember />
+            <InsertMember refreshMembers={fecthMembers} />
 
-            <button className='btnSearch'>
-                SEARCH
-            </button>
+            <button className='btnSearch'>SEARCH</button>
 
             <section className='tableContent'>
                 <Table
                     columns={columns}
                     dataSource={data}
-                    pagination={{
-                        pageSize: 50,
-                    }}
-                    scroll={{
-                        y: 390,
-                    }}
+                    pagination={{ pageSize: 50 }}
+                    scroll={{ y: 390 }}
                 />
-
             </section>
+
+            {updateMember && (
+                <EditMember
+                    member={memberList.find((member) => member.c_tel === updateMember)}
+                    update={handleUpdateMember}
+                />
+            )}
         </div>
-    )
+
+
+    );
 }
 
-export default Members
+export default Members;

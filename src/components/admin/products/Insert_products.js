@@ -89,7 +89,7 @@ function Insert_products({ insertProduct }) {
                 message: "Saved!",
                 description: "Your product has been updated.",
             });
-            form.resetFields();
+            form.resetFields(); 
             setIsModalVisible(false);
             insertProduct(true);
         } catch (error) {
