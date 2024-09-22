@@ -1,4 +1,4 @@
-const { query } = require('express');
+
 const conn = require('../db')
 const moment = require('moment-timezone');
 
@@ -9,14 +9,14 @@ const convertToBangkokTimeforMonth = (date) => moment(date).tz('Asia/Bangkok').f
 
 exports.readTypeSales = (req, res) => {
 
-    const sqlPrice = ` SELECT SUM(order_detail.price), orders.payment_type 
+    const sqlPaymentType = ` SELECT SUM(order_detail.price), orders.payment_type 
                         FROM order_detail 
                         JOIN orders
                         ON order_detail.order_id = orders.order_id
                         GROUP BY orders.payment_type;
                      `
 
-    conn.query(sqlPrice, (error, results) => {
+    conn.query(sqlPaymentType, (error, results) => {
         if (error) {
             res.status(400).json({ error })
         }
@@ -139,7 +139,7 @@ exports.readYear = (req, res) => {
     })
 }
 
-exports.topProduct = (req,res)=>{
+exports.topProduct = (req, res) => {
     const sqlTop = `
                    SELECT
                         order_detail.p_id AS product_id,
@@ -159,13 +159,96 @@ exports.topProduct = (req,res)=>{
                     LIMIT 5;
 
                    `
-    conn.query(sqlTop,(error,results)=>{
-        if(error){
-            res.status(400).json({error})
-        }else{
+    conn.query(sqlTop, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        } else {
             res.json(results)
         }
     })
 }
 
+exports.readRepotSales = (req, res) => {
+    const { startDate, endDate } = req.params;
 
+    // คิวรียอดขายรวม
+    const totalSalesQuery = `
+        SELECT SUM(order_detail.price * order_detail.quantity) AS total_amount
+        FROM orders
+        JOIN order_detail ON orders.order_id = order_detail.order_id
+        WHERE DATE(orders.order_date_time) BETWEEN ? AND ?`;
+
+    // คิวรีข้อมูลสินค้าทั้งหมด
+    const products = `
+        SELECT order_detail.p_id, SUM(order_detail.quantity) AS qty, products.p_name as name, SUM(order_detail.price * order_detail.quantity) as amount, products.p_price as price
+        FROM order_detail
+        JOIN orders ON orders.order_id = order_detail.order_id
+        JOIN products ON order_detail.p_id = products.p_id
+        WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+        GROUP BY order_detail.p_id
+        ORDER BY p_id ASC`;
+
+    // คิวรีสินค้าขายดี
+    const topProductsQuery = `
+        SELECT
+            order_detail.p_id AS product_id,
+            products.p_name AS Product_Name,
+            SUM(order_detail.price * order_detail.quantity) AS total_sales,
+            SUM(order_detail.quantity) AS quantity
+        FROM
+            order_detail
+        JOIN
+            orders ON order_detail.order_id = orders.order_id
+        JOIN 
+            products ON order_detail.p_id = products.p_id
+        WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+        GROUP BY
+            order_detail.p_id
+        ORDER BY
+            total_sales DESC
+        LIMIT 5`;
+
+    // คิวรีข้อมูลยอดขายตามประเภทการชำระเงิน
+    const sqlPaymentType = `
+        SELECT SUM(order_detail.price * order_detail.quantity) AS total_sales, orders.payment_type
+        FROM order_detail
+        JOIN orders ON order_detail.order_id = orders.order_id
+        WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+        GROUP BY orders.payment_type`;
+
+    // ดึงยอดขายรวม
+    conn.query(totalSalesQuery, [startDate, endDate], (error, totalSalesResults) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+
+        // ดึงสินค้าทั้งหมด
+        conn.query(products, [startDate, endDate], (error, topSellingProductsResults) => {
+            if (error) {
+                return res.status(500).json({ error: error.message });
+            }
+
+            // ดึงสินค้าขายดี
+            conn.query(topProductsQuery, [startDate, endDate], (error, topProductsResults) => {
+                if (error) {
+                    return res.status(500).json({ error: error.message });
+                }
+
+                // ดึงข้อมูลยอดขายตามประเภทการชำระเงิน
+                conn.query(sqlPaymentType, [startDate, endDate], (error, paymentTypeResults) => {
+                    if (error) {
+                        return res.status(500).json({ error: error.message });
+                    }
+
+                    // ส่งข้อมูลผลลัพธ์ทั้งหมดกลับไป
+                    res.json({
+                        totalSales: totalSalesResults[0],
+                        products: topSellingProductsResults,
+                        topProducts: topProductsResults,
+                        paymentTypes: paymentTypeResults
+                    });
+                });
+            });
+        });
+    });
+};

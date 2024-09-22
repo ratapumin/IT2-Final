@@ -1,63 +1,85 @@
 import React, { useEffect, useState } from "react";
-import { Page, Text, Document, PDFViewer, StyleSheet } from "@react-pdf/renderer";
-import { Table } from "antd";
 import axios from "axios";
 import './contentpdf.css'
-function ContentPdf() {
-    const [product, setProduct] = useState();
+
+function ContentPdf({ date }) {
+    const [productList, setProductList] = useState();
+    const [sales, setSales] = useState()
+    const [topProducts, setTopProducts] = useState()
+    const [paymentType, setPaymentType] = useState()
+
 
     useEffect(() => {
         const fetchProduct = async () => {
-            try {
-                const res = await axios.get("http://localhost:5000/api/products");
-                console.log("product", res.data);
-                setProduct(res.data);
-            } catch (error) {
-                console.log(error.response);
+            if (date && date.start && date.end) { // ตรวจสอบว่ามีวันที่ถูกเลือก
+                try {
+                    const res = await axios.get(`http://localhost:5000/api/reportsales/${date.start}/${date.end}`);
+                    console.log("product", res.data);
+                    setProductList(res.data.products);
+                    setSales(res.data.totalSales)
+                    setTopProducts(res.data.topProducts)
+                    setPaymentType(res.data.paymentTypes)
+                } catch (error) {
+                    console.log(error.response);
+                }
+            } else {
+                console.log("No date range selected");
             }
         };
         fetchProduct();
-    }, []);
-
-
+    }, [date]);
 
     return (
         <div className="contentflexpdf">
-            <div>Khathong Coffee Shop</div>
+            <div className="label">Khathong Coffee Shop</div>
             <div className="saleReport">
-                <div>Sales Report</div>
-                <div>On 17-9-2024</div>
+                <div className="label">Sales Report</div>
+                <div>
+                    On {date && date.start && date.end ?
+                        (date.start === date.end ? date.start : `${date.start} To ${date.end}`)
+                        : 'ไม่ระบุ'}
+                </div>
             </div>
 
-            <div>*** Sales Summary ***</div>
+            <div className="label">*** Sales Summary ***</div>
             <div className="sales">
                 <div className="label">Gross Sales</div>
-                <div className="value">20000</div>
+                <div className="value">{sales
+                    ? sales.total_amount
+                    : '0'
+                }
+                </div>
                 <div className="label">Discount</div>
                 <div className="value">2400</div>
                 <div className="label">Net Sales</div>
                 <div className="value">17600</div>
                 <div className="label">Tax</div>
-                <div className="value">800</div>
+                <div className="value">{sales
+                    ? (sales.total_amount - (sales.total_amount * (100 / 107))).toFixed(2)
+                    : '0'
+                }</div>
             </div>
 
-            <div>*** Payment Methods ***</div>
-            <div className="sales">
-                <div className="label">Cash</div>
-                <div className="value">5700</div>
-                <div className="label">Promtpay</div>
-                <div className="value">4300</div>
-                <div className="label">Credit Card</div>
-                <div className="value">6000</div>
+            <div className="label">*** Payment Methods ***</div>
+            <div className="paymentMethods">
+                {paymentType && paymentType.map((type) => (
+                    <div className="paymentRow" key={type.payment_type}>
+                        <div className="label">
+                            {type.payment_type.charAt(0).toUpperCase() + type.payment_type.slice(1)}
+                        </div>
+                        <div className="value">{type.total_sales}</div>
+                    </div>
+                ))}
             </div>
 
-            <div>*** Product Sold Summary ***</div>
+            <div className="label">*** Product Sold Summary ***</div>
+
             <div className="productSold">
-                <p>ID</p>
-                <p>Name</p>
-                <p>Qty</p>
-                <p>Price</p>
-                <p>Amount</p>
+                <p className="label">ID</p>
+                <p className="label">Name</p>
+                <p className="label">Qty</p>
+                <p className="label">Price</p>
+                <p className="label">Amount</p>
             </div>
             <div className="productSold">
                 <p>---------------------,</p>
@@ -67,13 +89,13 @@ function ContentPdf() {
                 <p>---------------------,</p>
             </div>
 
-            {product && product.map((item) => (
-                <div className="productSold" key={item.p_id}>
-                    <p>{item.p_id}</p>
-                    <p>{item.p_name}</p>
-                    <p>{item.qty}</p>
-                    <p>{item.p_price}</p>
-                    <p>{item.amount}</p>
+            {productList && productList.map((product) => (
+                <div className="productSold" key={product.p_id}>
+                    <p>{product.p_id}</p>
+                    <p>{product.name}</p>
+                    <p>{product.qty}</p>
+                    <p>{product.price}</p>
+                    <p>{product.amount}</p>
                 </div>
             ))}
 
@@ -85,26 +107,19 @@ function ContentPdf() {
                 <p>---------------------,</p>
             </div>
 
-            <div>*** Top-Selling Products ***</div>
-            <div className="productSold">
-                <p>1. Product A (Qty: 30)</p>
-                <p>2. Product B (Qty: 25)</p>
-                <p>3. Product C (Qty: 15)</p>
+            <div className="label">*** Top-Selling Products ***</div>
+            <div>
+                {topProducts && topProducts.map((product, i) => (
+                    <div className="topsales" key={product.product_id}>
+                        <div className="label">{i + 1}. {product.Product_Name}</div>
+                        <div className="value">(Qty:{product.quantity})</div>
+                    </div>
+                ))}
             </div>
 
-            <div>*** Refunds ***</div>
-            <div className="sales">
-                <div className="label">Total Refunds</div>
-                <div className="value">500</div>
-            </div>
 
-            <div>*** Employee Performance ***</div>
-            <div className="sales">
-                <div className="label">Employee A</div>
-                <div className="value">Sales: 12000</div>
-                <div className="label">Employee B</div>
-                <div className="value">Sales: 8000</div>
-            </div>
+
+
         </div>
     );
 

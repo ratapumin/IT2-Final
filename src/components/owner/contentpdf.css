@@ -2,7 +2,7 @@
         display: flex;
         flex-direction: column;
         text-align: center;
-        gap:10px;
+        gap: 10px;
     }
 
     .saleReport {
@@ -21,10 +21,37 @@
         padding: 10px;
         width: 300px;
         margin: 0 auto;
+        border: solid;
 
     }
 
+    .topsales {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        text-align: left;
+        padding: 10px;
+        width: 400px;
+        margin: 0 auto;
 
+    }
+
+    .paymentMethods {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+        margin: 0 auto;
+        border: solid;
+
+        
+    }
+    .paymentRow {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 5px 10px;
+       
+    }
 
     .label {
         font-weight: bold;
