@@ -8,6 +8,12 @@ function InsertMember({ refreshMembers }) {
     const [form] = Form.useForm()
 
     const onFinish = async (values) => {
+
+        if (!/^\d+$/.test(values.c_tel) || values.c_tel.length !== 10) {
+            notification.error({ message: 'Phone number must be 10 digits and numeric only!' });
+            return;
+        }
+
         values.c_points = 0;  // เพิ่มค่าในรูปแบบของ key-value
         values.c_status = 'Active';
         console.log('Success:', values);
@@ -86,7 +92,9 @@ function InsertMember({ refreshMembers }) {
                         label="TEL"
                         rules={[{ required: true, message: 'Please input your phone number!' }]}
                     >
-                        <Input style={{ width: '100%' }} minLength={10} maxLength={10} />
+                        <Input style={{ width: '100%' }} minLength={10} maxLength={10}
+                            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')}
+                        />
                     </Form.Item>
 
                     <Button type="primary" htmlType="submit">

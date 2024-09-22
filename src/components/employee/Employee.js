@@ -3,21 +3,23 @@ import './employee.css';
 import { Space, Table, Modal } from 'antd';
 import axios from 'axios';
 import { Button } from 'antd';
-// import InsertMember from './InsertMember';
-// import EditMember from './EditMember';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import InsertEmployee from './InsertEmployee';
+import './employee.css'
+import UpdateEmployee from './UpdateEmployee';
 
 function Employee() {
-    const [member, setMember] = useState();
-    const [updateMember, setUpdateMember] = useState()
+
     const [employeeList, setEmployeeList] = useState()
+    const [userList, setUserList] = useState()
+    const [employeeId, setEmployeeId] = useState()
 
     const fetchEmployees = async () => {
         try {
             const res = await axios.get("http://localhost:5000/api/users");
             const filteredEmployee = res.data.filter(employee => employee.role_type === "E");
             setEmployeeList(filteredEmployee);
+            setUserList(res.data)
         } catch (error) {
             console.log("Cannot fetch fetchEmployees", error);
         }
@@ -27,42 +29,43 @@ function Employee() {
         fetchEmployees();
     }, []);
 
-    // const showDeleteConfirm = (value) => {
-    //     Modal.confirm({
-    //         title: `Are you sure delete Member?`,
-    //         icon: <ExclamationCircleFilled />,
-    //         content: `Member : ${value.c_fname} ${value.c_lname}`,
-    //         okText: 'Yes',
-    //         okType: 'danger',
-    //         cancelText: 'No',
-    //         async onOk() {
-    //             try {
-    //                 await axios.delete(`http://localhost:5000/api/members/${value.c_id}`);
-    //                 console.log('OK');
-    //                 // Update member list after deletion
-    //                 fecthMembers();
-    //             } catch (error) {
-    //                 console.error('Error deleting member:', error);
-    //             }
-    //         },
-    //         onCancel() {
-    //             console.log('Cancel');
-    //         },
-    //     });
-    // };
+    const showDeleteConfirm = (value) => {
 
-    // const handleFindmember = (values) => {
-    //     const findmember = memberList.find((member) => member.c_tel === values);
-    //     if (findmember) {
-    //         showDeleteConfirm(findmember);
-    //     }
-    // };
+        const findemployee = employeeList.find((employee) => employee.user_id === value);
+        if (findemployee) {
+            Modal.confirm({
+                title: `Are you sure delete Member?`,
+                centered: true,
+                icon: <ExclamationCircleFilled />,
+                content: `Employee : ${findemployee.user_fname} ${findemployee.user_lname}`,
+                okText: 'Yes',
+                okType: 'danger',
+                cancelText: 'No',
+                async onOk() {
+                    try {
+                        await axios.delete(`http://localhost:5000/api/users/${findemployee.user_id}`);
+                        console.log('OK');
+                        fetchEmployees();
+                    } catch (error) {
+                        console.error('Error deleting employee:', error);
+                    }
+                },
+                onCancel() {
+                    console.log('Cancel');
+                },
+            });
+        }
+        else {
+            console.log('no employee')
+        }
+    };
 
-    // const handleUpdateMember = async () => {
-    //     // console.log(values)
-    //     await fecthMembers()
-    //     setUpdateMember(null)
-    // }
+
+    const handleUpdateEmployee = async () => {
+        // console.log(values)
+        await fetchEmployees()
+        setEmployeeId(null)
+    }
 
     const columns = [
         {
@@ -70,11 +73,13 @@ function Employee() {
             dataIndex: 'index',
             key: 'index',
             render: (text, record, index) => index + 1,
+            width: 50,
         },
         {
             title: 'ID',
             dataIndex: 'user_id',
             key: 'user_id',
+            width: 80,
         },
         {
             title: 'Password',
@@ -95,31 +100,38 @@ function Employee() {
             title: 'Tel',
             dataIndex: 'user_tel',
             key: 'user_tel',
+            width: 120,
         },
         {
             title: 'ID Card',
             dataIndex: 'user_id_card',
             key: 'user_id_card',
+            width: 140,
+
         },
         {
             title: 'Role',
             dataIndex: 'role_type',
             key: 'role_type',
+            width: 70,
         },
         {
             title: 'Status',
             dataIndex: 'user_status',
             key: 'user_status',
+            width: 80,
+
         },
         {
             title: 'Actions',
             key: 'actions',
+            width: 200,
             render: (text, record) => (
                 <>
                     <Button
                         className="bntEdit "
                         type="primary"
-                        // onClick={() => setEditOwnerId(record.user_id)}
+                        onClick={() => setEmployeeId(record.user_id)}
                         style={{ marginRight: 8 }}
                     >
                         Edit
@@ -127,7 +139,8 @@ function Employee() {
                     <Button
                         danger
                         type="primary"
-                    // onClick={() => setDeleteOwnerId(record.user_id)}
+                        onClick={() => showDeleteConfirm(record.user_id)}
+
                     >
                         Delete
                     </Button>
@@ -147,9 +160,9 @@ function Employee() {
                 EMPLOYEE LIST
             </section>
 
-            {/* <InsertMember refreshMembers={fecthMembers} /> */}
             <InsertEmployee
-                refreshEmployee={fetchEmployees()}
+                refreshEmployee={fetchEmployees}
+                userList={userList}
             />
 
             <button className='btnSearch'>SEARCH</button>
@@ -161,19 +174,19 @@ function Employee() {
                     rowKey="user_id"
                     bordered
                     pagination={{ pageSize: 50 }}
-                    scroll={{ y: 390 }}
+                // scroll={{ y: 390 }}
                 />
             </section>
 
-            {updateMember && (
-                <>
-                </>
-                // <EditMember
-                //     member={memberList.find((member) => member.c_tel === updateMember)}
-                //     update={handleUpdateMember}
-                // />
+            {employeeId && (
+                <UpdateEmployee
+                    employee={employeeList.find((employee) => employee.user_id === employeeId)}
+                    update={handleUpdateEmployee}
+                />
             )}
+
         </div>
+
 
 
     );

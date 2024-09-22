@@ -1,26 +1,95 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Modal, Form, Input, InputNumber, Button, notification } from 'antd';
 import axios from "axios";
 
 
 
-function InsertEmployee() {
+function InsertEmployee({ refreshEmployee, userList }) {
     const [openModalInsert, setOpeModalInsert] = useState(false)
     const [form] = Form.useForm()
+    const [newEmployeeId, setNewEmployeeId] = useState("");
+
+
+    function generateRandomNumber() {
+        return Math.floor(Math.random() * 90000) + 10000;
+    }
+
+    const generateUniqueId = useCallback(() => {
+        let newId;
+        do {
+            newId = generateRandomNumber();
+        } while (userList.includes(newId));
+        setNewEmployeeId(newId);
+    }, [userList]);
+
+    useEffect(() => {
+        if (userList) {
+            generateUniqueId();
+        }
+    }, [generateUniqueId, userList]);
+
     const onFinish = async (values) => {
-        values.role_type = 'E'
+        // ตรวจสอบว่าเป็นตัวเลขเท่านั้น
+        if (!/^\d+$/.test(values.user_tel) || values.user_tel.length !== 10) {
+            notification.error({ message: 'Phone number must be 10 digits and numeric only!' });
+            return;
+        }
+
+        if (!/^\d+$/.test(values.user_id_card) || values.user_id_card.length !== 13) {
+            notification.error({ message: 'ID Card must be 13 digits and numeric only!' });
+            return;
+        }
+
+        if (userList.find(user => user.user_tel === values.user_tel)) {
+            notification.error({
+                message: "This phone number already exists."
+            });
+            return;
+        }
+
+        if (userList.find(user => user.user_id_card === values.user_id_card)) {
+            notification.error({
+                message: "This ID Card already exists."
+            });
+            return;
+        }
+
+        values.user_id = newEmployeeId
+        values.role_type = 'E';
         values.user_status = 'Active';
         console.log('Success:', values);
+        // console.log(newEmployeeId)
+
+        if (values) {
+            try {
+                await axios.post(`http://localhost:5000/api/users`, values)
+                notification.success({
+                    message: "Saved!",
+                    description: "Your Employee has been Insert."
+                })
+                form.resetFields()
+                setOpeModalInsert(false)
+                refreshEmployee()
+            } catch (error) {
+                console.log("Cannot Insert Member", error);
+                notification.error({
+                    message: "Error!",
+                    description: "There was a problem inserting the Employee.",
+                });
+            }
+        }
     }
+
     return (
         <>
-            <button className='btnAdd'
+            <Button className='btnAdd'
+                style={{ marginRight: 8 }}
                 onClick={() => {
                     setOpeModalInsert(true)
                 }}
             >
                 ADD EMPLOYEE
-            </button>
+            </Button>
 
 
 
@@ -71,19 +140,25 @@ function InsertEmployee() {
                         label="TEL"
                         rules={[{ required: true, message: 'Please input your phone number!' }]}
                     >
-                        <Input style={{ width: '100%' }}
-                            type="number"
-                            minLength={10} maxLength={10} />
+                        <Input
+                            maxLength={10}
+                            style={{ width: '100%' }}
+                            type="text"
+                            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')} // กรองตัวอักษรที่ไม่ใช่ตัวเลข
+                        />
                     </Form.Item>
 
                     <Form.Item
                         name='user_id_card'
                         label="ID Card"
-                        rules={[{ required: true, message: 'Please input your Id Card!' }]}
+                        rules={[{ required: true, message: 'Please input your ID Card!' }]}
                     >
-                        <Input style={{ width: '100%' }}
-                            type="number"
-                            minLength={13} maxLength={13} />
+                        <Input
+                            maxLength={13}
+                            style={{ width: '100%' }}
+                            type="text"
+                            onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')} // กรองตัวอักษรที่ไม่ใช่ตัวเลข
+                        />
                     </Form.Item>
 
                     <Button type="primary" htmlType="submit">
