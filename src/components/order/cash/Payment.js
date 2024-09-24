@@ -4,6 +4,7 @@ import { Modal, Form, Input, Button } from 'antd';
 import './Payment.css';
 import axios from 'axios';
 import Promtpay from './Promtpay';
+import CreateOrder from './CreateOrder';
 
 function Payment({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
@@ -19,18 +20,7 @@ function Payment({
     const [currentMember, setCurrentMember] = useState()
     const [paymentType, setPaymentType] = useState('cash')
     const [isModalPromtpay, setIsModalPromtpay] = useState(false)
-
-    // useEffect(() => {
-    //     console.log('sumCash', sumCash)
-
-    // }, [sumCash])
-    
-   // useEffect(() => {
-    //     console.log('collectPoints', collectPoints);
-    //     console.log('getPoints', onGetPoints);
-    //     console.log('redeemPoints', redeemPoints);
-    // }, [redeemPoints]);
-
+    const [showCreateOrder, setShowCreateOrder] = useState(false);
 
 
     const fetchMembers = async () => {
@@ -42,7 +32,7 @@ function Payment({
             console.log("Cannot fetch Members", error);
         }
     }
- 
+
 
     useEffect(() => {
         fetchMembers()
@@ -96,6 +86,15 @@ function Payment({
     };
 
 
+    const handleCallPageCreateOrder = () => {
+        setShowCreateOrder(false);
+        console.log('eie prommp')
+        onDeleteAll();
+        resetMember();
+        selectedType('Coffee');
+
+    }
+
     return (
         <div className="flexCash">
             <Cashmoney
@@ -110,7 +109,19 @@ function Payment({
                 getPoints={getPoints}
                 redeemPoints={redeemPoints}
             />
-
+            {/* <CreateOrder
+                onCashChange={onCashChange}
+                products={products}
+                sumCash={sumCash}
+                onChange={onChange}
+                onDeleteAll={onDeleteAll}
+                selectedType={selectedType}
+                sentMember={currentMember}
+                resetMember={resetMember}
+                getPoints={getPoints}
+                redeemPoints={redeemPoints}
+                paymenMethod={paymentType}
+            /> */}
             <button
                 className={`btnClick ${paymentType === 'points' ? 'active' : ''}`}
                 onClick={() => {
@@ -147,8 +158,12 @@ function Payment({
                     title="QR Code สำหรับชำระเงิน"
                     open={isModalPromtpay}
                     onOk={() => {
-                        setPaymentType('cash')
-                        setIsModalPromtpay(false)
+                        setPaymentType('promtpay');
+                        setShowCreateOrder(true);
+                        setIsModalPromtpay(false);
+                        // onDeleteAll();
+                        // resetMember();
+                        // selectedType('Coffee');
 
                     }}
                     cancelButtonProps={{ style: { display: 'none' } }}
@@ -157,14 +172,28 @@ function Payment({
                     width={500}
                     height={10}
                 >
-                    <Promtpay 
-                    sumCash={sumCash}
-                    
-                    
-                    />
-                </Modal >
+                    <Promtpay sumCash={sumCash} />
+                </Modal>
             )}
 
+            {showCreateOrder && (
+                <CreateOrder
+                    onCashChange={onCashChange}
+                    products={products}
+                    sumCash={sumCash}
+                    onChange={onChange}
+                    onDeleteAll={onDeleteAll}
+                    selectedType={selectedType}
+                    sentMember={currentMember}
+                    resetMember={resetMember}
+                    getPoints={getPoints}
+                    redeemPoints={redeemPoints}
+                    paymenMethod={paymentType}
+                    clearOrder={handleCallPageCreateOrder}
+                    showCreateOrder={showCreateOrder}
+
+                />
+            )}
 
             <Modal
                 title="Points"
