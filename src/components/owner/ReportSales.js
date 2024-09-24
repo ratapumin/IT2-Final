@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import './report.css';
 import ContentPdf from './ContentPdf';
 import { useState } from 'react';
+import DownloadPdf from './DownloadPdf';
 
 const { RangePicker } = DatePicker; // Import RangePicker จาก DatePicker
 
@@ -37,14 +38,14 @@ function ReportSales() {
                                 onChange={onDateChange} // เรียกฟังก์ชันเมื่อวันที่เปลี่ยน
                             />
                         </div>
-                        <Button type='primary'>
-                            Print Report
-                        </Button>
+                            <DownloadPdf date={date} />
+
                     </div>
                 </div>
                 <div className='bottomContent'>
                     <div className='boxContent'>
                         <ContentPdf date={date} />
+
                     </div>
                 </div>
             </div>

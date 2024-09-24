@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './contentpdf.css'
-
+import {Document,Page,Text,View} from '@react-pdf/renderer'
 function ContentPdf({ date }) {
     const [productList, setProductList] = useState();
     const [sales, setSales] = useState()
     const [topProducts, setTopProducts] = useState()
     const [paymentType, setPaymentType] = useState()
+    const [discount, setDiscount] = useState()
 
 
     useEffect(() => {
@@ -19,6 +20,7 @@ function ContentPdf({ date }) {
                     setSales(res.data.totalSales)
                     setTopProducts(res.data.topProducts)
                     setPaymentType(res.data.paymentTypes)
+                    setDiscount(res.data.redeemPoints)
                 } catch (error) {
                     console.log(error.response);
                 }
@@ -29,7 +31,10 @@ function ContentPdf({ date }) {
         fetchProduct();
     }, [date]);
 
+  
+    
     return (
+       
         <div className="contentflexpdf">
             <div className="label">Khathong Coffee Shop</div>
             <div className="saleReport">
@@ -44,20 +49,31 @@ function ContentPdf({ date }) {
             <div className="label">*** Sales Summary ***</div>
             <div className="sales">
                 <div className="label">Gross Sales</div>
-                <div className="value">{sales
-                    ? sales.total_amount
-                    : '0'
-                }
+                <div className="value">
+                    {sales && sales.total_amount !== null && sales.total_amount !== undefined
+                        ? sales.total_amount
+                        : '0.00'
+                    }
                 </div>
                 <div className="label">Discount</div>
-                <div className="value">2400</div>
+                <div className="value">
+                    {discount && discount.length > 0
+                        ? discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)
+                        : '0.00'}
+                </div>
                 <div className="label">Net Sales</div>
-                <div className="value">17600</div>
+                <div className="value">
+                    {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
+                        ? (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0)).toFixed(2)
+                        : '0.00'
+                    }
+                </div>
                 <div className="label">Tax</div>
-                <div className="value">{sales
-                    ? (sales.total_amount - (sales.total_amount * (100 / 107))).toFixed(2)
-                    : '0'
-                }</div>
+                <div className="value">
+                    {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
+                        ? ((sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)) - (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)) * ((100 / 107))).toFixed(2)
+                        : '0.00'
+                    }</div>
             </div>
 
             <div className="label">*** Payment Methods ***</div>
@@ -116,10 +132,6 @@ function ContentPdf({ date }) {
                     </div>
                 ))}
             </div>
-
-
-
-
         </div>
     );
 
@@ -131,23 +143,3 @@ export default ContentPdf;
 
 
 
-// const pdfDocument = (
-//     <Document>
-//         <Page size="A4">
-//             <Text>Khathong Coffee Shop</Text>
-//             <Text>Sales Report</Text>
-//             <Text>On 17-9-2024</Text>
-//             <Text>*** Sales ***</Text>
-//             <Text>Gross</Text>
-//             <Text>20000</Text>
-//             <Text>Discount</Text>
-//             <Text>2400</Text>
-//             <Text>Cash</Text>
-//             <Text>5700</Text>
-//             <Text>Promtpay</Text>
-//             <Text>4300</Text>
-//             <Text>*** Product Sold ***</Text>
-//             <Table columns={columnsProducts} dataSource={product} />
-//         </Page>
-//     </Document>
-// );

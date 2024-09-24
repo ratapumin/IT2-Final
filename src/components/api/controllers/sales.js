@@ -216,6 +216,15 @@ exports.readRepotSales = (req, res) => {
         WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
         GROUP BY orders.payment_type`;
 
+    // คิวรีข้อมูล redeem points
+    const redeemQuery = `
+       SELECT 
+       COUNT(*) AS redeem_count,
+       SUM(5) AS total_redeem_value
+        FROM points_history
+        WHERE type = 'redeem' AND DATE(transaction_date) BETWEEN ? AND ?;
+    `;
+
     // ดึงยอดขายรวม
     conn.query(totalSalesQuery, [startDate, endDate], (error, totalSalesResults) => {
         if (error) {
@@ -240,15 +249,24 @@ exports.readRepotSales = (req, res) => {
                         return res.status(500).json({ error: error.message });
                     }
 
-                    // ส่งข้อมูลผลลัพธ์ทั้งหมดกลับไป
-                    res.json({
-                        totalSales: totalSalesResults[0],
-                        products: topSellingProductsResults,
-                        topProducts: topProductsResults,
-                        paymentTypes: paymentTypeResults
+                    // ดึงข้อมูลการใช้ redeem points
+                    conn.query(redeemQuery, [startDate, endDate], (error, redeemResults) => {
+                        if (error) {
+                            return res.status(500).json({ error: error.message });
+                        }
+
+                        // ส่งข้อมูลผลลัพธ์ทั้งหมดกลับไป
+                        res.json({
+                            totalSales: totalSalesResults[0],
+                            products: topSellingProductsResults,
+                            topProducts: topProductsResults,
+                            paymentTypes: paymentTypeResults,
+                            redeemPoints: redeemResults // เพิ่มข้อมูล redeem
+                        });
                     });
                 });
             });
         });
     });
 };
+
