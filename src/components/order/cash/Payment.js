@@ -224,7 +224,8 @@ function Payment({
                         createOrder(setOrderData,handleCallPageCreateOrder)
 
                     }}
-                    cancelButtonProps={{ style: { display: 'none' } }}
+                    // cancelButtonProps={{ style: { display: 'none' } }}
+                    onCancel={handleCallPageCreateOrder}
                     closable={false}
                     style={{ textAlign: "center" }}
                     width={500}

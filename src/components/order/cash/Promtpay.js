@@ -7,19 +7,20 @@ function Promtpay({ sumCash }) {
     const [amount, setAmount] = useState(20)
     const [qrcode, setQrcode] = useState(null)
 
-    // useEffect(() => {
-    //     console.log('sumCash', sumCash)
-    // }, [sumCash])
+    useEffect(() => {
+        console.log('sumCash', sumCash)
+    }, [sumCash])
 
     const handleSetQrcode = () => {
         if (sumCash) {
-            setAmount(sumCash)
-            const playload = generatePayload(phoneNumber, { amount: amount })
+            // setAmount(sumCash)
+            const playload = generatePayload(phoneNumber, { amount: sumCash })
             setQrcode(playload)
         } else {
             console.log('no sumcash')
         }
         console.log('amountaa', amount)
+        // console.log('qrq',qrcode)
     }
     useEffect(() => {
         handleSetQrcode()
