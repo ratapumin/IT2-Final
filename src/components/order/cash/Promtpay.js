@@ -19,7 +19,7 @@ function Promtpay({ sumCash }) {
         } else {
             console.log('no sumcash')
         }
-        console.log('amount', amount)
+        console.log('amountaa', amount)
     }
     useEffect(() => {
         handleSetQrcode()

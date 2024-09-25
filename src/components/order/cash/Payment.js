@@ -5,6 +5,9 @@ import './Payment.css';
 import axios from 'axios';
 import Promtpay from './Promtpay';
 import CreateOrder from './CreateOrder';
+import { createOrder } from './Cashmoney';
+import { useUser } from '../../user/UserContext';
+import moment from 'moment';
 
 function Payment({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
@@ -20,9 +23,10 @@ function Payment({
     const [currentMember, setCurrentMember] = useState()
     const [paymentType, setPaymentType] = useState('cash')
     const [isModalPromtpay, setIsModalPromtpay] = useState(false)
-    const [showCreateOrder, setShowCreateOrder] = useState(false);
-
-
+    const [showCreateOrder, setShowCreateOrder] = useState(false); // State for triggering order creation
+    const [orderId, setOrderId] = useState('');
+    const [orderNo, setOrderNo] = useState('');
+    const { user } = useUser();
     const fetchMembers = async () => {
         try {
             const res = await axios.get('http://localhost:5000/api/members')
@@ -84,16 +88,83 @@ function Payment({
         setTel('');
         setContactName('');
     };
+    useEffect(() => {
+        const fetchOrderId = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/readorder");
+                const filterOrderId = res.data.map(order => parseInt(order.order_id, 10)).filter(id => !isNaN(id));
+                const filterOrderNo = res.data.map(order => parseInt(order.order_no, 10)).filter(no => !isNaN(no));
 
+                setOrderId(filterOrderId.length === 0 ? '1' : (Math.max(...filterOrderId) + 1).toString().padStart(4, '0'));
+                setOrderNo(filterOrderNo.length === 0 ? '1' : (Math.max(...filterOrderNo) + 1).toString().padStart(3, '0'));
+            } catch (error) {
+                console.log("Cannot fetch order", error);
+            }
+        };
+
+        fetchOrderId();
+    }, []);
+
+    const utcDate = moment().format('YYYY-MM-DD HH:mm:ss');
+    const setOrderData = () => {
+        let c_id = currentMember ? `${currentMember.c_id}` : null;
+        let newPoints = getPoints || 0;
+        let minusPoints = redeemPoints || 0;
+
+        const historyEntries = [];
+
+        // Add earn entry if newPoints exists
+        if (newPoints > 0) {
+            historyEntries.push({
+                c_id: c_id,
+                points: newPoints,
+                type: 'earn',
+                transaction_data: utcDate
+            });
+        }
+
+        // Add redeem entry if minusPoints exists
+        if (minusPoints > 0) {
+            historyEntries.push({
+                c_id: c_id,
+                points: -minusPoints,
+                type: 'redeem',
+                transaction_data: utcDate
+            });
+        }
+
+        return {
+            order_id: orderId,
+            order_no: orderNo,
+            order_date_time: utcDate,
+            payment_type: paymentType,
+            user_id: user.user_id,
+            c_id: c_id,
+            products: products.map(product => ({
+                p_id: product.p_id,
+                p_price: product.p_price,
+                quantity: product.quantity
+            })),
+            history: historyEntries, // Store an array of history entries
+            customer: {
+                c_id: c_id,
+                c_points: newPoints - minusPoints // Adjust points balance
+            }
+        };
+    };
+
+    const orderData = setOrderData();
+    console.log(orderData)
 
     const handleCallPageCreateOrder = () => {
-        setShowCreateOrder(false);
+        // setShowCreateOrder(false);
         console.log('eie prommp')
         onDeleteAll();
         resetMember();
         selectedType('Coffee');
 
     }
+
 
     return (
         <div className="flexCash">
@@ -108,20 +179,9 @@ function Payment({
                 resetMember={resetMember}
                 getPoints={getPoints}
                 redeemPoints={redeemPoints}
+                paymentType={paymentType}
             />
-            {/* <CreateOrder
-                onCashChange={onCashChange}
-                products={products}
-                sumCash={sumCash}
-                onChange={onChange}
-                onDeleteAll={onDeleteAll}
-                selectedType={selectedType}
-                sentMember={currentMember}
-                resetMember={resetMember}
-                getPoints={getPoints}
-                redeemPoints={redeemPoints}
-                paymenMethod={paymentType}
-            /> */}
+
             <button
                 className={`btnClick ${paymentType === 'points' ? 'active' : ''}`}
                 onClick={() => {
@@ -159,11 +219,9 @@ function Payment({
                     open={isModalPromtpay}
                     onOk={() => {
                         setPaymentType('promtpay');
-                        setShowCreateOrder(true);
                         setIsModalPromtpay(false);
-                        // onDeleteAll();
-                        // resetMember();
-                        // selectedType('Coffee');
+                        // setShowCreateOrder(true); // Trigger the creation of the order
+                        createOrder(setOrderData,handleCallPageCreateOrder)
 
                     }}
                     cancelButtonProps={{ style: { display: 'none' } }}
@@ -176,24 +234,8 @@ function Payment({
                 </Modal>
             )}
 
-            {showCreateOrder && (
-                <CreateOrder
-                    onCashChange={onCashChange}
-                    products={products}
-                    sumCash={sumCash}
-                    onChange={onChange}
-                    onDeleteAll={onDeleteAll}
-                    selectedType={selectedType}
-                    sentMember={currentMember}
-                    resetMember={resetMember}
-                    getPoints={getPoints}
-                    redeemPoints={redeemPoints}
-                    paymenMethod={paymentType}
-                    clearOrder={handleCallPageCreateOrder}
-                    showCreateOrder={showCreateOrder}
+            
 
-                />
-            )}
 
             <Modal
                 title="Points"
@@ -296,7 +338,7 @@ function Payment({
 
 
 
-        </div>
+        </div >
     );
 }
 

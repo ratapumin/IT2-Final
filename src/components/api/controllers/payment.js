@@ -14,12 +14,16 @@ exports.payment = (req, res) => {
         customer
     } = req.body;
 
-    if (!c_id) {
+    if (!c_id) {    
         c_id = null;
     }
     if (!products || !Array.isArray(products) || products.length === 0) {
         return res.status(400).json({ error: 'Products data is required and must be an array' });
     }
+    if (!Array.isArray(history)) {
+        history = [history]; // Wrap in an array if it's not already one
+    }
+
 
     const sqlOrder = 'INSERT INTO orders (order_id, order_no, order_date_time, payment_type, user_id, c_id) VALUES (?, ?, ?, ?, ?, ?)';
     const sqlOrderDetail = 'INSERT INTO order_detail (order_id, p_id, quantity, price) VALUES (?, ?, ?, ?)';

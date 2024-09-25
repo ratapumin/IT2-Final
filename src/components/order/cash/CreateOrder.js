@@ -86,10 +86,11 @@ function CreateOrder({ onCashChange, products, sumCash, onChange, onDeleteAll,
     useEffect(() => {
         if (showCreateOrder === true) {
             console.log('showCreateOrder ture')
-            createOrder()
+            createOrder(setOrderData)
         }
     }, [showCreateOrder])
-    const createOrder = async () => {
+
+    const createOrder = async (setOrderData) => {
         try {
             const orderData = setOrderData();
             await axios.post('http://localhost:5000/api/createOrder', orderData);
@@ -97,9 +98,10 @@ function CreateOrder({ onCashChange, products, sumCash, onChange, onDeleteAll,
             console.log('Order Data:', orderData);
             clearOrder()
         } catch (error) {
-            console.error('Error creating order:', error);
+            console.error('Error creating order:', error.response ? error.response.data : error.message);
         }
     };
+    return null; // No UI elements needed here
 }
 
 
