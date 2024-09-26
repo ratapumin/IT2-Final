@@ -38,11 +38,10 @@ function OrderProducts() {
 
 
   useEffect(() => {
-    if (!user || user.role === 'O') {
+    if (!user || user.role === 'a' && user.role === 'o') {
       navigate('/protected');
     }
   }, [user, navigate]);
-
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {

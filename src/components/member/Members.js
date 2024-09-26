@@ -6,12 +6,15 @@ import { Button } from 'antd';
 import InsertMember from './InsertMember';
 import EditMember from './EditMember';
 import { ExclamationCircleFilled } from '@ant-design/icons';
-
+import { useUser } from '../user/UserContext';
 function Members() {
     const [memberList, setMemberList] = useState([]);
     const [member, setMember] = useState();
+    const { user } = useUser();
     const [updateMember, setUpdateMember] = useState()
 
+
+    console.log(user)
     const fecthMembers = async () => {
         try {
             const res = await axios.get('http://localhost:5000/api/members');

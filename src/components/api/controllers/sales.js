@@ -139,7 +139,8 @@ exports.readYear = (req, res) => {
     })
 }
 
-exports.topProduct = (req, res) => {
+exports.topProductMonth = (req, res) => {
+    const { month } = req.params
     const sqlTop = `
                    SELECT
                         order_detail.p_id AS product_id,
@@ -152,6 +153,8 @@ exports.topProduct = (req, res) => {
                         orders ON order_detail.order_id = orders.order_id
                     JOIN 
                         products ON order_detail.p_id = products.p_id
+                    WHERE  
+                        DATE_FORMAT(orders.order_date_time, '%Y-%m') = ?
                     GROUP BY
                         order_detail.p_id
                     ORDER BY
@@ -159,7 +162,9 @@ exports.topProduct = (req, res) => {
                     LIMIT 5;
 
                    `
-    conn.query(sqlTop, (error, results) => {
+    const value = [month]
+
+    conn.query(sqlTop, value, (error, results) => {
         if (error) {
             res.status(400).json({ error })
         } else {
@@ -167,6 +172,41 @@ exports.topProduct = (req, res) => {
         }
     })
 }
+
+exports.topProductYear = (req, res) => {
+    const { month } = req.params
+    const sqlTop = `
+                   SELECT
+                        order_detail.p_id AS product_id,
+                        products.p_name AS Product_Name,
+                        SUM(order_detail.price * order_detail.quantity) AS total_sales,
+                        SUM(order_detail.quantity) AS quantity
+                    FROM
+                        order_detail
+                    JOIN
+                        orders ON order_detail.order_id = orders.order_id
+                    JOIN 
+                        products ON order_detail.p_id = products.p_id
+                    WHERE  
+                        DATE_FORMAT(orders.order_date_time, '%Y') = ?
+                    GROUP BY
+                        order_detail.p_id
+                    ORDER BY
+                        total_sales DESC
+                    LIMIT 5;
+
+                   `
+    const value = [month]
+
+    conn.query(sqlTop, value, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        } else {
+            res.json(results)
+        }
+    })
+}
+
 
 exports.readRepotSales = (req, res) => {
     const { startDate, endDate } = req.params;
