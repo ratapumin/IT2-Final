@@ -174,7 +174,7 @@ exports.topProductMonth = (req, res) => {
 }
 
 exports.topProductYear = (req, res) => {
-    const { month } = req.params
+    const { year } = req.params
     const sqlTop = `
                    SELECT
                         order_detail.p_id AS product_id,
@@ -196,7 +196,7 @@ exports.topProductYear = (req, res) => {
                     LIMIT 5;
 
                    `
-    const value = [month]
+    const value = [year]
 
     conn.query(sqlTop, value, (error, results) => {
         if (error) {

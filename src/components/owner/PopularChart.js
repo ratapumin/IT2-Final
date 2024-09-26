@@ -18,12 +18,23 @@ function PopularChart() {
     useEffect(() => {
         const fetchTopProduct = async () => {
             try {
-                const formattedDate = selectedDate.format(chartType === 'monthly' ? 'YYYY-MM' : 'YYYY');
-                const res = await axios.get(`http://localhost:5000/api/topproductmonth/${formattedDate}`);
-                const formattedData = res.data.map(item => ({
-                    name: item.Product_Name,
-                    value: parseFloat(item.quantity)
-                }));
+                let formattedData = [];
+                if (chartType === 'monthly') {
+                    const formattedDate = selectedDate.format('YYYY-MM');
+                    const res = await axios.get(`http://localhost:5000/api/topproductmonth/${formattedDate}`);
+                    formattedData = res.data.map(item => ({
+                        name: item.Product_Name,
+                        value: parseFloat(item.quantity)
+                    }));
+                } else {
+                    // For yearly, use the selected year
+                    const formattedYear = selectedDate.format('YYYY');
+                    const res = await axios.get(`http://localhost:5000/api/topproductyear/${formattedYear}`);
+                    formattedData = res.data.map(item => ({
+                        name: item.Product_Name,
+                        value: parseFloat(item.quantity)
+                    }));
+                }
                 setTopProduct(formattedData);
             } catch (error) {
                 console.log(error.response);
@@ -48,9 +59,9 @@ function PopularChart() {
     const handleChartTypeChange = (value) => {
         setChartType(value);
         if (value === 'monthly') {
-            setSelectedDate(dayjs()); // Reset date to the current date when changing to monthly
+            setSelectedDate(dayjs()); // Reset date to current month when changing to monthly
         }
-        // เมื่อเปลี่ยนเป็น 'yearly' ไม่ต้องรีเซ็ต selectedDate
+        // When changing to 'yearly', do not reset selectedDate
     };
 
     const handleDateChange = (date) => {
@@ -63,7 +74,7 @@ function PopularChart() {
         <Card
             title={
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Sales Chart</span>
+                    <span>Best Seller</span>
                     <Select
                         defaultValue="monthly"
                         style={{ width: 200 }}
