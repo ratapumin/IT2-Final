@@ -8,15 +8,18 @@ const convertToBangkokTimeforMonth = (date) => moment(date).tz('Asia/Bangkok').f
 
 
 exports.readTypeSales = (req, res) => {
-
-    const sqlPaymentType = ` SELECT SUM(order_detail.price), orders.payment_type 
-                        FROM order_detail 
-                        JOIN orders
-                        ON order_detail.order_id = orders.order_id
-                        GROUP BY orders.payment_type;
+    const { date } = req.params
+    const sqlPaymentType = `
+                            SELECT SUM(order_detail.price*order_detail.quantity) as total,orders.payment_type 
+                            FROM order_detail
+                            JOIN orders
+                            ON order_detail.order_id = orders.order_id
+                            WHERE DATE_FORMAT(orders.order_date_time,'%Y-%m-%d') = ?
+                            GROUP BY orders.payment_type
                      `
+    const value = [date]
 
-    conn.query(sqlPaymentType, (error, results) => {
+    conn.query(sqlPaymentType, value, (error, results) => {
         if (error) {
             res.status(400).json({ error })
         }

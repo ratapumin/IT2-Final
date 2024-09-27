@@ -2,7 +2,7 @@ const express = require('express')
 const { readTypeSales,readGraphMonthly, readDaily, readMonthly, readYear, topProductMonth, readRepotSales, topProductYear } = require('../controllers/sales')
 const router = express.Router()
 
-router.get('/typesales', readTypeSales)
+router.get('/typesales/:date', readTypeSales)
 router.get('/graphmonthly', readGraphMonthly)
 router.get('/daily/:id',readDaily)
 router.get('/monthly/:id',readMonthly)
