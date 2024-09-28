@@ -249,7 +249,7 @@ function OrderProducts() {
 
 
           {
-            selectedType !== 'Member' &&
+            selectedType !== 'Management' &&
             selectedType !== 'Cash' &&
             selectedType !== 'CloseDaily' &&
             selectedType !== 'Logout' &&
@@ -270,18 +270,21 @@ function OrderProducts() {
               </>
             )}
 
-          {selectedType === 'Member' && (
-            <Another />
+          {selectedType === 'Management' && (
+            <Another
+              selectedCategory={selectedCategory}
+              selectedType={selectedType}
+            />
           )}
 
-          {selectedType === 'CloseDaily' && (
+          {/* {selectedType === 'CloseDaily' && (
             <>
               <CloseDaily
                 CloseDaily={isModalCloseDaily}
                 handleCloseDaily={handleCloseDaily}
               />
             </>
-          )}
+          )} */}
 
           {selectedType === 'Logout' && (
             <>

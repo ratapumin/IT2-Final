@@ -4,15 +4,15 @@ import axios from 'axios';
 import { useUser } from '../../user/UserContext';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { Modal } from 'antd';
+import { Modal, notification } from 'antd'; // เพิ่ม notification
 
-const createOrder = async (setOrderData,onDeleteAll) => {
+const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         await axios.post('http://localhost:5000/api/createOrder', orderData);
         console.log('Order created successfully');
         console.log('Order Data:', orderData);
-        onDeleteAll()
+        onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
     }
@@ -137,15 +137,35 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     };
 
     const orderData = setOrderData();
-    console.log(orderData)
+    console.log(orderData);
 
-    const clearDataAll =()=>{
+    const clearDataAll = () => {
         setCash('');
         setChange('');
         onDeleteAll();
         resetMember();
         selectedType('Coffee');
-    }
+    };
+
+    const handleEnterClick = () => {
+        if (Number(cash) < Number(sumCash)) {
+            Modal.error({
+                title: 'Insufficient Cash',
+                content: 'Please enter enough cash to complete the transaction.',
+                centered: true, 
+            });
+            return;
+        }
+        setModal2Open(true);
+    };
+
+    const showSuccessNotification = () => {
+        notification.success({
+            message: 'Success',
+            description: 'Payment completed successfully!',
+            placement: 'topRight', // แจ้งเตือนทางขวาบน
+        });
+    };
 
     return (
         <div>
@@ -178,10 +198,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                     ))}
                     <button className="butN" onClick={handleDelete}>Delete</button>
                     <button className="butN" value={0} onClick={() => calNum(0)}>0</button>
-                    <button className="butN" onClick={() => {
-                        createOrder(setOrderData,clearDataAll);
-                        setModal2Open(true);
-                    }}>Enter</button>
+                    <button className="butN" onClick={handleEnterClick}>Enter</button>
                 </div>
             </section>
 
@@ -191,12 +208,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 open={modal2Open}
                 onOk={() => {
                     setModal2Open(false);
-                    // setCash('');
-                    // setChange('');
-                    // onDeleteAll();
-                    // resetMember();
-                    // selectedType('Coffee');
-                    // clearDataAll()
+                    createOrder(setOrderData, clearDataAll);
+                    showSuccessNotification(); // แสดงแจ้งเตือนเมื่อกด OK
                 }}
                 cancelButtonProps={{ style: { display: 'none' } }}
                 closable={false}

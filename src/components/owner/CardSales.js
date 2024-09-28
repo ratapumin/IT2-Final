@@ -60,7 +60,6 @@ function CardSales() {
 
         <>
             <Card
-                className='solid'
                 title="Daily sales"
                 bordered={false}
                 style={{ width: 300, height: 150 }}
@@ -72,7 +71,6 @@ function CardSales() {
                 </p>
             </Card>
             <Card
-                className='solid'
                 title="Monthly sales"
                 bordered={false}
                 style={{ width: 300, height: 150 }}
@@ -86,7 +84,6 @@ function CardSales() {
                     }   </p>
             </Card>
             <Card
-                className='solid'
                 title="Annual sales"
                 bordered={false}
                 style={{ width: 300, height: 150 }}

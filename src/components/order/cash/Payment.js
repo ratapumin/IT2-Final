@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import Cashmoney from './Cashmoney';
-import { Modal, Form, Input, Button } from 'antd';
+import { Modal, Form, Input, Button, notification } from 'antd';
 import './Payment.css';
 import axios from 'axios';
 import Promtpay from './Promtpay';
-import CreateOrder from './CreateOrder';
 import { createOrder } from './Cashmoney';
 import { useUser } from '../../user/UserContext';
 import moment from 'moment';
@@ -165,6 +164,15 @@ function Payment({
 
     }
 
+    const showSuccessNotification = () => {
+        notification.success({
+            message: 'Payment Successful',
+            description: 'Your payment via Promtpay was successful!',
+            duration: 3, // ระยะเวลาในการแสดง (3 วินาที)
+        });
+    };
+
+
 
     return (
         <div className="flexCash">
@@ -221,21 +229,19 @@ function Payment({
                         setPaymentType('promtpay');
                         setIsModalPromtpay(false);
                         // setShowCreateOrder(true); // Trigger the creation of the order
-                        createOrder(setOrderData,handleCallPageCreateOrder)
-
+                        createOrder(setOrderData, handleCallPageCreateOrder);
+                        showSuccessNotification(); // เรียกฟังก์ชันแสดง noti หลังจากกด OK
                     }}
-                    // cancelButtonProps={{ style: { display: 'none' } }}
                     onCancel={handleCallPageCreateOrder}
                     closable={false}
                     style={{ textAlign: "center" }}
                     width={500}
-                    height={10}
                 >
                     <Promtpay sumCash={sumCash} />
                 </Modal>
             )}
 
-            
+
 
 
             <Modal
