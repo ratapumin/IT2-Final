@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Select, Button, notification, Row, Col } from "antd";
 const { Option } = Select;
 
-function Insert_products({ insertProduct }) {
+function Insert_products({ insertProduct, productList }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [productIdPrefix, setProductIdPrefix] = useState('');
@@ -19,6 +19,13 @@ function Insert_products({ insertProduct }) {
         ICE: "ICE",
         HOT: "HOT",
     };
+    useEffect(() => {
+        console.log(productList)
+    }, [productList]);
+
+
+
+
 
     const handleProductTypeChange = (value) => {
         let prefix;
@@ -44,6 +51,7 @@ function Insert_products({ insertProduct }) {
     const handleCategoryChange = (value) => {
         const categoryPrefix = value === 'ICE' ? '1' : '2';
         updateProductId(productIdPrefix, categoryPrefix);
+        console.log(categoryPrefix)
     };
 
     const handlePart = (e) => {
@@ -51,30 +59,56 @@ function Insert_products({ insertProduct }) {
         setPartId(value);
         console.log('set value', value);
         const categoryPrefix = form.getFieldValue('category') === 'ICE' ? '1' : '2';
-        // updateProductId(productIdPrefix, categoryPrefix);
+        updateProductId(productIdPrefix, categoryPrefix);
     };
 
     useEffect(() => {
         setIsModalVisible(true);
 
-        const defaultTypePrefix = '10';
-        const defaultCategoryPrefix = '1';
+        const defaultTypePrefix = '10'; // Prefix สำหรับ Coffee
+        const defaultCategoryPrefix = '1'; // Prefix สำหรับ ICE
         form.setFieldsValue({
             p_id: `${defaultTypePrefix}${defaultCategoryPrefix}`,
             editablePart: ''
         });
 
         setProductIdPrefix(defaultTypePrefix);
-    }, [form]);
+        updateProductId(defaultTypePrefix, defaultCategoryPrefix);
+    }, [form, productList]);
+
 
     const updateProductId = (typePrefix, categoryPrefix) => {
-        const newProductId = `${typePrefix}${categoryPrefix}`;
-        console.log('set value', partId);
+        const newProductIdPrefix = `${typePrefix}${categoryPrefix}`;
+
+        // ฟิลเตอร์สินค้าที่มี prefix ตรงกัน
+        const filteredProducts = productList.filter((product) =>
+            String(product.p_id).startsWith(newProductIdPrefix)
+        );
+
+        // หาค่าสูงสุดของเลขลำดับ
+        const maxId = filteredProducts.length > 0
+            ? Math.max(...filteredProducts.map((product) => {
+                const pId = String(product.p_id);
+                return parseInt(pId.slice(newProductIdPrefix.length)) || 0;
+            }))
+            : 0;
+
+        // เพิ่มเลขลำดับถัดไป และเติม 0 ให้ครบ 2 หลัก
+        const nextId = String(maxId + 1).padStart(2, '0');
+
+        // ตั้งค่า Product ID ใหม่
         form.setFieldsValue({
-            p_id: newProductId
+            p_id: `${newProductIdPrefix}${nextId}`
         });
-        console.log('set newProductId', newProductId);
+
+        console.log('Filtered productList', filteredProducts);
+        console.log('Next ID:', `${newProductIdPrefix}${nextId}`);
     };
+
+
+
+
+
 
     const addProduct = useCallback(async (values) => {
         values.p_id = `${form.getFieldValue('p_id')}${partId}`;
@@ -89,7 +123,7 @@ function Insert_products({ insertProduct }) {
                 message: "Saved!",
                 description: "Your product has been updated.",
             });
-            form.resetFields(); 
+            form.resetFields();
             setIsModalVisible(false);
             insertProduct(true);
         } catch (error) {
@@ -133,10 +167,11 @@ function Insert_products({ insertProduct }) {
             ]}
         >
             <Form
-                form={form}
+                form={form}  // Make sure the form prop is passed here
                 layout="vertical"
-                initialValues={{ p_type: 'Coffee', category: 'ICE', editablePart: '' }}
+                initialValues={{ p_type: 'Coffee', category: 'ICE' }}
             >
+
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
@@ -165,27 +200,17 @@ function Insert_products({ insertProduct }) {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row gutter={16}>
+                {/* <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
                             name="p_id"
                             label="Product ID"
-                            rules={[{ required: true, message: 'Please input the product ID!' }]}
+                            rules={[{ required: true, message: 'Product ID is required!' }]}
                         >
                             <Input disabled />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
-                        <Form.Item
-                            onChange={handlePart}
-                            name="editablePart"
-                            label="Editable Part"
-                            rules={[{ required: true, message: 'Please input the last 2 digits!' }]}
-                        >
-                            <Input maxLength={2} />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                </Row> */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item

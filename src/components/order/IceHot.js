@@ -13,7 +13,7 @@ const IceHot = ({ selectedCategory, onCategoryClick }) => {
                 return (
                     <h2
                         key={category}
-                        className="icehot-box"  
+                        className="icehot-box"
                         style={{
                             backgroundColor: backgroundColor,
                             border: `solid ${borderColor}`

@@ -5,7 +5,7 @@ import moment from 'moment';
 
 function CloseDaily({ CloseDaily, handleCloseDaily }) {
     const [totalcash, setTotalCash] = useState('');
-    const [totalpromtpay, setTotalPromtpay] = useState('');
+    // const [totalpromtpay, setTotalPromtpay] = useState('');
     const [cashInput, setCashInput] = useState('');
 
     useEffect(() => {
@@ -18,11 +18,11 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
                 // แยกค่าออกตาม payment_type
                 const cashData = res.data.find(item => item.payment_type === 'cash') || {};
-                const promtpayData = res.data.find(item => item.payment_type === 'promtpay') || {};
+                // const promtpayData = res.data.find(item => item.payment_type === 'promtpay') || {};
 
                 // ตั้งค่า state โดยถ้าไม่มีค่าให้ตั้งเป็น 0
                 setTotalCash(cashData.total || 0);
-                setTotalPromtpay(promtpayData.total || 0);
+                // setTotalPromtpay(promtpayData.total || 0);
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -43,12 +43,13 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
         } else {
             console.log('total equal');
         }
-    };  
+    };
 
     return (
         <>
-            {(totalcash !== null && totalcash !== '' && totalcash !== 0) && 
-             (totalpromtpay !== null && totalpromtpay !== '' && totalpromtpay !== 0)
+            {(totalcash !== null && totalcash !== '' && totalcash !== 0)
+                // && 
+                //  (totalpromtpay !== null && totalpromtpay !== '' && totalpromtpay !== 0)
                 ? (
                     <Modal
                         title="Close Daily Sales"
@@ -81,7 +82,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                             >
                                 Total Cash In Machine
                             </span>
-    
+
                             <Form.Item
                                 label="Total"
                                 rules={[{ required: true, message: 'Please input Cash!' }]}
@@ -93,7 +94,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                                 />
                             </Form.Item>
                         </Form>
-    
+
                         <Space>
                             <Button
                                 key="select"
@@ -130,7 +131,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
             }
         </>
     );
-    
+
 
 }
 

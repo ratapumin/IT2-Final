@@ -29,7 +29,7 @@ function LayoutWithSidebar() {
   return (
     <div style={{ display: 'flex' }}>
       <Sidebar />
-      <div style={{ marginLeft: '150px', width: '100%' }}>
+      <div style={{ marginLeft: '200px', width: '100%' }}>
         <Outlet />
       </div>
     </div>

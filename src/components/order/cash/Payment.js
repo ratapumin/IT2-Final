@@ -173,7 +173,6 @@ function Payment({
     };
 
 
-
     return (
         <div className="flexCash">
             <Cashmoney
