@@ -137,7 +137,7 @@ function InsertEmployee({ refreshEmployee, userList }) {
 
                     <Form.Item
                         name='user_tel'
-                        label="TEL"
+                        label="Tel"
                         rules={[{ required: true, message: 'Please input your phone number!' }]}
                     >
                         <Input

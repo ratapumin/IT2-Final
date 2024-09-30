@@ -9,7 +9,7 @@ import InsertOwner from './Inser_owner'
 import './owner.css';
 
 function Owner() {
-    const [owners, setOwners] = useState([]);
+    const [ownerList, setOwners] = useState([]);
     const [editOwnerId, setEditOwnerId] = useState(null);
     const [deleteOwnerId, setDeleteOwnerId] = useState(null);
     const [insertOwner, setInsertOwner] = useState(false);
@@ -136,7 +136,7 @@ function Owner() {
 
                     <Table
                         columns={columns}
-                        dataSource={owners}
+                        dataSource={ownerList}
                         rowKey="user_id"
                         bordered
                     />
@@ -144,20 +144,22 @@ function Owner() {
             </div>
             {editOwnerId && (
                 <EditOwner
-                    owner={owners.find((o) => o.user_id === editOwnerId)}
+                    owner={ownerList.find((o) => o.user_id === editOwnerId)}
                     saveEdit={handleSaveEdit}
                 />
             )}
 
             {deleteOwnerId && (
                 <DeleteOwner
-                    owner={owners.find((o) => o.user_id === deleteOwnerId)}
+                    owner={ownerList.find((o) => o.user_id === deleteOwnerId)}
                     onDelete={handleonDelete}
                 />
             )}
 
             {insertOwner && (
-                <InsertOwner insertOwner={handleInsertOwner} />
+                <InsertOwner insertOwner={handleInsertOwner} 
+                    ownerList={ownerList}
+                />
             )}
         </>
     );
