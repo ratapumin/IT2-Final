@@ -74,12 +74,14 @@ function Employee() {
             key: 'index',
             render: (text, record, index) => index + 1,
             width: 50,
+            align: 'center',  // จัดข้อความกลาง
         },
         {
             title: 'ID',
             dataIndex: 'user_id',
             key: 'user_id',
             width: 80,
+            align: 'center',  // จัดข้อความกลาง
         },
         {
             title: 'Password',
@@ -100,13 +102,15 @@ function Employee() {
             title: 'Tel',
             dataIndex: 'user_tel',
             key: 'user_tel',
-            width: 120,
+            align: 'center',  // จัดข้อความกลางwidth: 120,
+
         },
         {
             title: 'ID Card',
             dataIndex: 'user_id_card',
             key: 'user_id_card',
-            width: 140,
+            align: 'center',  // จัดข้อความกลางwidth: 140,
+
 
         },
         {
@@ -114,18 +118,21 @@ function Employee() {
             dataIndex: 'role_type',
             key: 'role_type',
             width: 70,
+            align: 'center',  // จัดข้อความกลาง
         },
         {
             title: 'Status',
             dataIndex: 'user_status',
             key: 'user_status',
             width: 80,
+            align: 'center',  // จัดข้อความกลาง
 
         },
         {
             title: 'Actions',
             key: 'actions',
-            width: 200,
+            align: 'center',  // จัดข้อความกลางwidth: 200,
+
             render: (text, record) => (
                 <>
                     <Button

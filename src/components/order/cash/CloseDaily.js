@@ -11,7 +11,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
     useEffect(() => {
         const fetchTotalPrice = async () => {
             try {
-                const currentDate = moment().format('YYYY-MM-D');
+                const currentDate = moment().format('YYYY-MM-DD');
                 console.log(currentDate);
                 const res = await axios.get(`http://localhost:5000/api/typesales/${currentDate}`);
                 console.log('price', res.data);
@@ -47,7 +47,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
     return (
         <>
-            {(totalcash !== null && totalcash !== '' && totalcash !== 0)
+            {(totalcash && totalcash !== 0)
                 // && 
                 //  (totalpromtpay !== null && totalpromtpay !== '' && totalpromtpay !== 0)
                 ? (

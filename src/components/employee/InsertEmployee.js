@@ -40,14 +40,14 @@ function InsertEmployee({ refreshEmployee, userList }) {
             return;
         }
 
-        if (userList.find(user => user.user_tel === values.user_tel)) {
+        if (userList.find(user => user.user_tel === values.user_tel && user.user_id !== values.user_id)) {
             notification.error({
                 message: "This phone number already exists."
             });
             return;
         }
 
-        if (userList.find(user => user.user_id_card === values.user_id_card)) {
+        if (userList.find(user => user.user_id_card === values.user_id_card && user.user_id !== values.user_id)) {
             notification.error({
                 message: "This ID Card already exists."
             });

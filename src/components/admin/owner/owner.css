@@ -13,62 +13,9 @@
     min-width: 70px;
 }
 
-.table {
+.tableOwner {
     width: 100%; /* ลดความกว้างของตารางจาก 100% เป็น 80% */
     margin: auto; /* จัดตารางให้อยู่กลาง */
     overflow-x: auto; /* ทำให้ตารางสามารถเลื่อนในแนวนอนได้ */
 }
 
-.table th,
-.table td {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table th:nth-child(1),
-.table td:nth-child(1) {
-    width: 5%;
-}
-
-.table th:nth-child(2),
-.table td:nth-child(2) {
-    width: 10%;
-}
-
-.table th:nth-child(3),
-.table td:nth-child(3) {
-    width: 15%; /* ลดความกว้างของคอลัมน์ Name */
-}
-
-.table th:nth-child(4),
-.table td:nth-child(4) {
-    width: 10%;
-}
-
-.table th:nth-child(5),
-.table td:nth-child(5) {
-    width: 10%;
-}
-
-.table th:nth-child(6),
-.table td:nth-child(6) {
-    width: 15%;
-}
-
-.table th:nth-child(7),
-.table td:nth-child(7) {
-    width: 15%; 
-}
-.table th:nth-child(8),
-.table td:nth-child(8) {
-    width: 0%; 
-}
-
-.table th:nth-child(9),
-.table td:nth-child(9) {
-    width: 5%; 
-}
-.table th:nth-child(10),
-.table td:nth-child(10) {
-    width: 15%; 
-}

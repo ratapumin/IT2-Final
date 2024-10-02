@@ -24,6 +24,7 @@ import Dashboard from "./components/owner/Dashboard";
 import SidebarDashboard from "./components/owner/SidebarDashboard";
 import ReportSales from "./components/owner/ReportSales";
 import Employee from "./components/employee/Employee";
+import PrintReceipt from "./components/order/cash/PrintReceipt";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -79,6 +80,8 @@ function App() {
             <Route path='/qrcode' element={<Qrcode />} />
 
             <Route path='/closedaily' element={<CloseDaily />} />
+            
+            <Route path='/printreceipt' element={<PrintReceipt/>}/>
 
           </Route>
           {/* Layout Dashboard Sidebar */}

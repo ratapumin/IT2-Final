@@ -14,7 +14,7 @@ exports.payment = (req, res) => {
         customer
     } = req.body;
 
-    if (!c_id) {    
+    if (!c_id) {
         c_id = null;
     }
     if (!products || !Array.isArray(products) || products.length === 0) {
@@ -101,3 +101,36 @@ exports.payment = (req, res) => {
         });
     });
 };
+
+
+
+exports.closedaily = (req, res) => {
+    const { date, cash_in_machine } = req.body;
+    const sqlClosedaily = `
+                        INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
+                        SELECT 
+                            cash_in_machine,
+                            cash_in_system,
+                            cash_in_system - cash_in_machine AS cash_difference,
+                            12345, 
+                            CURRENT_DATE()
+                        FROM (
+                            SELECT 
+                                2000 AS cash_in_machine,
+                                SUM(order_detail.price * order_detail.quantity) AS cash_in_system
+                            FROM order_detail
+                            JOIN orders ON order_detail.order_id = orders.order_id 
+                            WHERE DATE(orders.order_date_time) = '2024-09-28'
+                        ) AS subquery;
+                        `
+    const value = [date, cash_in_machine]
+
+    conn.query(sqlClosedaily, value, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        } else {
+            res.json(results)
+            console.log(results)
+        }
+    })
+}

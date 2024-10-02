@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // Import React
 import { Modal, Form, Input, Row, Col, message, notification, Button } from "antd";
 
 function Insert_owner({ insertOwner, ownerList }) {
@@ -60,7 +60,6 @@ function Insert_owner({ insertOwner, ownerList }) {
             return;
         }
 
-        // ตรวจสอบว่าเบอร์โทรศัพท์หรือบัตรประชาชนมีอยู่แล้วในระบบหรือไม่
         if (ownerIdList.find(owner => owner.user_tel === values.user_tel)) {
             notification.error({ message: "This phone number already exists." });
             return;

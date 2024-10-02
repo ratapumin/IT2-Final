@@ -41,6 +41,7 @@ function DeleteProducts({ product, onDelete }) {
                 onCancel={handleCancel}
                 okText="Yes, delete it!"
                 cancelText="No, keep it"
+                centered
             >
                 <p>Are you sure you want to delete this product?</p>
                 <p>ID: {product.p_id}</p>

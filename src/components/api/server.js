@@ -9,8 +9,7 @@ const membersRoutes = require('./routes/member')
 const paymentRoutes = require('./routes/payment')
 const orderRoutes = require('./routes/order')
 const salesRoutes = require('./routes/sales')
-
-
+const receiptRoutes = require('./routes/device')
 
 
 app.use(cors());
@@ -22,6 +21,7 @@ app.use('/api', membersRoutes)
 app.use('/api', paymentRoutes)
 app.use('/api', orderRoutes)
 app.use('/api', salesRoutes)
+app.use('/api',receiptRoutes)
 
 
 

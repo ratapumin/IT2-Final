@@ -1,123 +1,160 @@
-import axios from "axios"
-import { useEffect, useState, useCallback } from "react"
-import Swal from "sweetalert2";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Modal, Form, Input, Row, Col, message, notification, Select } from "antd";
 
-
-
-function Edit_owner({ owner, saveEdit }) {
-    const [currentowner, setCurrentOwner] = useState(owner)
-
-
-    useEffect(() => {
-        setCurrentOwner(owner)
-    }, [owner])
-
-
-    const changeData = useCallback(async () => {
-        const { value: formValues } = await Swal.fire({
-            title: "Edit Owner",
-            width: 'auto',
-            html: `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <!-- Row 1: User ID and Password -->
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="user_id" style="width: 35%; text-align: right; padding-right: 5px;">User ID</label>
-                            <input id="user_id" class="swal2-input" style="width: 60%;" value="${currentowner.user_id}" readonly>
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="user_password" style="width: 35%; text-align: right; padding-right: 5px;">Password</label>
-                            <input id="user_password" class="swal2-input" style="width: 60%;" value="${currentowner.user_password}">
-                        </div>
-                    </div>
-                    <!-- Row 2: First Name and Last Name -->
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="first_name" style="width: 35%; text-align: right; padding-right: 5px;">First Name</label>
-                            <input id="first_name" class="swal2-input" style="width: 60%;" value="${currentowner.user_fname}">
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="last_name" style="width: 35%; text-align: right; padding-right: 5px;">Last Name</label>
-                            <input id="last_name" class="swal2-input" style="width: 60%;" value="${currentowner.user_lname}">
-                        </div>
-                    </div>
-                    <!-- Row 3: Tel and ID Card -->
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="tel" style="width: 35%; text-align: right; padding-right: 5px;">Tel</label>
-                            <input id="tel" class="swal2-input" style="width: 60%;" value="${currentowner.user_tel}">
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="id_card" style="width: 35%; text-align: right; padding-right: 5px;">ID Card</label>
-                            <input id="id_card" class="swal2-input" style="width: 60%;" value="${currentowner.user_id_card}">
-                        </div>
-                    </div>
-                    <!-- Row 4: Role and Status -->
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="role" style="width: 35%; text-align: right; padding-right: 5px;">Role</label>
-                            <input id="role" class="swal2-input" style="width: 60%;" value="${currentowner.role_type}">
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; width: 48%;">
-                            <label for="status" style="width: 35%; text-align: right; padding-right: 5px;">Status</label>
-                            <input id="status" class="swal2-input" style="width: 60%;" value="${currentowner.user_status}">
-                        </div>
-                    </div>
-                </div>
-            `,
-            focusConfirm: false,
-            showCancelButton: true,
-            preConfirm: () => {
-                return {
-                    user_id: document.getElementById("user_id")?.value || "",
-                    user_password: document.getElementById("user_password")?.value || "",
-                    user_fname: document.getElementById("first_name")?.value || "",
-                    user_lname: document.getElementById("last_name")?.value || "",
-                    user_tel: document.getElementById("tel")?.value || "",
-                    user_id_card: document.getElementById("id_card")?.value || "",
-                    role_type: document.getElementById("role")?.value || "",
-                    user_status: document.getElementById("status")?.value || "",
-                };
-            }
-        });
-    
-        if (formValues) {
-            try {
-                await axios.put(
-                    `http://localhost:5000/api/users/${formValues.user_id}`,
-                    formValues
-                );
-                Swal.fire({
-                    title: "Saved!",
-                    text: "Your Owner has been updated.",
-                    icon: "success",
-                    timer: 1000, // ระยะเวลาแสดงผลเป็นมิลลิวินาที
-                    showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-                });
-                
-                saveEdit();
-            } catch (error) {
-                console.log("Cannot edit product", error);
-                await Swal.fire({
-                    title: "Error!",
-                    text: "There was a problem updating the product.",
-                    icon: "error",
-                });
-            }
-        } else {
-            saveEdit();
-        }
-    }, [currentowner, saveEdit]);
-    
+function Edit_owner({ owner, saveEdit, ownerList }) {
+    const [currentOwner, setCurrentOwner] = useState(owner);
+    const [isModalVisible, setIsModalVisible] = useState(true);
+    const [form] = Form.useForm();
 
     useEffect(() => {
-        if (currentowner) {
-            changeData()
+        setCurrentOwner(owner);
+        form.setFieldsValue(owner);
+    }, [owner, form]);
 
+    const onFinish = async (values) => {
+        // ตรวจสอบเบอร์โทรศัพท์
+        if (!/^\d+$/.test(values.user_tel)) {
+            message.error('Phone number must be numeric only!');
+            return;
         }
-    }, [changeData, currentowner])
-    return null
+        if (values.user_tel.length !== 10) {
+            message.error('Phone number must be exactly 10 digits!');
+            return;
+        }
+
+        // ตรวจสอบบัตรประชาชน
+        if (!/^\d+$/.test(values.user_id_card)) {
+            message.error('ID Card must be numeric only!');
+            return;
+        }
+        if (values.user_id_card.length !== 13) {
+            message.error('ID Card must be exactly 13 digits!');
+            return;
+        }
+
+        if (ownerList.find(owner => owner.user_tel === values.user_tel && owner.user_id !== values.user_id)) {
+            notification.error({ message: "This phone number already exists." });
+            return;
+        }
+        if (ownerList.find(owner => owner.user_id_card === values.user_id_card && owner.user_id !== values.user_id)) {
+            notification.error({ message: "This ID Card already exists." });
+            return;
+        }
+        
+        // ส่งข้อมูลไปยังเซิร์ฟเวอร์
+        try {
+            await axios.put(`http://localhost:5000/api/users/${values.user_id}`, values);
+            message.success("Owner updated successfully!");
+            setIsModalVisible(false);
+            saveEdit(); // เรียก callback เมื่อบันทึกสำเร็จ
+        } catch (error) {
+            console.error("Cannot edit owner", error);
+            message.error("Failed to update owner.");
+        }
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        saveEdit();
+    };
+
+    return (
+        <Modal
+            title="Edit Owner"
+            open={isModalVisible}
+            onCancel={handleCancel}
+            onOk={() => form.submit()}
+            centered
+            width={700}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                initialValues={currentOwner}
+                onFinish={onFinish}
+            >
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item label="User ID" name="user_id">
+                            <Input value={currentOwner?.user_id} disabled />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Password" name="user_password"
+                            rules={[{ required: true, message: "Please enter a password" },
+                            { min: 5, max: 15, message: "Password must be 5-15 characters long" }]}
+                        >
+                            <Input.Password />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="First Name" name="user_fname"
+                            rules={[{ required: true, message: "Please enter a first name" },
+                            { max: 30, message: "First name cannot exceed 30 characters" }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Last Name" name="user_lname"
+                            rules={[{ required: true, message: "Please enter a last name" },
+                            { max: 30, message: "Last name cannot exceed 30 characters" }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Tel" name="user_tel"
+                            rules={[{ required: true, message: "Please input your phone number!" }]}
+                        >
+                            <Input
+                                maxLength={10}
+                                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')} // กรองเฉพาะตัวเลข
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="ID Card" name="user_id_card"
+                            rules={[{ required: true, message: "Please input your ID Card!" }]}
+                        >
+                            <Input
+                                maxLength={13}
+                                onInput={(e) => e.target.value = e.target.value.replace(/\D/g, '')} // กรองเฉพาะตัวเลข
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item label="Role" name="role_type">
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label="Status" name="user_status">
+                            <Select>
+                                <Select.Option value="Active">Active</Select.Option>
+                                <Select.Option value="Unactive">Unactive</Select.Option>
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
+    );
 }
 
-
-export default Edit_owner
+export default Edit_owner;
