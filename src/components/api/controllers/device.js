@@ -3,7 +3,7 @@ const types = require('node-thermal-printer').types;
 
 const printer = new Printer({
     type: types.EPSON,
-    interface: '//localhost/printer',
+    interface: '//localhost/printer', // shirnig
     options: {
         timeout: 10000, // เพิ่ม timeout ในการเชื่อมต่อ
     }
