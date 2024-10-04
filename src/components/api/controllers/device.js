@@ -15,14 +15,12 @@ exports.printReceipt = (req, res) => {
     // ตั้งค่าข้อมูลที่จะพิมพ์
     printer.alignCenter();
     printer.println(content);
-
-    // สั่งตัดกระดาษ
-    printer.cut(); // เพิ่มคำสั่งตัดกระดาษที่นี่
+    // printer.cut();  // ตัดกระดาษหลังจากที่พิมพ์เสร็จ
 
     // สั่งพิมพ์
     printer.execute()
         .then(() => {
-            console.log("Printed successfully.");
+            console.log("Printed and cut successfully.");
             res.status(200).send("Print job sent successfully.");
         })
         .catch(err => {
