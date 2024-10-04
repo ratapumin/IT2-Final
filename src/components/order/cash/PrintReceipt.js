@@ -1,36 +1,31 @@
-import axios from 'axios'
-import React from 'react'
-import { useEffect } from 'react'
+import React from 'react';
+import axios from 'axios';
 
 const PrintReceipt = () => {
+    const handlePrint = async () => {
+        const content = "Receipt\nItem: U80II(U) 1\nThank you for your purchase!"; // ข้อมูลที่คุณต้องการส่งไปยัง API
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const createReceipt = async () => {
-    const items = [
-      { name: 'สินค้า A', price: 100 },
-      { name: 'สินค้า B', price: 200 },
-    ];
-    const total = 300;
-    try {
-      const res = await axios.post('http://localhost:5000/api/createreceipt', items, total)
-      if (res.ok) {
-        console.log('ใบเสร็จพิมพ์เรียบร้อย');
-      } else {
-        console.error('เกิดข้อผิดพลาดในการพิมพ์ใบเสร็จ');
-      }
-    } catch (error) {
-      console.error('เกิดข้อผิดพลาดในการเชื่อมต่อ:', error);
-    }
+        try {
+            // เรียก API สำหรับการพิมพ์
+            const response = await axios.post('http://localhost:5000/api/print', {
+                content: content
+            });
 
+            // แสดงผลการพิมพ์ใน console
+            console.log(response.data);
+            alert(response.data); // แสดงข้อความที่ส่งกลับจากเซิร์ฟเวอร์
+        } catch (error) {
+            console.error("Error printing receipt:", error);
+            alert("Failed to print. Please check the console for details.");
+        }
+    };
 
-  }
-  useEffect(() => {
-    createReceipt()
-  }, [createReceipt]);
+    return (
+        <div>
+            <h1>Print Receipt</h1>
+            <button onClick={handlePrint}>Print Receipt</button>
+        </div>
+    );
+};
 
-  return (
-    <div>PrintReceipt</div>
-  )
-}
-
-export default PrintReceipt
+export default PrintReceipt;

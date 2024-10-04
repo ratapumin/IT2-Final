@@ -1,4 +1,5 @@
 import React from 'react';
+import PrintReceipt from './order/cash/PrintReceipt';
 
 const PageHome = () => {
   const [productType, setProductType] = useState()
@@ -19,14 +20,10 @@ const PageHome = () => {
 
   return (<>
 
-    {/* {productType && productType.map((type) => (
-      <section key={type.p_type}>
-        <h1>{type.p_type}</h1>
-      </section>
-    ))} */}
+    <PrintReceipt />
 
 
-<h1>home page</h1>
+    <h1>home page</h1>
   </>)
 
 }

@@ -1,37 +1,32 @@
-const ThermalPrinter = require("node-thermal-printer").printer;
-const PrinterTypes = require("node-thermal-printer").types;
+const Printer = require('node-thermal-printer').printer;
+const types = require('node-thermal-printer').types;
 
-// สร้างอินสแตนซ์เครื่องพิมพ์
-let printer = new ThermalPrinter({
-  type: PrinterTypes.EPSON,  // ประเภทเครื่องพิมพ์
-  interface: 'usb',          // การเชื่อมต่อ (เช่น usb, network, serial)
+const printer = new Printer({
+    type: types.EPSON,
+    interface: '//localhost/printer',
+    options: {
+        timeout: 10000, // เพิ่ม timeout ในการเชื่อมต่อ
+    }
 });
 
+exports.printReceipt = (req, res) => {
+    const { content } = req.body;
 
-// ฟังก์ชันสำหรับพิมพ์ใบเสร็จ
-exports.printReceipt = async (req, res) => {
-    const { items, total } = req.body;
+    // ตั้งค่าข้อมูลที่จะพิมพ์
+    printer.alignCenter();
+    printer.println(content);
 
-    try {
-        // เริ่มต้นการพิมพ์ใบเสร็จ
-        printer.println('ใบเสร็จรับเงิน');
-        printer.println('--------------------------');
+    // สั่งตัดกระดาษ
+    printer.cut(); // เพิ่มคำสั่งตัดกระดาษที่นี่
 
-        // พิมพ์รายการสินค้า
-        items.forEach(item => {
-            printer.println(`${item.name} - ${item.price} บาท`);
+    // สั่งพิมพ์
+    printer.execute()
+        .then(() => {
+            console.log("Printed successfully.");
+            res.status(200).send("Print job sent successfully.");
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).send("Failed to print.");
         });
-
-        printer.println(`รวม: ${total} บาท`);
-        printer.println('ขอบคุณที่ใช้บริการ');
-        printer.cut();  // ตัดกระดาษ
-
-        // สั่งพิมพ์
-        await printer.execute();
-        console.log('พิมพ์ใบเสร็จเสร็จสิ้น');
-        return res.status(200).send('พิมพ์ใบเสร็จเสร็จสิ้น');
-    } catch (err) {
-        console.error('เกิดข้อผิดพลาดในการพิมพ์:', err);
-        return res.status(500).send('เกิดข้อผิดพลาดในการพิมพ์');
-    }
 };

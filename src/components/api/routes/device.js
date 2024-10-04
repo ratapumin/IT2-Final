@@ -1,7 +1,8 @@
-const express = require('express')
-const { printReceipt } = require('../controllers/device')
-const router = express.Router()
+const express = require('express');
+const { printReceipt } = require('../controllers/device');
+const router = express.Router();
 
-router.post('/createreceipt', printReceipt)
+// Route สำหรับสร้างใบเสร็จ
+router.post('/print', printReceipt);
 
-module.exports = router
+module.exports = router;
