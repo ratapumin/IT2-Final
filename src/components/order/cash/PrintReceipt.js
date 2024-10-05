@@ -15,15 +15,17 @@ const PrintReceipt = ({ orderData }) => {
                 customer: orderData.customer || { name: "Unknown" },
                 products: Array.isArray(orderData.products) ? orderData.products : [],
                 history: Array.isArray(orderData.history) ? orderData.history : [],
+                paymentMethod:orderData.payment_type
             });
         }
     }, [orderData]);
 
-useEffect(() => {
-    if (orderInfor) {
-        handlePrint();
-    }
-}, [orderInfor]);
+    useEffect(() => {
+        if (orderInfor) {
+            console.log("Sending data to server:", orderInfor);  // ตรวจสอบข้อมูลก่อนการส่ง request
+            handlePrint();
+        }
+    }, [orderInfor]);
 
 const handlePrint = async () => {
     if (isPrinting || !orderInfor) return; // หากยังอยู่ในระหว่างการพิมพ์หรือไม่มี orderInfor ให้ return
@@ -37,6 +39,7 @@ const handlePrint = async () => {
             customer: orderInfor.customer,
             products: orderInfor.products,
             history: orderInfor.history,
+            paymentMethod:orderInfor.paymentMethod
         });
 
         console.log(response.data);
@@ -52,24 +55,6 @@ const handlePrint = async () => {
 
     return null
 
-    // <div>
-    //     {orderInfor && (
-    //         <div>
-    //             <h1>Order No: {orderInfor.order_no}</h1>
-    //             <h2>Customer: {orderInfor.customer.name}</h2>
-    //             <ul>
-    //                 {orderInfor.products.map((product, index) => (
-    //                     <li key={index}>
-    //                         Product ID: {product.p_id}, Price: {product.p_price}, Quantity: {product.quantity}
-    //                     </li>
-    //                 ))}
-    //             </ul>
-    //         </div>
-    //     )}
-    //     <button onClick={handlePrint} disabled={isPrinting}>
-    //         {isPrinting ? 'Printing...' : 'Print Receipt'}
-    //     </button>
-    // </div>
 };
 
 export default PrintReceipt;

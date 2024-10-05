@@ -11,7 +11,6 @@ const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         console.log(orderData)
-
         // await axios.post('http://localhost:5000/api/createOrder', orderData);
         // console.log('Order created successfully');
         // console.log('Order Data:', orderData);
@@ -155,12 +154,12 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     const handleEnterClick = () => {
         // กำหนดยอดรวมที่ต้องจ่าย
         let totalAmount = Number(sumCash);
-        
+
         // หากมีการใช้แต้ม ให้หัก 5 บาท
         if (redeemPoints) {
             totalAmount -= 5;
         }
-    
+
         // ตรวจสอบว่าเงินสดที่กรอกเข้ามามีมากพอหรือไม่
         if (Number(cash) < totalAmount) {
             Modal.error({
@@ -170,13 +169,13 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             });
             return;
         }
-    
+
         const orderInfoData = setOrderData(); // get the order data from setOrderData
         console.log(orderInfoData); // Log to ensure order info is correct
         setOrderInfo(orderInfoData); // set the order info state
         setModal2Open(true);
     };
-    
+
     const showSuccessNotification = () => {
         notification.success({
             message: 'Success',
@@ -223,7 +222,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             {modal2Open === true && orderInfo
                 ?
                 <><PrintReceipt
-                    orderData={orderInfo} /><Modal
+                    orderData={orderInfo} />
+                    <Modal
                         style={{ textAlign: "center" }}
                         centered
                         open={modal2Open}

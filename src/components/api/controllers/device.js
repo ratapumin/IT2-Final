@@ -1,29 +1,27 @@
 const Printer = require('node-thermal-printer').printer;
 const types = require('node-thermal-printer').types;
 const conn = require('../db');
+const generatePayload = require('promptpay-qr'); // เพิ่มการนำเข้า
 
-exports.printReceipt = (req, res) => {
-  const { order_id, order_no, order_date_time, customer, products, history } = req.body;
+exports.printReceipt = async (req, res) => {
+  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, sumCash } = req.body; // รับ sumCash จาก request
 
-  const sqlCustomer = `
-    SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
+  // คำสั่ง SQL เดิม
+  const sqlCustomer = `SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
+  const sqlProduct = `SELECT p_name, p_price FROM products WHERE p_id = ?`;
 
-  const sqlProduct = `
-    SELECT p_name, p_price FROM products WHERE p_id = ?`;
+  // คำนวณคะแนนรวมที่ได้รับและใช้
+  let totalEarn = 0;
+  let totalRedeem = 0;
 
-  let totalEarn = 0; // คะแนนที่ได้รับ
-  let totalRedeem = 0; // คะแนนที่ใช้
-
-  // แยกคะแนนที่ได้และที่ใช้
   history.forEach(entry => {
     if (entry.type === 'earn') {
-      totalEarn += entry.points; // บวกคะแนนที่ได้รับ
+      totalEarn += entry.points;
     } else if (entry.type === 'redeem') {
-      totalRedeem += entry.points; // บวกคะแนนที่ใช้
+      totalRedeem += entry.points;
     }
   });
 
-  // สร้าง Promise เพื่อดึงข้อมูลผลิตภัณฑ์ทั้งหมด
   const productQueries = products.map(product => {
     return new Promise((resolve, reject) => {
       conn.query(sqlProduct, [product.p_id], (error, productResult) => {
@@ -44,81 +42,82 @@ exports.printReceipt = (req, res) => {
     });
   });
 
-  // ดึงข้อมูลผลิตภัณฑ์ทั้งหมดพร้อมกัน
-  Promise.all(productQueries)
-    .then(productsData => {
-      // คำนวณ subtotal
-      const subtotal = productsData.reduce((acc, product) => acc + (product.p_price * product.quantity), 0);
+  try {
+    const productsData = await Promise.all(productQueries);
+    const subtotal = productsData.reduce((acc, product) => acc + (product.p_price * product.quantity), 0);
+    let discount = totalRedeem ? 5 : 0;
+    const totalPrice = subtotal - discount;
 
-      // คำนวณ discount และ totalPrice
-      let discount = totalRedeem ? 5 : 0; // ส่วนลดที่ต้องการ
-      const totalPrice = subtotal - discount;
+    const receipt = [];
+    const totalWidth = 40;
 
-      // สร้างข้อมูลที่จะพิมพ์
-      const totalWidth = 40; // กำหนดความกว้างรวมของบรรทัด
-      const receipt = [];
-      // receipt.push('Khathong Coffee');
-      receipt.push(`Emp: Ratapumin   #${order_id}   #${order_no}`.padEnd(totalWidth));
-      receipt.push(`Date: ${order_date_time.split(' ')[0]}`.padEnd(totalWidth));
-      receipt.push(`Time: ${order_date_time.split(' ')[1]}`.padEnd(totalWidth));
+    if (paymentMethod === 'promptpay') {
+      // สร้าง QR Code สำหรับการชำระเงินโดยใช้ sumCash
+      const qrCodeData = generatePayload(customer.phoneNumber, { amount: sumCash });
       receipt.push('------------------------------------------');
-      receipt.push('Item                   Qty     Amount'); // ปรับความกว้างของคอลัมน์
+      receipt.push('QR Code for Payment:');
+      receipt.push(qrCodeData);
+    }
 
-      productsData.forEach(product => {
-        const itemLine = `${product.p_name.padEnd(20)} ${String(product.quantity).padEnd(8)} ${product.p_price * product.quantity}`;
-        receipt.push(itemLine);
-      });
+    receipt.push(`Emp: Ratapumin   #${order_id}   #${order_no}`.padEnd(totalWidth));
+    receipt.push(`Date: ${order_date_time.split(' ')[0]}`.padEnd(totalWidth));
+    receipt.push(`Time: ${order_date_time.split(' ')[1]}`.padEnd(totalWidth));
+    receipt.push('------------------------------------------');
+    receipt.push('Item                   Qty     Amount');
 
-      receipt.push('------------------------------------------');
+    productsData.forEach(product => {
+      const itemLine = `${product.p_name.padEnd(20)} ${String(product.quantity).padEnd(8)} ${product.p_price * product.quantity}`;
+      receipt.push(itemLine);
+    });
 
-      // กำหนดความยาวของแต่ละบรรทัด
-      const subtotalLine = `Subtotal:                ${subtotal}`;
-      const discountLine = `Discount:                ${discount}`;
-      const totalLine = `Total:                   ${totalPrice}`;
+    receipt.push('------------------------------------------');
+    receipt.push(`Subtotal:                ${subtotal}`.padEnd(35));
+    receipt.push(`Discount:                ${discount}`.padEnd(35));
+    receipt.push(`Total:                   ${totalPrice}`.padEnd(35));
 
-      // ใช้ padEnd เพื่อให้ความยาวเท่ากัน
-      receipt.push(subtotalLine.padEnd(35));
-      receipt.push(discountLine.padEnd(35));
-      receipt.push(totalLine.padEnd(35));
-
-      // ตรวจสอบข้อมูลลูกค้า
-      if (customer && customer.c_id) {
-        const customerId = customer.c_id;
-
-        conn.query(sqlCustomer, [customerId], (error, customerResult) => {
-          if (error || customerResult.length === 0) {
-            // ไม่พบข้อมูลลูกค้า
-            console.error("Customer not found or error:", error);
-          } else {
-            const customerData = customerResult[0];
-            receipt.push('------------------------------------------');
-            receipt.push(` Customer: ${customerData.firstname} ${customerData.lastname}`.padEnd(totalWidth));
-            receipt.push('*** Point ***');
-            receipt.push(`Collect: ${totalEarn}   Redeem: ${totalRedeem}   Current: ${customerData.c_points + totalRedeem + totalEarn}`);
-          }
-
+    // ตรวจสอบข้อมูลลูกค้า
+    // Update this part of your code
+    if (customer && customer.c_id) {
+      const customerId = customer.c_id;
+      conn.query(sqlCustomer, [customerId], (error, customerResult) => {
+        if (error || customerResult.length === 0) {
+          console.error("Customer not found or error:", error);
+        } else {
+          const customerData = customerResult[0];
           receipt.push('------------------------------------------');
-          receipt.push('Thank you');
-          receipt.push('Please come again soon');
+          receipt.push(` Customer: ${customerData.firstname} ${customerData.lastname}`.padEnd(totalWidth));
+          receipt.push('*** Point ***');
+          receipt.push(`Collect: ${totalEarn}   Redeem: ${totalRedeem}   Current: ${customerData.c_points + totalRedeem + totalEarn}`);
+        }
 
-          // เรียกฟังก์ชันพิมพ์ใบเสร็จ
-          printReceipt(receipt, res);
-        });
-      } else {
         receipt.push('------------------------------------------');
         receipt.push('Thank you');
         receipt.push('Please come again soon');
+        logReceipt(receipt);
+        printReceipt(receipt, res);  // Pass the res object here
+      });
+    } else {
+      receipt.push('------------------------------------------');
+      receipt.push('Thank you');
+      receipt.push('Please come again soon');
+      receipt.push(`Method:${paymentMethod}`);
+      logReceipt(receipt);
+      printReceipt(receipt, res);  // Pass the res object here
+    }
 
-        // เรียกฟังก์ชันพิมพ์ใบเสร็จ
-        printReceipt(receipt, res);
-
-      }
-    })
-    .catch(error => {
-      console.error("Failed to get products:", error);
-      res.status(500).json({ message: "Failed to get product details.", error });
-    });
+  } catch (error) {
+    console.error("Failed to get products:", error);
+    res.status(500).json({ message: "Failed to get product details.", error });
+  }
 };
+
+
+
+
+// ฟังก์ชันสำหรับบันทึกใบเสร็จ
+function logReceipt(receipt) {
+  console.log("Receipt:\n", receipt.join('\n'));
+}
 
 // ฟังก์ชันพิมพ์ใบเสร็จ
 function printReceipt(receipt, res) {
@@ -136,7 +135,7 @@ function printReceipt(receipt, res) {
     printer.bold(true);
     printer.setTextQuadArea(0, 0, 1, 1); // กำหนดพื้นที่ในการพิมพ์ (x, y, width, height)
     printer.println('Khathong Coffee');
-    printer.newLine();   
+    printer.newLine();
     printer.bold(false);
     printer.setTextNormal()
     receipt.forEach(line => {

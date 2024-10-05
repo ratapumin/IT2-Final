@@ -7,6 +7,7 @@ import Promtpay from './Promtpay';
 import { createOrder } from './Cashmoney';
 import { useUser } from '../../user/UserContext';
 import moment from 'moment';
+import PrintReceipt from './PrintReceipt';
 
 function Payment({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
@@ -26,6 +27,7 @@ function Payment({
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
     const { user } = useUser();
+    const [orderInfo, setOrderInfo] = useState();
     const fetchMembers = async () => {
         try {
             const res = await axios.get('http://localhost:5000/api/members')
@@ -152,18 +154,31 @@ function Payment({
         };
     };
 
-    const orderData = setOrderData();
-    console.log(orderData)
+    // const orderData = setOrderData();
+    // console.log(orderData)
 
     const handleCallPageCreateOrder = () => {
-        // setShowCreateOrder(false);
+        setShowCreateOrder(false);
+        const createOrderData = setOrderData()
+        setOrderInfo(createOrderData)
+        console.log('Order Data:', orderInfo);
         console.log('eie prommp')
-        onDeleteAll();
-        resetMember();
-        selectedType('Coffee');
+        // onDeleteAll();
+        // resetMember();
+        // selectedType('Coffee');
 
     }
 
+    useEffect(() => {
+        if (paymentType === 'promtpay') {
+            setIsModalPromtpay(true);
+            setOrderInfo(setOrderData());
+        }
+    }, [paymentType]);
+    const handleClosePromtpay = () => {
+        setIsModalPromtpay(false)
+        setPaymentType('cash')
+    }
     const showSuccessNotification = () => {
         notification.success({
             message: 'Payment Successful',
@@ -213,32 +228,44 @@ function Payment({
                 className={`btnClick ${paymentType === 'promtpay' ? 'active' : ''}`}
                 onClick={() => {
                     setPaymentType('promtpay')
-                    setIsModalPromtpay(true)
+                    // setIsModalPromtpay(true)
+                    // setOrderInfo(setOrderData())
                 }}
 
-            >PROMPTPAY</button>
+            >
+                PROMPTPAY
+            </button>
 
 
+            {paymentType === 'promtpay' && orderInfo && (
+                <>
+                    <Modal
+                        title="QR Code สำหรับชำระเงิน"
+                        open={isModalPromtpay}
+                        onOk={() => {
+                            setPaymentType('promtpay');
+                            setIsModalPromtpay(false);
+                            createOrder(setOrderData, handleCallPageCreateOrder);
+                            showSuccessNotification();
+                        }}
+                        onCancel={() =>
+                            handleClosePromtpay()
+                        }
+                        closable={false}
+                        style={{ textAlign: "center" }}
+                        width={500}
+                    >
+                        <Promtpay sumCash={sumCash} />
+                        {orderInfo
+                            ?
+                            <PrintReceipt orderData={orderInfo} />
+                            : console.log('nodata promtpay')
+                        }
+                    </Modal>
+                </>
+            )
+            }
 
-            {paymentType === 'promtpay' && (
-                <Modal
-                    title="QR Code สำหรับชำระเงิน"
-                    open={isModalPromtpay}
-                    onOk={() => {
-                        setPaymentType('promtpay');
-                        setIsModalPromtpay(false);
-                        // setShowCreateOrder(true); // Trigger the creation of the order
-                        createOrder(setOrderData, handleCallPageCreateOrder);
-                        showSuccessNotification(); // เรียกฟังก์ชันแสดง noti หลังจากกด OK
-                    }}
-                    onCancel={handleCallPageCreateOrder}
-                    closable={false}
-                    style={{ textAlign: "center" }}
-                    width={500}
-                >
-                    <Promtpay sumCash={sumCash} />
-                </Modal>
-            )}
 
 
 
