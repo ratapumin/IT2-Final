@@ -1,16 +1,18 @@
 const Printer = require('node-thermal-printer').printer;
 const types = require('node-thermal-printer').types;
 const conn = require('../db');
-const generatePayload = require('promptpay-qr'); // เพิ่มการนำเข้า
+const generatePayload = require('promptpay-qr'); // นำเข้าแพ็คเกจสร้าง QR Code
+const fs = require('fs'); // ใช้สำหรับเขียนไฟล์
+const QRCode = require('qrcode'); // นำเข้าไลบรารี qrcode
+const path = require('path'); // เพิ่มการนำเข้า path
 
 exports.printReceipt = async (req, res) => {
-  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, sumCash } = req.body; // รับ sumCash จาก request
+  const phoneNumber = '0621645650'; // หมายเลขโทรศัพท์สำหรับ PromptPay
+  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, sumCash } = req.body;
 
-  // คำสั่ง SQL เดิม
   const sqlCustomer = `SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
   const sqlProduct = `SELECT p_name, p_price FROM products WHERE p_id = ?`;
 
-  // คำนวณคะแนนรวมที่ได้รับและใช้
   let totalEarn = 0;
   let totalRedeem = 0;
 
@@ -51,12 +53,32 @@ exports.printReceipt = async (req, res) => {
     const receipt = [];
     const totalWidth = 40;
 
-    if (paymentMethod === 'promptpay') {
-      // สร้าง QR Code สำหรับการชำระเงินโดยใช้ sumCash
-      const qrCodeData = generatePayload(customer.phoneNumber, { amount: sumCash });
+    // QR Code for PromptPay
+    let qrCodeData; // ประกาศที่นี่
+    let qrCodePath; // เปลี่ยนชื่อเป็น qrCodePath
+    if (paymentMethod === 'promtpay') {
+      qrCodeData = generatePayload(phoneNumber, { amount: totalPrice });
+      console.log("Generated QR Code Data:", qrCodeData); // Check QR Code data
+
+      // สร้าง QR Code เป็นรูปภาพ
+      qrCodePath = path.join(__dirname, 'qrcode.png'); // กำหนด path ของ QR Code
+      const qrCodeWidth = 200; // ปรับขนาดให้เหมาะสม
+      const qrCodeHeight = 200; // ปรับขนาดให้เหมาะสม
+      await QRCode.toFile(qrCodePath, qrCodeData, { errorCorrectionLevel: 'H', width: qrCodeWidth, height: qrCodeHeight }); // ใช้ await ที่นี่เพื่อรอให้การสร้างเสร็จ
+      console.log('QR Code generated at:', qrCodePath); // แสดง path ของ QR Code
+
+      // อ่านไฟล์ QR Code และแสดงใน Console
+      fs.readFile(qrCodePath, (err, data) => {
+        if (err) {
+          console.error('Error reading QR code image:', err);
+        } else {
+          console.log('QR Code image data:', data); // แสดงข้อมูลของ QR Code
+        }
+      });
+      
+
       receipt.push('------------------------------------------');
       receipt.push('QR Code for Payment:');
-      receipt.push(qrCodeData);
     }
 
     receipt.push(`Emp: Ratapumin   #${order_id}   #${order_no}`.padEnd(totalWidth));
@@ -75,8 +97,6 @@ exports.printReceipt = async (req, res) => {
     receipt.push(`Discount:                ${discount}`.padEnd(35));
     receipt.push(`Total:                   ${totalPrice}`.padEnd(35));
 
-    // ตรวจสอบข้อมูลลูกค้า
-    // Update this part of your code
     if (customer && customer.c_id) {
       const customerId = customer.c_id;
       conn.query(sqlCustomer, [customerId], (error, customerResult) => {
@@ -94,15 +114,15 @@ exports.printReceipt = async (req, res) => {
         receipt.push('Thank you');
         receipt.push('Please come again soon');
         logReceipt(receipt);
-        printReceipt(receipt, res);  // Pass the res object here
+        printReceipt(receipt, res, qrCodePath); // Pass QR Code path here
       });
     } else {
       receipt.push('------------------------------------------');
       receipt.push('Thank you');
       receipt.push('Please come again soon');
-      receipt.push(`Method:${paymentMethod}`);
+      receipt.push(`Method: ${paymentMethod}`);
       logReceipt(receipt);
-      printReceipt(receipt, res);  // Pass the res object here
+      printReceipt(receipt, res, qrCodePath); // Pass QR Code path here
     }
 
   } catch (error) {
@@ -111,43 +131,52 @@ exports.printReceipt = async (req, res) => {
   }
 };
 
-
-
-
 // ฟังก์ชันสำหรับบันทึกใบเสร็จ
 function logReceipt(receipt) {
   console.log("Receipt:\n", receipt.join('\n'));
 }
 
 // ฟังก์ชันพิมพ์ใบเสร็จ
-function printReceipt(receipt, res) {
+function printReceipt(receipt, res, qrCodePath) {
   const printer = new Printer({
     type: types.EPSON,
-    interface: '//localhost/printer', // sharing
+    interface: '//localhost/printer',
     options: {
-      timeout: 10000, // เพิ่ม timeout ในการเชื่อมต่อ
+      timeout: 10000,
     }
   });
 
   try {
-    // ตั้งค่าข้อมูลที่จะพิมพ์
     printer.alignCenter();
     printer.bold(true);
-    printer.setTextQuadArea(0, 0, 1, 1); // กำหนดพื้นที่ในการพิมพ์ (x, y, width, height)
+    printer.setTextQuadArea(0, 0, 1, 1);
     printer.println('Khathong Coffee');
     printer.newLine();
     printer.bold(false);
-    printer.setTextNormal()
+    printer.setTextNormal();
+    
+    // Print receipt
     receipt.forEach(line => {
       printer.println(line);
     });
+
+    if (qrCodePath) {
+      printer.newLine(); // เพิ่มบรรทัดใหม่ก่อนพิมพ์ QR Code
+      printer.printImage(qrCodePath, { width: 200, height: 200 }); // กำหนดขนาดพิมพ์ให้เหมาะสม
+    }
+    
     printer.cut();
     printer.execute();
 
     console.log("Print done!");
-    res.status(200).json({ message: "Receipt printed successfully." });
+    if (res) {
+      res.status(200).json({ message: "Receipt printed successfully." });
+    }
   } catch (error) {
     console.error("Print failed:", error);
-    res.status(500).json({ message: "Failed to print receipt.", error });
+    if (res) {
+      res.status(500).json({ message: "Failed to print receipt.", error });
+    }
   }
 }
+
