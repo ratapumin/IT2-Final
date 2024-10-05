@@ -5,13 +5,16 @@ import { useUser } from '../../user/UserContext';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { Modal, notification } from 'antd'; // เพิ่ม notification
+import PrintReceipt from './PrintReceipt';
 
 const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
-        await axios.post('http://localhost:5000/api/createOrder', orderData);
-        console.log('Order created successfully');
-        console.log('Order Data:', orderData);
+        console.log(orderData)
+
+        // await axios.post('http://localhost:5000/api/createOrder', orderData);
+        // console.log('Order created successfully');
+        // console.log('Order Data:', orderData);
         onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
@@ -28,6 +31,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     const [cash, setCash] = useState('');
     const [change, setChange] = useState('');
     const [modal2Open, setModal2Open] = useState(false);
+    const [orderInfo, setOrderInfo] = useState();
 
     useEffect(() => {
         if (!user || user.role === 'O') {
@@ -46,7 +50,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     useEffect(() => {
         console.log('getPoints', getPoints);
         console.log('redeemPoints', redeemPoints);
-    }, [getPoints]);
+    }, [getPoints, redeemPoints]);
 
     const calNum = (num) => {
         const newCash = cash + num.toString();
@@ -61,6 +65,10 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             setChange(changeAmount > 0 ? changeAmount : 0);
             onChange(changeAmount > 0 ? changeAmount : 0);
             console.log("Calculated Change:", changeAmount);
+            console.log("Calculated sumCash:", sumCash);
+            console.log("Calculated onChange:", onChange);
+
+
         }
     }, [cash, sumCash, onChange]);
 
@@ -136,9 +144,6 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         };
     };
 
-    const orderData = setOrderData();
-    console.log(orderData);
-
     const clearDataAll = () => {
         setCash('');
         setChange('');
@@ -148,17 +153,30 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     };
 
     const handleEnterClick = () => {
-        if (Number(cash) < Number(sumCash)) {
+        // กำหนดยอดรวมที่ต้องจ่าย
+        let totalAmount = Number(sumCash);
+        
+        // หากมีการใช้แต้ม ให้หัก 5 บาท
+        if (redeemPoints) {
+            totalAmount -= 5;
+        }
+    
+        // ตรวจสอบว่าเงินสดที่กรอกเข้ามามีมากพอหรือไม่
+        if (Number(cash) < totalAmount) {
             Modal.error({
                 title: 'Insufficient Cash',
                 content: 'Please enter enough cash to complete the transaction.',
-                centered: true, 
+                centered: true,
             });
             return;
         }
+    
+        const orderInfoData = setOrderData(); // get the order data from setOrderData
+        console.log(orderInfoData); // Log to ensure order info is correct
+        setOrderInfo(orderInfoData); // set the order info state
         setModal2Open(true);
     };
-
+    
     const showSuccessNotification = () => {
         notification.success({
             message: 'Success',
@@ -202,22 +220,31 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 </div>
             </section>
 
-            <Modal
-                style={{ textAlign: "center" }}
-                centered
-                open={modal2Open}
-                onOk={() => {
-                    setModal2Open(false);
-                    createOrder(setOrderData, clearDataAll);
-                    showSuccessNotification(); // แสดงแจ้งเตือนเมื่อกด OK
-                }}
-                cancelButtonProps={{ style: { display: 'none' } }}
-                closable={false}
-            >
-                <p style={{ fontSize: "30px" }}>PAYMENT SUCCESS</p>
-                <p style={{ fontSize: "30px" }}>CHANGE = {change}</p>
-            </Modal>
+            {modal2Open === true && orderInfo
+                ?
+                <><PrintReceipt
+                    orderData={orderInfo} /><Modal
+                        style={{ textAlign: "center" }}
+                        centered
+                        open={modal2Open}
+                        onOk={() => {
+                            setModal2Open(false);
+                            createOrder(setOrderData, clearDataAll);
+                            showSuccessNotification(); // แสดงแจ้งเตือนเมื่อกด OK
+
+                        }}
+                        cancelButtonProps={{ style: { display: 'none' } }}
+                        closable={false}
+                    >
+                        <p style={{ fontSize: "30px" }}>PAYMENT SUCCESS</p>
+                        <p style={{ fontSize: "30px" }}>CHANGE = {change}</p>
+                    </Modal></>
+                : modal2Open === false
+            }
+
         </div>
+
+
     );
 }
 
