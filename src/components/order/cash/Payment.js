@@ -163,9 +163,9 @@ function Payment({
         setOrderInfo(createOrderData)
         console.log('Order Data:', orderInfo);
         console.log('eie prommp')
-        // onDeleteAll();
-        // resetMember();
-        // selectedType('Coffee');
+        onDeleteAll();
+        resetMember();
+        selectedType('Coffee');
 
     }
 
@@ -241,6 +241,7 @@ function Payment({
                 <>
                     <Modal
                         title="QR Code สำหรับชำระเงิน"
+                        centered
                         open={isModalPromtpay}
                         onOk={() => {
                             setPaymentType('promtpay');
@@ -255,7 +256,10 @@ function Payment({
                         style={{ textAlign: "center" }}
                         width={500}
                     >
-                        <Promtpay sumCash={sumCash} />
+                        {/* <Promtpay sumCash={sumCash} /> */}
+                        <b>
+                            "Press 'OK' after the transfer is successful."
+                        </b>
                         {orderInfo
                             ?
                             <PrintReceipt orderData={orderInfo} />

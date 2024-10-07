@@ -11,9 +11,9 @@ const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         console.log(orderData)
-        // await axios.post('http://localhost:5000/api/createOrder', orderData);
-        // console.log('Order created successfully');
-        // console.log('Order Data:', orderData);
+        await axios.post('http://localhost:5000/api/createOrder', orderData);
+        console.log('Order created successfully');
+        console.log('Order Data:', orderData);
         onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
