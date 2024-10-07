@@ -12,32 +12,85 @@
     margin: 5px;
     border: 1px gray solid;
     background-color: white;
-
-
 }
 
 .btnClick.active {
-    background-color: yellow; /* สีเมื่อปุ่มถูกเลือก */
+    background-color: #FFE8A3     ; /* สีเมื่อปุ่มถูกเลือก */
+    border:  #FFCD2B solid;
+
 }
 
 .btnCollect {
     min-width: 150px;
     max-width: 150px;
-    background-color: aquamarine;
+    background-color: #FFEBEE; /* สีพื้นหลัง */
+    border: solid #FFB3B3; /* สี border ที่เข้มขึ้น */
     height: 100px;
     margin: 10px;
+    color: #8a8787; /* สีตัวอักษร */
+    font-size: 20px;
+    transition: background-color 0.3s, color 0.3s; /* เพิ่มการเปลี่ยนแปลง */
+}
+
+.btnCollect:hover {
+    background-color: #FFB3B3; /* สีพื้นหลังเมื่อ hover */
+    color: white; /* สีตัวอักษรเมื่อ hover */
 }
 
 .btnRedeem {
     min-width: 150px;
     max-width: 150px;
-    background-color: rgb(76, 167, 232);
+    background-color: #C8E6C9; /* สีพื้นหลัง */
+    border: solid #A5D6A7; /* สี border ที่เข้มขึ้น */
     height: 100px;
     margin: 10px;
+    color: #8a8787; /* สีตัวอักษร */
+    font-size: 20px;
+    transition: background-color 0.3s, color 0.3s; /* เพิ่มการเปลี่ยนแปลง */
 }
+
+.btnRedeem:hover {
+    background-color: #A5D6A7; /* สีพื้นหลังเมื่อ hover */
+    color: white; /* สีตัวอักษรเมื่อ hover */
+}
+
+
 
 
 .promtpay {
     display: flex;
     justify-content: center;
+}
+
+
+
+/* setmoney page */
+
+.setMoneyContent {
+    position: absolute;
+    left: 0%;
+    width: 20%;
+    /* border: solid; */
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* ตั้งค่าให้เรียงตามแนวตั้ง */
+    align-items: center; /* จัดตำแหน่งให้กลาง */
+    justify-content: space-evenly;
+    margin: 5px;
+    gap: 10px;
+}
+
+.moneyButton {
+    width: 200px;
+    min-width: 150px; /* ความกว้างขั้นต่ำของปุ่ม */
+    height: 70px; /* ความสูงของปุ่ม */
+    margin: 5px; /* ระยะห่างระหว่างปุ่ม */
+    color: #8a8787; /* สีตัวอักษร */
+    font-size: 18px; /* ขนาดตัวอักษร */
+    cursor: pointer; /* เปลี่ยนตัวชี้เมาส์เมื่อ hover */
+    transition: background-color 0.3s, color 0.3s; /* การเปลี่ยนแปลงเมื่อ hover */
+}
+
+.moneyButton:hover {
+    color: white; /* สีตัวอักษรเมื่อ hover */
 }

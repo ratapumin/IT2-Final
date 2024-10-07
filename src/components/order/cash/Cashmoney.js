@@ -21,7 +21,7 @@ const createOrder = async (setOrderData, onDeleteAll) => {
 };
 
 function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
-    selectedType, sentMember, resetMember, getPoints, redeemPoints, paymentType
+    selectedType, sentMember, resetMember, getPoints, redeemPoints, paymentType, configMoney, deleteconfigMoney
 }) {
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
@@ -44,12 +44,22 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             number.push(i);
         }
         return number;
+
     };
 
     useEffect(() => {
-        console.log('getPoints', getPoints);
-        console.log('redeemPoints', redeemPoints);
-    }, [getPoints, redeemPoints]);
+        if (configMoney) {
+            setCash(configMoney.toString());
+            // onCashChange(configMoney);
+        }
+    }, [configMoney, onCashChange]);
+
+    // useEffect(() => {
+    //     console.log('getPoints', getPoints);
+    //     console.log('redeemPoints', redeemPoints);
+    //     console.log(configMoney)
+    // }, [configMoney, getPoints, redeemPoints]);
+
 
     const calNum = (num) => {
         const newCash = cash + num.toString();
@@ -58,25 +68,37 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         console.log("Updated Cash in calNum:", newCash);
     };
 
+
+
+    // คิดเงิน
     useEffect(() => {
         if (cash && sumCash) {
             const changeAmount = Number(cash) - Number(sumCash);
-            setChange(changeAmount > 0 ? changeAmount : 0);
+            setChange(changeAmount > 0 ? changeAmount : '');
             onChange(changeAmount > 0 ? changeAmount : 0);
             console.log("Calculated Change:", changeAmount);
-            console.log("Calculated sumCash:", sumCash);
-            console.log("Calculated onChange:", onChange);
-
-
+            // console.log("Calculated sumCash:", sumCash);
+            // console.log("Calculated onChange:", onChange);
         }
     }, [cash, sumCash, onChange]);
+    // console.log(cash)
+
 
     const handleDelete = () => {
+        console.log(typeof cash);
         const newCash = cash.slice(0, -1);
         setCash(newCash);
         onCashChange(newCash);
-        console.log("Updated Cash after Delete:", newCash);
+        console.log("New Cash after delete:", newCash);
+        if (configMoney > 0) {
+            deleteconfigMoney()
+        }
+
+
     };
+
+
+
 
     useEffect(() => {
         const fetchOrderId = async () => {

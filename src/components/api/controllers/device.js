@@ -54,20 +54,20 @@ exports.printReceipt = async (req, res) => {
     const totalWidth = 40;
 
     let qrCodePath = null; // กำหนด path สำหรับไฟล์ QR Code
-    // if (paymentMethod === 'promtpay') {
-    //   const qrCodeData = generatePayload(phoneNumber, { amount: totalPrice });
-    //   qrCodePath = path.join(__dirname, `qrcode_${order_id}.png`);
-    //   const options = { type: 'png', color: { dark: '#000', light: '#fff' }, width: 200 };
+    if (paymentMethod === 'promtpay') {
+      const qrCodeData = generatePayload(phoneNumber, { amount: totalPrice });
+      qrCodePath = path.join(__dirname, `qrcode_${order_id}.png`);
+      const options = { type: 'png', color: { dark: '#000', light: '#fff' }, width: 200 };
 
-    //   await new Promise((resolve, reject) => {
-    //     QRCode.toFile(qrCodePath, qrCodeData, options, (err) => {
-    //       if (err) return reject(err);
-    //       console.log('QR Code created as PNG:', qrCodePath);
-    //       resolve();
-    //     });
-    //   });
+      await new Promise((resolve, reject) => {
+        QRCode.toFile(qrCodePath, qrCodeData, options, (err) => {
+          if (err) return reject(err);
+          console.log('QR Code created as PNG:', qrCodePath);
+          resolve();
+        });
+      });
 
-    // }
+    }
 
     // สร้างบรรทัดต่างๆ สำหรับใบเสร็จ
     receipt.push('------------------------------------------');
@@ -105,7 +105,7 @@ exports.printReceipt = async (req, res) => {
         receipt.push('Thank you');
         receipt.push('Please come again soon');
         logReceipt(receipt);
-        // printReceipt(receipt, res, qrCodePath);
+        printReceipt(receipt, res, qrCodePath);
       });
     } else {
       receipt.push('------------------------------------------');
@@ -113,7 +113,7 @@ exports.printReceipt = async (req, res) => {
       receipt.push('Please come again soon');
       receipt.push(`Method: ${paymentMethod}`);
       logReceipt(receipt);
-      // printReceipt(receipt, res, qrCodePath);
+      printReceipt(receipt, res, qrCodePath);
     }
 
   } catch (error) {

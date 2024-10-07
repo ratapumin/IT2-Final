@@ -78,9 +78,12 @@ function Orders({
       <p>Collect:  {getPoints !== null && getPoints !== ''
         ? `+${getPoints}`
         : ''}</p>
-      <p>Redeem: {redeemPoints !== null && redeemPoints !== ''
-        ? `-${redeemPoints}`
-        : ''}</p>
+      {redeemPoints && (
+        <p>Redeem: {redeemPoints !== null && redeemPoints !== ''
+          ? `-${redeemPoints}`
+          : ''}</p>
+      )}
+
       <p>
         Current: {OnsaveMember !== null && OnsaveMember !== ''
           ? (

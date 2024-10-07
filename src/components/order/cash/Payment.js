@@ -8,6 +8,7 @@ import { createOrder } from './Cashmoney';
 import { useUser } from '../../user/UserContext';
 import moment from 'moment';
 import PrintReceipt from './PrintReceipt';
+import SetMoney from './SetMoney';
 
 function Payment({
     onCashChange, products, sumCash, onChange, onDeleteAll, selectedType,
@@ -26,6 +27,7 @@ function Payment({
     const [showCreateOrder, setShowCreateOrder] = useState(false); // State for triggering order creation
     const [orderId, setOrderId] = useState('');
     const [orderNo, setOrderNo] = useState('');
+    const [money, setMoney] = useState()
     const { user } = useUser();
     const [orderInfo, setOrderInfo] = useState();
     const fetchMembers = async () => {
@@ -205,7 +207,16 @@ function Payment({
         });
     };
 
-
+    const handlesetMoney = (value) => {
+        setMoney(value)
+        // console.log(money)
+    }
+    const handleDeleteConfigMoney = () => {
+        setMoney()
+    }
+    // useEffect(() => {
+    //     console.log(money)
+    // }, [money]);
     return (
         <div className="flexCash">
             <Cashmoney
@@ -220,6 +231,8 @@ function Payment({
                 getPoints={getPoints}
                 redeemPoints={redeemPoints}
                 paymentType={paymentType}
+                configMoney={money}
+                deleteconfigMoney={handleDeleteConfigMoney}
             />
 
             <button
@@ -288,7 +301,9 @@ function Payment({
             )
             }
 
-
+            <SetMoney
+                configMoney={handlesetMoney}
+            />
 
 
 
