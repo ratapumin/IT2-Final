@@ -6,6 +6,60 @@ const fs = require('fs');
 const QRCode = require('qrcode');
 const path = require('path');
 
+const printer = new Printer({
+  type: types.EPSON,
+  interface: '//localhost/printer',
+  options: {
+    timeout: 10000,
+  }
+});
+
+function logReceipt(receipt) {
+  console.log("Receipt:\n", receipt.join('\n'));
+}
+
+async function printReceipt(receipt, res, qrCodePath) {
+
+
+  try {
+    printer.alignCenter();
+    printer.bold(true);
+    printer.setTextQuadArea(0, 0, 1, 1);
+    printer.println('Khathong Coffee');
+    printer.bold(false);
+    if (qrCodePath) {
+      printer.newLine();
+      await printer.printImage(qrCodePath, { width: 200, height: 200 }); // Print PNG image
+    }
+    printer.newLine();
+    printer.setTextNormal();
+
+    receipt.forEach(line => {
+      printer.println(line);
+    });
+
+
+
+    printer.cut();
+    await printer.execute();
+
+    console.log("Print done!");
+    if (res) {
+      res.status(200).json({ message: "Receipt printed successfully." });
+    }
+
+    if (qrCodePath) {
+      fs.unlinkSync(qrCodePath); // ลบไฟล์ PNG เมื่อใช้งานเสร็จ
+      console.log('QR Code PNG deleted:', qrCodePath);
+    }
+  } catch (error) {
+    console.error("Print failed:", error);
+    if (res) {
+      res.status(500).json({ message: "Failed to print receipt.", error });
+    }
+  }
+}
+
 exports.printReceipt = async (req, res) => {
   console.log("Incoming request body:", req.body);
   const phoneNumber = '0621645650';
@@ -86,7 +140,7 @@ exports.printReceipt = async (req, res) => {
     receipt.push(`Subtotal:                ${subtotal.toString().padStart(5)}`.padEnd(35));
     receipt.push(`Discount:                ${discount.toString().padStart(5)}`.padEnd(35));
     receipt.push(`Total:                   ${totalPrice.toString().padStart(5)}`.padEnd(35));
-    
+
     // ซ่อน Cash และ Change ถ้าเป็น promtpay
     if (paymentMethod !== 'promtpay') {
       receipt.push(`Cash:                    ${cash.toString().padStart(5)}`.padEnd(35));
@@ -128,40 +182,169 @@ exports.printReceipt = async (req, res) => {
     console.error("Failed to get products:", error);
     res.status(500).json({ message: "Failed to get product details.", error });
   }
+
+
+
 };
 
+exports.printCloseDaily = (req, res) => {
+  const { startDate, endDate } = req.params;
 
-function logReceipt(receipt) {
-  console.log("Receipt:\n", receipt.join('\n'));
-}
+  // คิวรีข้อมูลต่าง ๆ
+  const totalSalesQuery = `
+      SELECT SUM(order_detail.price * order_detail.quantity) AS total_amount
+      FROM orders
+      JOIN order_detail ON orders.order_id = order_detail.order_id
+      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?`;
 
-async function printReceipt(receipt, res, qrCodePath) {
-  const printer = new Printer({
-    type: types.EPSON,
-    interface: '//localhost/printer',
-    options: {
-      timeout: 10000,
+  const products = `
+      SELECT order_detail.p_id, SUM(order_detail.quantity) AS qty, products.p_name as name, SUM(order_detail.price * order_detail.quantity) as amount, products.p_price as price
+      FROM order_detail
+      JOIN orders ON orders.order_id = order_detail.order_id
+      JOIN products ON order_detail.p_id = products.p_id
+      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+      GROUP BY order_detail.p_id
+      ORDER BY p_id ASC`;
+
+  const topProductsQuery = `
+      SELECT
+          order_detail.p_id AS product_id,
+          products.p_name AS Product_Name,
+          SUM(order_detail.price * order_detail.quantity) AS total_sales,
+          SUM(order_detail.quantity) AS quantity
+      FROM
+          order_detail
+      JOIN
+          orders ON order_detail.order_id = orders.order_id
+      JOIN 
+          products ON order_detail.p_id = products.p_id
+      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+      GROUP BY
+          order_detail.p_id
+      ORDER BY
+          total_sales DESC
+      LIMIT 5`;
+
+  const sqlPaymentType = `
+      SELECT SUM(order_detail.price * order_detail.quantity) AS total_sales, orders.payment_type
+      FROM order_detail
+      JOIN orders ON order_detail.order_id = orders.order_id
+      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+      GROUP BY orders.payment_type`;
+
+  const redeemQuery = `
+     SELECT 
+     COUNT(*) AS redeem_count,
+     SUM(5) AS total_redeem_value
+      FROM points_history
+      WHERE type = 'redeem' AND DATE(transaction_date) BETWEEN ? AND ?;`;
+
+  // ดึงยอดขายรวม
+  conn.query(totalSalesQuery, [startDate, endDate], (error, totalSalesResults) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
     }
-  });
 
+    // ดึงสินค้าทั้งหมด
+    conn.query(products, [startDate, endDate], (error, productsResults) => {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      // ดึงสินค้าขายดี
+      conn.query(topProductsQuery, [startDate, endDate], (error, topProductsResults) => {
+        if (error) {
+          return res.status(500).json({ error: error.message });
+        }
+
+        // ดึงข้อมูลยอดขายตามประเภทการชำระเงิน
+        conn.query(sqlPaymentType, [startDate, endDate], (error, paymentTypeResults) => {
+          if (error) {
+            return res.status(500).json({ error: error.message });
+          }
+
+          // ดึงข้อมูลการใช้ redeem points
+          conn.query(redeemQuery, [startDate, endDate], (error, redeemResults) => {
+            if (error) {
+              return res.status(500).json({ error: error.message });
+            }
+
+            // สร้างเนื้อหาจากข้อมูลที่ดึงมา
+            const receipt = [];
+            const totalSales = totalSalesResults[0].total_amount || 0; // ตรวจสอบยอดขายรวม
+
+            // หัวข้อ
+            // ...โค้ดก่อนหน้านี้
+            receipt.push('Khathong Coffee');
+            receipt.push(`Date: ${new Date().toLocaleDateString()}`);
+            receipt.push(`Time: ${new Date().toLocaleTimeString()}`);
+            receipt.push(`Total Sales: ${totalSales} บาท`);
+            receipt.push('-------------------------------');
+            receipt.push('*** Products ***');
+            receipt.push('---------------------------------');
+            receipt.push('| Id   | Name                | Qty |'); // แก้ไขให้คอลัมน์ Name มีความกว้างที่เหมาะสม
+            receipt.push('|------|---------------------|-----|'); // แก้ไขให้คอลัมน์ Name มีความกว้างที่เหมาะสม
+
+            // เพิ่มข้อมูลรายการสินค้า
+            productsResults.forEach(item => {
+              receipt.push(` ${String(item.p_id).padEnd(4)}  ${item.name.padEnd(20)}  ${String(item.qty).padStart(3)} `); // ใช้ padStart สำหรับ Qty
+            });
+
+            receipt.push('---------------------------------');
+            receipt.push(`รวมยอดสินค้า: ${totalSales} บาท`);
+            receipt.push('-------------------------------');
+            receipt.push('ยอดขายตามประเภทการชำระเงิน:');
+            receipt.push('---------------------------------');
+            receipt.push('| ประเภทการชำระเงิน | ยอดรวม  |');
+            paymentTypeResults.forEach(payment => {
+              receipt.push(`| ${payment.payment_type.padEnd(18)} | ${payment.total_sales}  |`);
+            });
+            receipt.push('---------------------------------');
+            receipt.push(`รวมยอดขายตามประเภทการชำระเงิน: ${totalSales} บาท`);
+            receipt.push('-------------------------------');
+            receipt.push('ข้อมูลการใช้คะแนน:');
+            receipt.push('---------------------------------');
+            receipt.push('| จำนวนการใช้คะแนน | มูลค่ารวม  |');
+            redeemResults.forEach(redeem => {
+              receipt.push(`| ${redeem.redeem_count.toString().padEnd(18)} | ${redeem.total_redeem_value || 'ไม่มีคะแนน'} |`);
+            });
+            receipt.push('---------------------------------');
+            receipt.push('ขอบคุณที่ใช้บริการ!');
+
+            // ส่งข้อมูลผลลัพธ์ทั้งหมดกลับไป
+            res.json({
+              totalSales: totalSalesResults[0],
+              products: productsResults,
+              topProducts: topProductsResults,
+              paymentTypes: paymentTypeResults,
+              redeemPoints: redeemResults,
+              receipt: receipt // ส่งใบเสร็จกลับไปด้วย
+            });
+
+
+            // พิมพ์ใบเสร็จ
+            // printDaily(receipt, res);
+          });
+        });
+      });
+    });
+  });
+};
+
+async function printDaily(receipt, res) {
   try {
     printer.alignCenter();
     printer.bold(true);
     printer.setTextQuadArea(0, 0, 1, 1);
     printer.println('Khathong Coffee');
     printer.bold(false);
-    if (qrCodePath) {
-      printer.newLine();
-      await printer.printImage(qrCodePath, { width: 200, height: 200 }); // Print PNG image
-    }
     printer.newLine();
     printer.setTextNormal();
 
+    // พิมพ์ใบเสร็จ
     receipt.forEach(line => {
       printer.println(line);
     });
-
-  
 
     printer.cut();
     await printer.execute();
@@ -171,10 +354,7 @@ async function printReceipt(receipt, res, qrCodePath) {
       res.status(200).json({ message: "Receipt printed successfully." });
     }
 
-    if (qrCodePath) {
-      fs.unlinkSync(qrCodePath); // ลบไฟล์ PNG เมื่อใช้งานเสร็จ
-      console.log('QR Code PNG deleted:', qrCodePath);
-    }
+
   } catch (error) {
     console.error("Print failed:", error);
     if (res) {
