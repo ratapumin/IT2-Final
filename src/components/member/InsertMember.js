@@ -44,13 +44,13 @@ function InsertMember({ refreshMembers }) {
 
     return (
         <>
-            <button className='btnAdd'
+            <Button className='btnAddCus'
                 onClick={() => {
                     setOpeModalInsert(true)
                 }}
             >
                 ADD MEMBER
-            </button>
+            </Button>
 
             <Modal
                 centered

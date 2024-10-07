@@ -105,32 +105,29 @@ exports.payment = (req, res) => {
 
 
 exports.closedaily = (req, res) => {
-    const { date, cash_in_machine } = req.body;
+    const { cash_in_machine, date,user_id } = req.body;
     const sqlClosedaily = `
-                        INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
-                        SELECT 
-                            cash_in_machine,
-                            cash_in_system,
-                            cash_in_system - cash_in_machine AS cash_difference,
-                            12345, 
-                            CURRENT_DATE()
-                        FROM (
-                            SELECT 
-                                2000 AS cash_in_machine,
-                                SUM(order_detail.price * order_detail.quantity) AS cash_in_system
-                            FROM order_detail
-                            JOIN orders ON order_detail.order_id = orders.order_id 
-                            WHERE DATE(orders.order_date_time) = '2024-09-28'
-                        ) AS subquery;
-                        `
-    const value = [date, cash_in_machine]
+        INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
+        SELECT 
+            ? AS cash_in_machine,
+            SUM(order_detail.price * order_detail.quantity) AS cash_in_system,
+            SUM(order_detail.price * order_detail.quantity) - ? AS cash_difference,
+            ?, 
+            ?
+        FROM order_detail
+        JOIN orders ON order_detail.order_id = orders.order_id 
+        WHERE DATE(orders.order_date_time) = ?
+        AND orders.payment_type = 'cash'; 
+    `;
 
+    const value = [cash_in_machine, cash_in_machine, user_id,date, date];
     conn.query(sqlClosedaily, value, (error, results) => {
         if (error) {
-            res.status(400).json({ error })
+            res.status(400).json({ error });
         } else {
-            res.json(results)
-            console.log(results)
+            console.log('Warnings:', results.warningStatus);
+            res.json(results);
+            console.log(results);
         }
-    })
+    });
 }

@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-
+import { Button, Popover, Space } from 'antd';
 
 
 
 function Orders({
-  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, getPoints,
-  minusCash
+  user, products, onUpdateCart, onDeleteAll, onCash, cash, sumCash, change, OnsaveMember, getPoints, redeemPoints,
+  minusCash, showorderId
 
 }) {
   const [productCart, setProductCart] = useState([]);
@@ -73,10 +73,40 @@ function Orders({
   }, [showsum, sumCash])
 
 
+  const content = (
+    <div>
+      <p>Collect:  {getPoints !== null && getPoints !== ''
+        ? `+${getPoints}`
+        : ''}</p>
+      <p>Redeem: {redeemPoints !== null && redeemPoints !== ''
+        ? `-${redeemPoints}`
+        : ''}</p>
+      <p>
+        Current: {OnsaveMember !== null && OnsaveMember !== ''
+          ? (
+            OnsaveMember.c_points === null
+              ? '0'
+              : OnsaveMember.c_points ?? '0'
+          )
+          : ''}
+      </p>
+    </div>
+  );
+
+
+
   return (
     <section className="orders">
       <div className="content-order">
-        <h1>New Orders</h1>
+        <h2
+          style={{ padding: '10px' }}
+        >
+          {showorderId
+            ? `${showorderId}`
+            : 'New Order'
+
+          }
+        </h2>
         {/* {user && user.user_fname} */}
 
         <section className="bg-order">
@@ -128,12 +158,18 @@ function Orders({
               <p>
                 Member
               </p>
-              <p>{OnsaveMember !== null && OnsaveMember !== ''
+              <Popover content={content} title="Poins" trigger="click" placement="right">
+                <Button>{OnsaveMember !== null && OnsaveMember !== ''
+                  ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname}`
+                  : ''}</Button>
+              </Popover>
+
+              {/* <p>{OnsaveMember !== null && OnsaveMember !== ''
                 ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname}`
-                : ''}</p>
+                : ''}</p> */}
             </section>
 
-            <section className="currentPoints">
+            {/* <section className="currentPoints">
               <p>
                 Current Points
               </p>
@@ -144,22 +180,22 @@ function Orders({
                     : OnsaveMember.c_points ?? '0'
                 )
                 : ''}</p>
-            </section>
+            </section> */}
 
-            <section className="getPoints">
+            {/* <section className="getPoints">
               <p>
                 Get Points
               </p>
               <p>{getPoints !== null && getPoints !== ''
                 ? `+${getPoints}`
                 : ''}</p>
-              {/* <p>
+              <p>
                 {minusCash !== null && minusCash !== ''
                   ? `${minusCash}`
                   : ''
                 }
-              </p> */}
-            </section>
+              </p>
+            </section> */}
           </>
         )}
 

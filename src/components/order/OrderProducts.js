@@ -11,6 +11,9 @@ import Another from "./Another";
 import Payment from "./cash/Payment";
 import { Button, Modal } from 'antd';
 import CloseDaily from "./cash/CloseDaily";
+import axios from "axios";
+import moment from "moment";
+
 
 
 function OrderProducts() {
@@ -31,6 +34,7 @@ function OrderProducts() {
   const [redeemPoints, setRedeemPoints] = useState('')
   const [minusCash, setMinusCash] = useState('')
   const [isModalCloseDaily, setIsModalCloseDaily] = useState(false)
+  const [showorderId, setShowOrderId] = useState()
 
 
 
@@ -54,7 +58,8 @@ function OrderProducts() {
 
   useEffect(() => {
     console.log(carts)
-  })
+    console.log(showorderId)
+  }, [showorderId, carts])
 
   // useEffect(() => {
   //   console.log(member)
@@ -65,7 +70,9 @@ function OrderProducts() {
 
   // })
 
-
+  const handleOrderId = (value) => {
+    setShowOrderId(value)
+  }
 
 
   const handleProductSelect = (product) => {
@@ -113,7 +120,9 @@ function OrderProducts() {
     setGetPoints('')
     setRedeemPoints('')
     setSelectedType('Coffee');
+    setSelectedCategory('ICE')
     setMinusCash('')
+    setShowOrderId()
   };
 
 
@@ -204,7 +213,41 @@ function OrderProducts() {
     }
   }
 
+  useEffect(() => {
+    if (carts.length > 0) {
 
+        const fetchOrderId = async () => {
+            try {
+                // ดึงวันที่ปัจจุบันในรูปแบบ YYYYMMDD
+                const currentDate = moment().format('YYYYMMDD');
+
+                // ดึงข้อมูลออเดอร์จาก API
+                const res = await axios.get("http://localhost:5000/api/readorder");
+                const orders = res.data;
+
+                // กรองข้อมูลเฉพาะ order_id ที่เป็นตัวเลข
+                const filterOrderIds = orders
+                    .map(order => order.order_id)
+                    .filter(order_id => order_id.startsWith(currentDate))  // เลือกเฉพาะออเดอร์ที่มีวันที่ตรงกับวันปัจจุบัน
+                    .map(order_id => parseInt(order_id.slice(8), 10));      // ดึงเฉพาะเลขลำดับ (เช่น 001, 002, ...)
+
+                // ถ้าไม่มีออเดอร์ในวันนั้น ให้เริ่มที่ 001 ถ้ามีแล้วให้เพิ่มจากลำดับสูงสุด
+                const nextOrderNumber = filterOrderIds.length === 0
+                    ? '001'
+                    : (Math.max(...filterOrderIds) + 1).toString().padStart(3, '0');
+
+                // สร้าง order_id ในรูปแบบ YYYYMMDD + เลขลำดับ
+                const newOrderId = `${currentDate}${nextOrderNumber}`;
+                setShowOrderId(newOrderId); // Change here
+                // Set ค่า order_id ใน state
+                // setOrderId(newOrderId);
+            } catch (error) {
+                console.log("Cannot fetch order", error);
+            }
+        };
+        fetchOrderId();
+    }
+}, [carts]);
 
 
   const warning = () => {
@@ -238,7 +281,9 @@ function OrderProducts() {
           change={change}
           OnsaveMember={member}
           getPoints={getPoints}
+          redeemPoints={redeemPoints}
           minusCash={minusCash}
+          showorderId={showorderId}
         />
 
         <section className="menu">
@@ -307,6 +352,7 @@ function OrderProducts() {
               onRedeemPoints={handleRedeemPoints}
               getPoints={getPoints}
               redeemPoints={redeemPoints}
+              showorderId={handleOrderId}
             // currentPoints={currentPoints}
             />
 

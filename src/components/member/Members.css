@@ -10,10 +10,10 @@
 
 }
 
-.members {
+.membersPage {
     position: absolute;
     right: 0%;
-    top: 2%;
+    top: 1%;
     width: 12%;
     height: 7%;
     background-color: #BDE3FF;
@@ -41,29 +41,51 @@
     font-weight: bold;
 }
 
-.btnAdd {
+.inputSearch{
     position: absolute;
-    border: none;
-    right: 20%;
-    top: 10%;
-    width: 10%;
-    height: 5%;
-    border-radius: 10px;
-    background-color: #AFF5C6;
-
+    right: 40%;
+    top: 9%;
+width: 400px;
 }
 
-.btnSearch {
+.btnAddCus {
+    position: absolute;
+    border: none;
+    right: 18%;
+    top: 9%;
+    width: 120px;
+    height: 40px; 
+    border-radius: 10px;
+    background-color: #68D391;
+    color: #FFFFFF; 
+    font-weight: bold;
+    cursor: pointer; 
+    transition: background-color 0.3s; 
+}
+
+.btnAddCus:hover {
+    background-color: #48BB78;
+}
+
+.btnSearchCus {
     position: absolute;
     border: none;
     right: 10%;
-    top: 10%;
-    width: 10%;
-    height: 5%;
+    top: 9%;
+    width: 120px;
+    height: 40px; 
     border-radius: 10px;
-    background-color: #c8c8c8;
-
+    background-color: #A0AEC0; 
+    color: #FFFFFF; 
+    font-weight: bold;
+    cursor: pointer; 
+    transition: background-color 0.3s; 
 }
+
+.btnSearchCus:hover {
+    background-color: #718096; 
+}
+
 
 
 .tableContent {
@@ -78,4 +100,31 @@
 .btnAction {
     min-width: 80px;
     max-width: 80px;
+}
+
+.backPage {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 8%;
+    height: 50px;
+    background-color: #BDE3FF;
+    /* โทนสีที่ต้องการ */
+    border: none;
+    /* ปิดการแสดงกรอบปุ่ม */
+    color: #003366;
+    /* สีข้อความที่เข้มเพื่อคอนทราสต์ */
+    font-weight: bold;
+    /* เพิ่มความหนาของข้อความ */
+    border-radius: 5px;
+    /* เพิ่มมุมโค้ง */
+    cursor: pointer;
+    /* เปลี่ยนเคอร์เซอร์เมื่อชี้ไปที่ปุ่ม */
+    transition: background-color 0.3s;
+    /* เพิ่มเอฟเฟกต์การเปลี่ยนสี */
+}
+
+.backPage:hover {
+    background-color: #A3D4FF;
+    /* สีพื้นหลังเมื่อชี้เมาส์ไปที่ปุ่ม */
 }
