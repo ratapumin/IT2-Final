@@ -82,7 +82,7 @@ function InsertEmployee({ refreshEmployee, userList }) {
 
     return (
         <>
-            <Button className='btnAdd'
+            <Button className='btnAddemp'
                 style={{ marginRight: 8 }}
                 onClick={() => {
                     setOpeModalInsert(true)

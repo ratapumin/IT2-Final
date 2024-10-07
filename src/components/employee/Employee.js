@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './employee.css';
-import { Space, Table, Modal } from 'antd';
+import { Space, Table, Modal, Input } from 'antd';
 import axios from 'axios';
 import { Button } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
@@ -9,19 +9,20 @@ import './employee.css'
 import UpdateEmployee from './UpdateEmployee';
 
 function Employee() {
-
-    const [employeeList, setEmployeeList] = useState()
-    const [userList, setUserList] = useState()
-    const [employeeId, setEmployeeId] = useState()
+    const [employeeList, setEmployeeList] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const [employeeId, setEmployeeId] = useState();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showSearchInput, setShowSearchInput] = useState(false);
 
     const fetchEmployees = async () => {
         try {
             const res = await axios.get("http://localhost:5000/api/users");
             const filteredEmployee = res.data.filter(employee => employee.role_type === "E");
             setEmployeeList(filteredEmployee);
-            setUserList(res.data)
+            setUserList(res.data);
         } catch (error) {
-            console.log("Cannot fetch fetchEmployees", error);
+            console.log("Cannot fetch employees", error);
         }
     };
 
@@ -30,21 +31,19 @@ function Employee() {
     }, []);
 
     const showDeleteConfirm = (value) => {
-
         const findemployee = employeeList.find((employee) => employee.user_id === value);
         if (findemployee) {
             Modal.confirm({
-                title: `Are you sure delete Member?`,
+                title: `Are you sure you want to delete this employee?`,
                 centered: true,
                 icon: <ExclamationCircleFilled />,
-                content: `Employee : ${findemployee.user_fname} ${findemployee.user_lname}`,
+                content: `Employee: ${findemployee.user_fname} ${findemployee.user_lname}`,
                 okText: 'Yes',
                 okType: 'danger',
                 cancelText: 'No',
                 async onOk() {
                     try {
                         await axios.delete(`http://localhost:5000/api/users/${findemployee.user_id}`);
-                        console.log('OK');
                         fetchEmployees();
                     } catch (error) {
                         console.error('Error deleting employee:', error);
@@ -55,17 +54,22 @@ function Employee() {
                 },
             });
         }
-        else {
-            console.log('no employee')
-        }
     };
 
-
     const handleUpdateEmployee = async () => {
-        // console.log(values)
-        await fetchEmployees()
-        setEmployeeId(null)
-    }
+        await fetchEmployees();
+        setEmployeeId(null);
+    };
+
+    const handleSearchToggle = () => {
+        setShowSearchInput(!showSearchInput);
+    };
+
+    // Filter employees based on search term (checks both name and phone number)
+    const filteredEmployees = employeeList.filter((employee) =>
+        `${employee.user_fname} ${employee.user_lname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.user_tel.includes(searchTerm)
+    );
 
     const columns = [
         {
@@ -74,14 +78,14 @@ function Employee() {
             key: 'index',
             render: (text, record, index) => index + 1,
             width: 50,
-            align: 'center',  // จัดข้อความกลาง
+            align: 'center',
         },
         {
             title: 'ID',
             dataIndex: 'user_id',
             key: 'user_id',
             width: 80,
-            align: 'center',  // จัดข้อความกลาง
+            align: 'center',
         },
         {
             title: 'Password',
@@ -102,39 +106,37 @@ function Employee() {
             title: 'Tel',
             dataIndex: 'user_tel',
             key: 'user_tel',
-            align: 'center',  // จัดข้อความกลางwidth: 120,
-
+            align: 'center',
+            width: 120,
         },
         {
             title: 'ID Card',
             dataIndex: 'user_id_card',
             key: 'user_id_card',
-            align: 'center',  // จัดข้อความกลางwidth: 140,
-
-
+            align: 'center',
+            width: 140,
         },
         {
             title: 'Role',
             dataIndex: 'role_type',
             key: 'role_type',
             width: 70,
-            align: 'center',  // จัดข้อความกลาง
+            align: 'center',
         },
         {
             title: 'Status',
             dataIndex: 'user_status',
             key: 'user_status',
             width: 80,
-            align: 'center',  // จัดข้อความกลาง
-
+            align: 'center',
         },
         {
             title: 'Actions',
             key: 'actions',
-            align: 'center',  // จัดข้อความกลางwidth: 200,
-
+            align: 'center',
+            width: 200,
             render: (text, record) => (
-                <>
+               <>
                     <Button
                         className="bntEdit "
                         type="primary"
@@ -156,32 +158,34 @@ function Employee() {
         },
     ];
 
-
     return (
         <div className="content-box">
-            <section className='members'>
-                EMPLOYEE
-            </section>
+            <section className='employee'>EMPLOYEE</section>
+            <section className='employeelist'>EMPLOYEE LIST</section>
 
-            <section className='memberlist'>
-                EMPLOYEE LIST
-            </section>
+            <InsertEmployee refreshEmployee={fetchEmployees} userList={userList} />
 
-            <InsertEmployee
-                refreshEmployee={fetchEmployees}
-                userList={userList}
-            />
+            <Button className='btnSearchemp' onClick={handleSearchToggle}>
+                {showSearchInput ? 'CLOSE SEARCH' : 'SEARCH'}
+            </Button>
 
-            <button className='btnSearch'>SEARCH</button>
+            {showSearchInput && (
+                <Input
+                className='inputSearchemp'
+                    placeholder="Search by name or phone number"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ margin: '10px 0' }}
+                />
+            )}
 
             <section className='tableContent'>
                 <Table
                     columns={columns}
-                    dataSource={employeeList}
+                    dataSource={filteredEmployees}
                     rowKey="user_id"
                     bordered
                     pagination={{ pageSize: 50 }}
-                // scroll={{ y: 390 }}
                 />
             </section>
 
@@ -191,11 +195,7 @@ function Employee() {
                     update={handleUpdateEmployee}
                 />
             )}
-
         </div>
-
-
-
     );
 }
 
