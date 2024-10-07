@@ -11,9 +11,9 @@ const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         console.log(orderData)
-        await axios.post('http://localhost:5000/api/createOrder', orderData);
-        console.log('Order created successfully');
-        console.log('Order Data:', orderData);
+        // await axios.post('http://localhost:5000/api/createOrder', orderData);
+        // console.log('Order created successfully');
+        // console.log('Order Data:', orderData);
         onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
@@ -76,7 +76,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             const changeAmount = Number(cash) - Number(sumCash);
             setChange(changeAmount > 0 ? changeAmount : '');
             onChange(changeAmount > 0 ? changeAmount : 0);
-            console.log("Calculated Change:", changeAmount);
+            // console.log("Calculated Change:", changeAmount);
             // console.log("Calculated sumCash:", sumCash);
             // console.log("Calculated onChange:", onChange);
         }
@@ -89,7 +89,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         const newCash = cash.slice(0, -1);
         setCash(newCash);
         onCashChange(newCash);
-        console.log("New Cash after delete:", newCash);
+        // console.log("New Cash after delete:", newCash);
         if (configMoney > 0) {
             deleteconfigMoney()
         }
@@ -114,7 +114,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 const filterOrderIds = orders
                     .map(order => order.order_id)
                     .filter(order_id => order_id.startsWith(currentDate))  // เลือกเฉพาะออเดอร์ที่มีวันที่ตรงกับวันปัจจุบัน
-                    .map(order_id => parseInt(order_id.slice(8), 10))      // ดึงเฉพาะเลขลำดับ (เช่น 001, 002, ...)
+                    .map(order_id => parseInt(order_id.slice(8), 10)); // ดึงเฉพาะเลขลำดับ (เช่น 001, 002, ...)
 
                 // ถ้าไม่มีออเดอร์ในวันนั้น ให้เริ่มที่ 001 ถ้ามีแล้วให้เพิ่มจากลำดับสูงสุด
                 const nextOrderNumber = filterOrderIds.length === 0
@@ -124,8 +124,10 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
                 // สร้าง order_id ในรูปแบบ YYYYMMDD + เลขลำดับ
                 const newOrderId = `${currentDate}${nextOrderNumber}`;
 
-                // Set ค่า order_id ใน state
+                // Set ค่า order_id และ order_no ใน state
                 setOrderId(newOrderId);
+                setOrderNo(nextOrderNumber); // เพิ่มการตั้งค่า order_no ที่นี่
+
             } catch (error) {
                 console.log("Cannot fetch order", error);
             }
@@ -189,16 +191,15 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         resetMember();
         selectedType('Coffee');
     };
-
     const handleEnterClick = () => {
         // กำหนดยอดรวมที่ต้องจ่าย
         let totalAmount = Number(sumCash);
-
+    
         // หากมีการใช้แต้ม ให้หัก 5 บาท
         if (redeemPoints) {
             totalAmount -= 5;
         }
-
+    
         // ตรวจสอบว่าเงินสดที่กรอกเข้ามามีมากพอหรือไม่
         if (Number(cash) < totalAmount) {
             Modal.error({
@@ -208,12 +209,19 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             });
             return;
         }
-
-        const orderInfoData = setOrderData(); // get the order data from setOrderData
+    
+        // สร้าง orderInfoData เป็น object
+        const orderInfoData = {
+            ...setOrderData(), // get the order data from setOrderData
+            cash: cash,       // เพิ่ม cash
+            change: change    // เพิ่ม change
+        };
+    
         console.log(orderInfoData); // Log to ensure order info is correct
         setOrderInfo(orderInfoData); // set the order info state
         setModal2Open(true);
     };
+    
 
     const showSuccessNotification = () => {
         notification.success({

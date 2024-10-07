@@ -91,6 +91,8 @@ function Payment({
         setTel('');
         setContactName('');
     };
+
+    
     useEffect(() => {
         const fetchOrderId = async () => {
             try {
@@ -105,7 +107,7 @@ function Payment({
                 const filterOrderIds = orders
                     .map(order => order.order_id)
                     .filter(order_id => order_id.startsWith(currentDate))  // เลือกเฉพาะออเดอร์ที่มีวันที่ตรงกับวันปัจจุบัน
-                    .map(order_id => parseInt(order_id.slice(8), 10))      // ดึงเฉพาะเลขลำดับ (เช่น 001, 002, ...)
+                    .map(order_id => parseInt(order_id.slice(8), 10)); // ดึงเฉพาะเลขลำดับ (เช่น 001, 002, ...)
 
                 // ถ้าไม่มีออเดอร์ในวันนั้น ให้เริ่มที่ 001 ถ้ามีแล้วให้เพิ่มจากลำดับสูงสุด
                 const nextOrderNumber = filterOrderIds.length === 0
@@ -114,9 +116,11 @@ function Payment({
 
                 // สร้าง order_id ในรูปแบบ YYYYMMDD + เลขลำดับ
                 const newOrderId = `${currentDate}${nextOrderNumber}`;
-                showorderId(newOrderId)
-                // Set ค่า order_id ใน state
+
+                // Set ค่า order_id และ order_no ใน state
                 setOrderId(newOrderId);
+                setOrderNo(nextOrderNumber); // เพิ่มการตั้งค่า order_no ที่นี่
+
             } catch (error) {
                 console.log("Cannot fetch order", error);
             }

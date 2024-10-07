@@ -7,8 +7,9 @@ const QRCode = require('qrcode');
 const path = require('path');
 
 exports.printReceipt = async (req, res) => {
+  console.log("Incoming request body:", req.body);
   const phoneNumber = '0621645650';
-  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, sumCash } = req.body;
+  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, cash, change } = req.body;
 
   const sqlCustomer = `SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
   const sqlProduct = `SELECT p_name, p_price FROM products WHERE p_id = ?`;
@@ -66,7 +67,6 @@ exports.printReceipt = async (req, res) => {
           resolve();
         });
       });
-
     }
 
     // สร้างบรรทัดต่างๆ สำหรับใบเสร็จ
@@ -83,9 +83,17 @@ exports.printReceipt = async (req, res) => {
     });
 
     receipt.push('------------------------------------------');
-    receipt.push(`Subtotal:                ${subtotal}`.padEnd(35));
-    receipt.push(`Discount:                ${discount}`.padEnd(35));
-    receipt.push(`Total:                   ${totalPrice}`.padEnd(35));
+    receipt.push(`Subtotal:                ${subtotal.toString().padStart(5)}`.padEnd(35));
+    receipt.push(`Discount:                ${discount.toString().padStart(5)}`.padEnd(35));
+    receipt.push(`Total:                   ${totalPrice.toString().padStart(5)}`.padEnd(35));
+    
+    // ซ่อน Cash และ Change ถ้าเป็น promtpay
+    if (paymentMethod !== 'promtpay') {
+      receipt.push(`Cash:                    ${cash.toString().padStart(5)}`.padEnd(35));
+      receipt.push(`Change:                  ${change.toString().padStart(5)}`.padEnd(35));
+      console.log('Received cash:', cash);
+      console.log('Received change:', change);
+    }
 
     // ตรวจสอบข้อมูลลูกค้า
     if (customer && customer.c_id) {
@@ -121,6 +129,7 @@ exports.printReceipt = async (req, res) => {
     res.status(500).json({ message: "Failed to get product details.", error });
   }
 };
+
 
 function logReceipt(receipt) {
   console.log("Receipt:\n", receipt.join('\n'));
