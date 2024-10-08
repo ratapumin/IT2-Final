@@ -7,6 +7,9 @@ import { ExclamationCircleFilled } from '@ant-design/icons';
 import InsertEmployee from './InsertEmployee';
 import './employee.css'
 import UpdateEmployee from './UpdateEmployee';
+import { useUser } from '../user/UserContext'
+import { useNavigate } from 'react-router-dom';
+
 
 function Employee() {
     const [employeeList, setEmployeeList] = useState([]);
@@ -14,6 +17,30 @@ function Employee() {
     const [employeeId, setEmployeeId] = useState();
     const [searchTerm, setSearchTerm] = useState('');
     const [showSearchInput, setShowSearchInput] = useState(false);
+    const { user } = useUser();
+    const navigate = useNavigate();
+    const [token, setToken] = useState();
+
+
+    useEffect(() => {
+        if (!user) {
+            navigate('/protected');
+        } else {
+            if (user.role_type === 'O' || user.role_type === 'o') {
+                navigate('/employee');
+            } else {
+                navigate('/protected');
+            }
+        }
+    }, [user, navigate]);
+    useEffect(() => {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            setToken(token);
+        } else {
+            navigate("/");
+        }
+    }, [token, navigate]);
 
     const fetchEmployees = async () => {
         try {
@@ -136,7 +163,7 @@ function Employee() {
             align: 'center',
             width: 200,
             render: (text, record) => (
-               <>
+                <>
                     <Button
                         className="bntEdit "
                         type="primary"
@@ -171,7 +198,7 @@ function Employee() {
 
             {showSearchInput && (
                 <Input
-                className='inputSearchemp'
+                    className='inputSearchemp'
                     placeholder="Search by name or phone number"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}

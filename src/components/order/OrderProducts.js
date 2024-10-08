@@ -42,7 +42,7 @@ function OrderProducts() {
 
 
   useEffect(() => {
-    if (!user || user.role === 'a' && user.role === 'o') {
+    if (!user || user.role_type === 'O' && user.role_type === 'E') {
       navigate('/protected');
     }
   }, [user, navigate]);
