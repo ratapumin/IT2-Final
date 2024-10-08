@@ -6,19 +6,19 @@ const fs = require('fs');
 const QRCode = require('qrcode');
 const path = require('path');
 
-const printer = new Printer({
-  type: types.EPSON,
-  interface: '//localhost/printer',
-  options: {
-    timeout: 10000,
-  }
-});
 
 function logReceipt(receipt) {
   console.log("Receipt:\n", receipt.join('\n'));
 }
 
 async function printReceipt(receipt, res, qrCodePath) {
+  const printer = new Printer({
+    type: types.EPSON,
+    interface: '//localhost/printer',
+    options: {
+      timeout: 10000,
+    }
+  });
 
 
   try {
@@ -198,13 +198,15 @@ exports.printCloseDaily = (req, res) => {
       WHERE DATE(orders.order_date_time) BETWEEN ? AND ?`;
 
   const products = `
-      SELECT order_detail.p_id, SUM(order_detail.quantity) AS qty, products.p_name as name, SUM(order_detail.price * order_detail.quantity) as amount, products.p_price as price
-      FROM order_detail
-      JOIN orders ON orders.order_id = order_detail.order_id
-      JOIN products ON order_detail.p_id = products.p_id
-      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
-      GROUP BY order_detail.p_id
-      ORDER BY p_id ASC`;
+                    SELECT order_detail.p_id, products.category, SUM(order_detail.quantity) AS qty, 
+                    products.p_name as name, SUM(order_detail.price * order_detail.quantity) as amount, 
+                    products.p_price as price      
+                    FROM order_detail
+                    JOIN orders ON orders.order_id = order_detail.order_id
+                    JOIN products ON order_detail.p_id = products.p_id
+                    WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+                    GROUP BY order_detail.p_id
+                    ORDER BY p_id ASC`;
 
   const topProductsQuery = `
       SELECT
@@ -233,11 +235,13 @@ exports.printCloseDaily = (req, res) => {
       GROUP BY orders.payment_type`;
 
   const redeemQuery = `
-     SELECT 
-     COUNT(*) AS redeem_count,
-     SUM(5) AS total_redeem_value
-      FROM points_history
-      WHERE type = 'redeem' AND DATE(transaction_date) BETWEEN ? AND ?;`;
+            SELECT 
+            COUNT(*) AS redeem_count,
+            COALESCE(SUM(5), 0) AS total_redeem_value
+          FROM points_history
+          WHERE type = 'redeem' AND DATE(transaction_date) BETWEEN ? AND ?`
+    ;
+
 
   // ดึงยอดขายรวม
   conn.query(totalSalesQuery, [startDate, endDate], (error, totalSalesResults) => {
@@ -269,61 +273,13 @@ exports.printCloseDaily = (req, res) => {
               return res.status(500).json({ error: error.message });
             }
 
-            // สร้างเนื้อหาจากข้อมูลที่ดึงมา
-            const receipt = [];
-            const totalSales = totalSalesResults[0].total_amount || 0; // ตรวจสอบยอดขายรวม
+            // ใช้ redeemResults ที่ได้จาก query
+            const receiptContent = generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults);
 
-            // หัวข้อ
-            // ...โค้ดก่อนหน้านี้
-            receipt.push('Khathong Coffee');
-            receipt.push(`Date: ${new Date().toLocaleDateString()}`);
-            receipt.push(`Time: ${new Date().toLocaleTimeString()}`);
-            receipt.push(`Total Sales: ${totalSales} บาท`);
-            receipt.push('-------------------------------');
-            receipt.push('*** Products ***');
-            receipt.push('---------------------------------');
-            receipt.push('| Id   | Name                | Qty |'); // แก้ไขให้คอลัมน์ Name มีความกว้างที่เหมาะสม
-            receipt.push('|------|---------------------|-----|'); // แก้ไขให้คอลัมน์ Name มีความกว้างที่เหมาะสม
+            logReceipt(receiptContent)
+            printDaily(receiptContent, res);
+            // res.json(receiptContent)
 
-            // เพิ่มข้อมูลรายการสินค้า
-            productsResults.forEach(item => {
-              receipt.push(` ${String(item.p_id).padEnd(4)}  ${item.name.padEnd(20)}  ${String(item.qty).padStart(3)} `); // ใช้ padStart สำหรับ Qty
-            });
-
-            receipt.push('---------------------------------');
-            receipt.push(`รวมยอดสินค้า: ${totalSales} บาท`);
-            receipt.push('-------------------------------');
-            receipt.push('ยอดขายตามประเภทการชำระเงิน:');
-            receipt.push('---------------------------------');
-            receipt.push('| ประเภทการชำระเงิน | ยอดรวม  |');
-            paymentTypeResults.forEach(payment => {
-              receipt.push(`| ${payment.payment_type.padEnd(18)} | ${payment.total_sales}  |`);
-            });
-            receipt.push('---------------------------------');
-            receipt.push(`รวมยอดขายตามประเภทการชำระเงิน: ${totalSales} บาท`);
-            receipt.push('-------------------------------');
-            receipt.push('ข้อมูลการใช้คะแนน:');
-            receipt.push('---------------------------------');
-            receipt.push('| จำนวนการใช้คะแนน | มูลค่ารวม  |');
-            redeemResults.forEach(redeem => {
-              receipt.push(`| ${redeem.redeem_count.toString().padEnd(18)} | ${redeem.total_redeem_value || 'ไม่มีคะแนน'} |`);
-            });
-            receipt.push('---------------------------------');
-            receipt.push('ขอบคุณที่ใช้บริการ!');
-
-            // ส่งข้อมูลผลลัพธ์ทั้งหมดกลับไป
-            res.json({
-              totalSales: totalSalesResults[0],
-              products: productsResults,
-              topProducts: topProductsResults,
-              paymentTypes: paymentTypeResults,
-              redeemPoints: redeemResults,
-              receipt: receipt // ส่งใบเสร็จกลับไปด้วย
-            });
-
-
-            // พิมพ์ใบเสร็จ
-            // printDaily(receipt, res);
           });
         });
       });
@@ -331,34 +287,161 @@ exports.printCloseDaily = (req, res) => {
   });
 };
 
+
 async function printDaily(receipt, res) {
+  const printer = new Printer({
+    type: types.EPSON,
+    interface: '//localhost/printer',
+    options: {
+      timeout: 10000,
+      encoding: 'utf8'
+    },
+  });
+
   try {
+    if (!receipt || receipt.length === 0) {
+      console.error('Receipt is empty or undefined.');
+      return res.status(400).json({ message: "No receipt to print." });
+    }
+
+    // Debug: Log the receipt content
+    console.log('Receipt Content:', receipt);
+
     printer.alignCenter();
     printer.bold(true);
-    printer.setTextQuadArea(0, 0, 1, 1);
     printer.println('Khathong Coffee');
     printer.bold(false);
     printer.newLine();
-    printer.setTextNormal();
 
-    // พิมพ์ใบเสร็จ
+    // Print receipt lines
     receipt.forEach(line => {
-      printer.println(line);
+      if (typeof line === 'string' && line.trim()) {
+        printer.println(line);
+      } else {
+        console.error('Invalid line:', line);
+      }
     });
 
     printer.cut();
-    await printer.execute();
-
-    console.log("Print done!");
-    if (res) {
-      res.status(200).json({ message: "Receipt printed successfully." });
+    try {
+      await printer.execute();
+    } catch (executeError) {
+      console.error('Error executing print command:', executeError);
     }
 
+    console.log('Print done!');
+
+    return res.status(200).json({ message: "Receipt printed successfully." });
 
   } catch (error) {
     console.error("Print failed:", error);
-    if (res) {
-      res.status(500).json({ message: "Failed to print receipt.", error });
-    }
+    return res.status(500).json({ message: "Failed to print receipt.", error });
   }
 }
+
+
+
+
+function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults) {
+  const receipt = [];
+  const totalSales = totalSalesResults[0]?.total_amount || 0;
+  const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
+
+  // ตรวจสอบและเพิ่มค่าลงใน receipt
+  const dateStr = `Date: ${new Date().toLocaleDateString()}`;
+  const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
+
+  if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
+  if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+  receipt.push(`  *** Sales Summary ***`);
+  redeemResults.forEach(redeem => {
+    const totalValue = redeem.total_redeem_value !== null ? parseFloat(redeem.total_redeem_value) : 0;
+    const grossSalesLabel = 'Gross Sales';
+    const discountLabel = 'Discount';
+    const netSalesLabel = 'Net Sales';
+    const taxLabel = 'Tax';
+
+    const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
+    const discountValue = totalValue.toFixed(2);
+    const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2); // ตรวจสอบการลบด้วย parseFloat
+    const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
+    const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2); // คำนวณภาษีที่รวมในยอดขายสุทธิ
+    const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2); // ตรวจสอบการลบด้วย parseFloat
+
+
+    // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
+    receipt.push(`${grossSalesLabel.padEnd(20)} ${grossSalesValue.padStart(10)}`); // 20 ช่องสำหรับชื่อและ 10 ช่องสำหรับค่า
+    receipt.push(`${discountLabel.padEnd(20)} ${discountValue.padStart(10)}`);
+    receipt.push(`${netSalesLabel.padEnd(20)} ${netSalesValue.padStart(10)}`);
+    receipt.push(`${taxLabel.padEnd(20)} ${taxValue.padStart(10)}`);
+  });
+  receipt.push('-----------------------------------------');
+
+  // แสดง Products
+  receipt.push('*** Products ***');
+  receipt.push('-----------------------------------------');
+  receipt.push(' Id    Name                Category  Qty '.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+
+  productsResults.forEach(item => {
+    if (item.p_id && item.name && item.category && item.qty) {
+      const id = String(item.p_id).padEnd(4);
+      const name = item.name.padEnd(20);
+      const category = item.category.padEnd(5);
+      const qty = String(item.qty).padStart(3);
+      receipt.push(` ${id}  ${name}  ${category}  ${qty} `.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
+    } else {
+      console.error('Invalid product item:', item);
+    }
+  });
+
+  // receipt.push('-----------------------------------------');
+  receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
+  receipt.push('-----------------------------------------');
+
+  // เพิ่มข้อมูลการชำระเงิน
+  receipt.push('*** Sales by payment type ***');
+  receipt.push('-----------------------------------------');
+  receipt.push('Payment Type          Total Amount   '.padEnd(totalWidth));
+  // receipt.push('-----------------------------------------');
+  paymentTypeResults.forEach(payment => {
+    if (payment.payment_type && payment.total_sales) {
+      const paymentType = payment.payment_type.padEnd(18);
+      const amount = payment.total_sales
+      receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
+    } else {
+      console.error('Invalid payment type:', payment);
+    }
+  });
+  receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
+  receipt.push('-----------------------------------------');
+
+  receipt.push('*** Points Usage Information ***');
+  receipt.push('-----------------------------------------');
+  receipt.push('    Points Redeemed      Discount(Baht)  ');
+  // receipt.push('-----------------------------------------');
+  redeemResults.forEach(redeem => {
+    const redeemCount = redeem.redeem_count || 0; // กำหนดเป็น 0 ถ้าไม่มีการใช้แต้ม
+    const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0; // กำหนดเป็น 0 ถ้า total_redeem_value เป็น null
+
+    // กำหนดความกว้างคงที่ (Fixed Width)
+    const redeemCountStr = 10*redeemCount.toString().padStart(5);  // แต้มกว้าง 5 ช่อง
+    const totalValueStr = totalValue.toString().padStart(5);  // Total กว้าง 10 ช่อง
+
+    // เพิ่มลงในใบเสร็จ
+    receipt.push(` ${redeemCountStr}                     ${totalValueStr} `);
+  });
+
+  receipt.push('-----------------------------------------');
+  receipt.push(`Thank you for using our service`.padEnd(totalWidth));
+
+  console.log('Total Sales Results:', totalSalesResults);
+  console.log('Products Results:', productsResults);
+  console.log('Payment Type Results:', paymentTypeResults);
+  console.log('Redeem Results:', redeemResults);
+
+  return receipt;
+}
+
+
