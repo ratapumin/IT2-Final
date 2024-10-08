@@ -28,13 +28,16 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
     const postCloseDaily = async () => {
         try {
-            const currentDate = moment().format('YYYY-MM-DD');
+            // const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+            const currentDate = moment().format('YYYY-MM-DD'); // แปลงเป็นวันที่
             const res = await axios.post('http://localhost:5000/api/closedaily', {
                 cash_in_machine: cashInput,
                 date: currentDate,
                 user_id: user.user_id
             });
+            setCashInput('')
             console.log(res.data);
+            printReceiptDaily(currentDate) // ส่งเฉพาะวันที่
             notification.success({
                 message: 'Success',
                 description: 'Close daily sales recorded successfully!',
@@ -48,6 +51,25 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
             });
         }
     };
+    
+
+    const printReceiptDaily = async(dateTime)=>{
+        try {
+            const res = await axios.post(`http://localhost:5000/api/printdaily/${dateTime}`)
+            console.log(res.data);
+            notification.success({
+                message: 'Success',
+                description: 'Print receipt Close Daily successfully!',
+            });
+        } catch (error) {
+            console.error('Error print closedaily:', error);
+            notification.error({
+                message: 'Error',
+                description: 'Failed to print receipt close daily sales.',
+            });
+        }
+    }
+
 
     const handleCashChange = (e) => {
         setCashInput(e.target.value);

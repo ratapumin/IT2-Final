@@ -4,6 +4,6 @@ const router = express.Router();
 
 // Route สำหรับสร้างใบเสร็จ
 router.post('/print', printReceipt);
-router.post('/printdaily/:startDate/:endDate',printCloseDaily)
+router.post('/printdaily/:date',printCloseDaily)
 
 module.exports = router;

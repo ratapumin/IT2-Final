@@ -187,15 +187,18 @@ exports.printReceipt = async (req, res) => {
 
 };
 
+
+
 exports.printCloseDaily = (req, res) => {
-  const { startDate, endDate } = req.params;
+  const { date } = req.params; // เปลี่ยนจาก req.body เป็น req.params
+  console.log('Requested date:', date); // log วันที่ที่ส่งมา
 
   // คิวรีข้อมูลต่าง ๆ
   const totalSalesQuery = `
       SELECT SUM(order_detail.price * order_detail.quantity) AS total_amount
       FROM orders
       JOIN order_detail ON orders.order_id = order_detail.order_id
-      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?`;
+      WHERE DATE(orders.order_date_time) = ?`;
 
   const products = `
                     SELECT order_detail.p_id, products.category, SUM(order_detail.quantity) AS qty, 
@@ -204,7 +207,7 @@ exports.printCloseDaily = (req, res) => {
                     FROM order_detail
                     JOIN orders ON orders.order_id = order_detail.order_id
                     JOIN products ON order_detail.p_id = products.p_id
-                    WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+                    WHERE DATE(orders.order_date_time) = ? 
                     GROUP BY order_detail.p_id
                     ORDER BY p_id ASC`;
 
@@ -220,7 +223,7 @@ exports.printCloseDaily = (req, res) => {
           orders ON order_detail.order_id = orders.order_id
       JOIN 
           products ON order_detail.p_id = products.p_id
-      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+      WHERE DATE(orders.order_date_time) = ? 
       GROUP BY
           order_detail.p_id
       ORDER BY
@@ -231,7 +234,7 @@ exports.printCloseDaily = (req, res) => {
       SELECT SUM(order_detail.price * order_detail.quantity) AS total_sales, orders.payment_type
       FROM order_detail
       JOIN orders ON order_detail.order_id = orders.order_id
-      WHERE DATE(orders.order_date_time) BETWEEN ? AND ?
+      WHERE DATE(orders.order_date_time) = ? 
       GROUP BY orders.payment_type`;
 
   const redeemQuery = `
@@ -239,47 +242,73 @@ exports.printCloseDaily = (req, res) => {
             COUNT(*) AS redeem_count,
             COALESCE(SUM(5), 0) AS total_redeem_value
           FROM points_history
-          WHERE type = 'redeem' AND DATE(transaction_date) BETWEEN ? AND ?`
-    ;
-
+          WHERE type = 'redeem' AND DATE(transaction_date) = ?`;
 
   // ดึงยอดขายรวม
-  conn.query(totalSalesQuery, [startDate, endDate], (error, totalSalesResults) => {
+  conn.query(totalSalesQuery, [date], (error, totalSalesResults) => {
     if (error) {
       return res.status(500).json({ error: error.message });
     }
 
     // ดึงสินค้าทั้งหมด
-    conn.query(products, [startDate, endDate], (error, productsResults) => {
+    conn.query(products, [date], (error, productsResults) => {
       if (error) {
         return res.status(500).json({ error: error.message });
       }
 
       // ดึงสินค้าขายดี
-      conn.query(topProductsQuery, [startDate, endDate], (error, topProductsResults) => {
+      conn.query(topProductsQuery, [date], (error, topProductsResults) => {
         if (error) {
           return res.status(500).json({ error: error.message });
         }
 
         // ดึงข้อมูลยอดขายตามประเภทการชำระเงิน
-        conn.query(sqlPaymentType, [startDate, endDate], (error, paymentTypeResults) => {
+        conn.query(sqlPaymentType, [date], (error, paymentTypeResults) => {
           if (error) {
             return res.status(500).json({ error: error.message });
           }
 
           // ดึงข้อมูลการใช้ redeem points
-          conn.query(redeemQuery, [startDate, endDate], (error, redeemResults) => {
+          conn.query(redeemQuery, [date], (error, redeemResults) => {
             if (error) {
               return res.status(500).json({ error: error.message });
             }
 
-            // ใช้ redeemResults ที่ได้จาก query
-            const receiptContent = generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults);
+            // คิวรีข้อมูลล่าสุดจาก closedaily
+            const latestCloseDailyQuery = `
+                                          SELECT 
+                                          DATE_FORMAT(closedaily.date, '%Y-%m-%d') AS date, 
+                                          closedaily.cash_in_machine, 
+                                          closedaily.cash_in_system, 
+                                          closedaily.cash_difference
+                                          FROM 
+                                              closedaily
+                                          ORDER BY 
+                                              closedaily.id DESC
+                                          LIMIT 1
+                                                      `
 
-            logReceipt(receiptContent)
-            printDaily(receiptContent, res);
-            // res.json(receiptContent)
+            // ดึงข้อมูลล่าสุดจาก closedaily
+            conn.query(latestCloseDailyQuery, (error, latestCloseDailyResults) => {
+              if (error) {
+                return res.status(500).json({ error: error.message });
+              }
 
+              // ใช้ latestCloseDailyResults ที่ได้จาก query
+              const receiptContent = generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults);
+
+              logReceipt(receiptContent);
+              printDaily(receiptContent, res);
+              //   res.json({
+              //   totalSalesResults,
+              //   productsResults,
+              //   paymentTypeResults,
+              //   redeemResults,
+              //   receiptContent,
+              //   latestCloseDailyResults
+              // });
+
+            });
           });
         });
       });
@@ -288,160 +317,184 @@ exports.printCloseDaily = (req, res) => {
 };
 
 
-async function printDaily(receipt, res) {
-  const printer = new Printer({
-    type: types.EPSON,
-    interface: '//localhost/printer',
-    options: {
-      timeout: 10000,
-      encoding: 'utf8'
-    },
-  });
 
-  try {
-    if (!receipt || receipt.length === 0) {
-      console.error('Receipt is empty or undefined.');
-      return res.status(400).json({ message: "No receipt to print." });
-    }
 
-    // Debug: Log the receipt content
-    console.log('Receipt Content:', receipt);
 
-    printer.alignCenter();
-    printer.bold(true);
-    printer.println('Khathong Coffee');
-    printer.bold(false);
-    printer.newLine();
-
-    // Print receipt lines
-    receipt.forEach(line => {
-      if (typeof line === 'string' && line.trim()) {
-        printer.println(line);
-      } else {
-        console.error('Invalid line:', line);
-      }
+  async function printDaily(receipt, res) {
+    const printer = new Printer({
+      type: types.EPSON,
+      interface: '//localhost/printer',
+      options: {
+        timeout: 10000,
+        encoding: 'utf8'
+      },
     });
 
-    printer.cut();
     try {
-      await printer.execute();
-    } catch (executeError) {
-      console.error('Error executing print command:', executeError);
+      if (!receipt || receipt.length === 0) {
+        console.error('Receipt is empty or undefined.');
+        return res.status(400).json({ message: "No receipt to print." });
+      }
+
+      // Debug: Log the receipt content
+      console.log('Receipt Content:', receipt);
+
+      printer.alignCenter();
+      printer.bold(true);
+      printer.println('Khathong Coffee');
+      printer.bold(false);
+      printer.newLine();
+
+      // Print receipt lines
+      receipt.forEach(line => {
+        if (typeof line === 'string' && line.trim()) {
+          printer.println(line);
+        } else {
+          console.error('Invalid line:', line);
+        }
+      });
+
+      printer.cut();
+      try {
+        await printer.execute();
+      } catch (executeError) {
+        console.error('Error executing print command:', executeError);
+      }
+
+      console.log('Print done!');
+
+      return res.status(200).json({ message: "Receipt printed successfully." });
+
+    } catch (error) {
+      console.error("Print failed:", error);
+      return res.status(500).json({ message: "Failed to print receipt.", error });
     }
-
-    console.log('Print done!');
-
-    return res.status(200).json({ message: "Receipt printed successfully." });
-
-  } catch (error) {
-    console.error("Print failed:", error);
-    return res.status(500).json({ message: "Failed to print receipt.", error });
   }
-}
 
 
 
 
-function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults) {
-  const receipt = [];
-  const totalSales = totalSalesResults[0]?.total_amount || 0;
-  const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
+  function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults) {
+    const receipt = [];
+    const totalSales = totalSalesResults[0]?.total_amount || 0;
+    const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
 
-  // ตรวจสอบและเพิ่มค่าลงใน receipt
-  const dateStr = `Date: ${new Date().toLocaleDateString()}`;
-  const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
+    // ตรวจสอบและเพิ่มค่าลงใน receipt
+    const dateStr = `Date: ${new Date().toLocaleDateString()}`;
+    const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
 
-  if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
-  if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
-  receipt.push('-----------------------------------------');
-  receipt.push(`  *** Sales Summary ***`);
-  redeemResults.forEach(redeem => {
-    const totalValue = redeem.total_redeem_value !== null ? parseFloat(redeem.total_redeem_value) : 0;
-    const grossSalesLabel = 'Gross Sales';
-    const discountLabel = 'Discount';
-    const netSalesLabel = 'Net Sales';
-    const taxLabel = 'Tax';
+    if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
+    if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
+    receipt.push('-----------------------------------------');
+    receipt.push(`  *** Sales Summary ***`);
+    
+    redeemResults.forEach(redeem => {
+        const totalValue = redeem.total_redeem_value !== null ? parseFloat(redeem.total_redeem_value) : 0;
+        const grossSalesLabel = 'Gross Sales';
+        const discountLabel = 'Discount';
+        const netSalesLabel = 'Net Sales';
+        const taxLabel = 'Tax';
 
-    const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
-    const discountValue = totalValue.toFixed(2);
-    const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2); // ตรวจสอบการลบด้วย parseFloat
-    const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
-    const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2); // คำนวณภาษีที่รวมในยอดขายสุทธิ
-    const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2); // ตรวจสอบการลบด้วย parseFloat
+        const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
+        const discountValue = totalValue.toFixed(2);
+        const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2);
+        const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
+        const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2);
+        const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2);
 
+        // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
+        receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
+        receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
+        receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
+        receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
+    });
+    
+    receipt.push('-----------------------------------------');
 
-    // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
-    receipt.push(`${grossSalesLabel.padEnd(20)} ${grossSalesValue.padStart(10)}`); // 20 ช่องสำหรับชื่อและ 10 ช่องสำหรับค่า
-    receipt.push(`${discountLabel.padEnd(20)} ${discountValue.padStart(10)}`);
-    receipt.push(`${netSalesLabel.padEnd(20)} ${netSalesValue.padStart(10)}`);
-    receipt.push(`${taxLabel.padEnd(20)} ${taxValue.padStart(10)}`);
-  });
-  receipt.push('-----------------------------------------');
+    // แสดง Products
+    receipt.push('*** Products ***');
+    receipt.push('-----------------------------------------');
+    receipt.push(' Id    Name                Category  Qty '.padEnd(totalWidth));
+    receipt.push('-----------------------------------------');
 
-  // แสดง Products
-  receipt.push('*** Products ***');
-  receipt.push('-----------------------------------------');
-  receipt.push(' Id    Name                Category  Qty '.padEnd(totalWidth));
-  receipt.push('-----------------------------------------');
+    productsResults.forEach(item => {
+        if (item.p_id && item.name && item.category && item.qty) {
+            const id = String(item.p_id).padEnd(4);
+            const name = item.name.padEnd(20);
+            const category = item.category.padEnd(5);
+            const qty = String(item.qty).padStart(3);
+            receipt.push(` ${id}  ${name}  ${category}  ${qty} `.padEnd(totalWidth));
+        } else {
+            console.error('Invalid product item:', item);
+        }
+    });
 
-  productsResults.forEach(item => {
-    if (item.p_id && item.name && item.category && item.qty) {
-      const id = String(item.p_id).padEnd(4);
-      const name = item.name.padEnd(20);
-      const category = item.category.padEnd(5);
-      const qty = String(item.qty).padStart(3);
-      receipt.push(` ${id}  ${name}  ${category}  ${qty} `.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
-    } else {
-      console.error('Invalid product item:', item);
-    }
-  });
+    receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth));
+    receipt.push('-----------------------------------------');
 
-  // receipt.push('-----------------------------------------');
-  receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
-  receipt.push('-----------------------------------------');
+    // เพิ่มข้อมูลการชำระเงิน
+    receipt.push('*** Sales by payment type ***');
+    receipt.push('-----------------------------------------');
+    receipt.push('Payment Type          Total Amount   '.padEnd(totalWidth));
 
-  // เพิ่มข้อมูลการชำระเงิน
-  receipt.push('*** Sales by payment type ***');
-  receipt.push('-----------------------------------------');
-  receipt.push('Payment Type          Total Amount   '.padEnd(totalWidth));
-  // receipt.push('-----------------------------------------');
-  paymentTypeResults.forEach(payment => {
-    if (payment.payment_type && payment.total_sales) {
-      const paymentType = payment.payment_type.padEnd(18);
-      const amount = payment.total_sales
-      receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
-    } else {
-      console.error('Invalid payment type:', payment);
-    }
-  });
-  receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth)); // ปรับการจัดรูปแบบ
-  receipt.push('-----------------------------------------');
+    paymentTypeResults.forEach(payment => {
+        if (payment.payment_type && payment.total_sales) {
+            const paymentType = payment.payment_type.padEnd(18);
+            const amount = payment.total_sales;
+            receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth));
+        } else {
+            console.error('Invalid payment type:', payment);
+        }
+    });
 
-  receipt.push('*** Points Usage Information ***');
-  receipt.push('-----------------------------------------');
-  receipt.push('    Points Redeemed      Discount(Baht)  ');
-  // receipt.push('-----------------------------------------');
-  redeemResults.forEach(redeem => {
-    const redeemCount = redeem.redeem_count || 0; // กำหนดเป็น 0 ถ้าไม่มีการใช้แต้ม
-    const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0; // กำหนดเป็น 0 ถ้า total_redeem_value เป็น null
+    receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth));
+    receipt.push('-----------------------------------------');
 
-    // กำหนดความกว้างคงที่ (Fixed Width)
-    const redeemCountStr = 10*redeemCount.toString().padStart(5);  // แต้มกว้าง 5 ช่อง
-    const totalValueStr = totalValue.toString().padStart(5);  // Total กว้าง 10 ช่อง
+    // เพิ่มข้อมูลการใช้ redeem points
+    receipt.push('*** Points Usage Information ***');
+    receipt.push('-----------------------------------------');
+    receipt.push('    Points Redeemed      Discount(Baht)  ');
 
-    // เพิ่มลงในใบเสร็จ
-    receipt.push(` ${redeemCountStr}                     ${totalValueStr} `);
-  });
+    redeemResults.forEach(redeem => {
+        const redeemCount = redeem.redeem_count || 0; 
+        const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0; 
+        const redeemCountStr = String(redeemCount).padStart(10);  
+        const totalValueStr = String(totalValue).padStart(10);  
+        receipt.push(` ${redeemCountStr}        ${totalValueStr}`);
+    });
 
-  receipt.push('-----------------------------------------');
-  receipt.push(`Thank you for using our service`.padEnd(totalWidth));
+    receipt.push('-----------------------------------------');
+    
+    // เพิ่มข้อมูลจาก latestCloseDailyResults
+    if (latestCloseDailyResults && latestCloseDailyResults.length > 0) {
+      const latestCloseDaily = latestCloseDailyResults[0];
+      receipt.push(`*** Latest Close Daily ***`);
+      receipt.push('-----------------------------------------');
+      receipt.push(`Date: ${latestCloseDaily.date}`.padEnd(totalWidth));
+  
+      // จัดข้อความให้ตัวเลขตรงกัน
+      const cashInMachineLabel = 'Cash In Machine:';
+      const cashInSystemLabel = 'Cash In System:';
+      const cashDifferenceLabel = 'Cash Difference:';
+  
+      const cashInMachineValue = latestCloseDaily.cash_in_machine.padStart(10);
+      const cashInSystemValue = latestCloseDaily.cash_in_system.padStart(10);
+      const cashDifferenceValue = latestCloseDaily.cash_difference.padStart(10);
+  
+      receipt.push(`${cashInMachineLabel.padEnd(25)}${cashInMachineValue}`.padEnd(totalWidth));
+      receipt.push(`${cashInSystemLabel.padEnd(25)}${cashInSystemValue}`.padEnd(totalWidth));
+      receipt.push(`${cashDifferenceLabel.padEnd(25)}${cashDifferenceValue}`.padEnd(totalWidth));
+  
+      receipt.push('-----------------------------------------');
+  }
+    receipt.push(`Thank you for using our service`.padEnd(totalWidth));
 
-  console.log('Total Sales Results:', totalSalesResults);
-  console.log('Products Results:', productsResults);
-  console.log('Payment Type Results:', paymentTypeResults);
-  console.log('Redeem Results:', redeemResults);
-
-  return receipt;
+    console.log('Total Sales Results:', totalSalesResults);
+    console.log('Products Results:', productsResults);
+    console.log('Payment Type Results:', paymentTypeResults);
+    console.log('Redeem Results:', redeemResults);
+    
+    return receipt;
 }
 
 
