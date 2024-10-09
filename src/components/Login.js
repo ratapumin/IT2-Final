@@ -1,5 +1,5 @@
 import { Form, Input, Button, notification, message, Spin } from 'antd';
-import Logo from '../img/logo-kathong.png';
+import Logo from '../img/bg.png';
 import './Login.css';
 import axios from 'axios';
 import { useEffect, useState } from "react";
@@ -64,50 +64,36 @@ function Login() {
 
   return (
     <div className='contentLogin'>
-      <div className='leftContent'>
+      <div className='bg'>
         <img src={Logo} alt="logo" />
-      </div>
-      <div className='rightContent'>
-        <Form
-          className="form"
-          onFinish={handleLogin}
-          layout="vertical"
-        >
-          <Form.Item
-            label="User Id"
-            name="userId"
-            style={{ width: '340px' }}
-            rules={[{ required: true, message: 'Please enter your User ID!' }]}
-          >
-            <Input
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Password"
-            name="password"
-            style={{ width: '340px' }}
-            rules={[{ required: true, message: 'Please enter your password!' }]}
-          >
-            <Input.Password
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button 
-              type="primary" 
-              style={{ width: '80px' }} 
-              htmlType="submit" 
-              block 
+        <div className='rightContent'>
+          <Form onFinish={handleLogin}>
+            <Form.Item
+              name="userId"
+              style={{ width: '350px' }}
+              rules={[{ required: true, message: 'Please input your User ID!' }]}
             >
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input className="custom-input" placeholder="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              style={{ width: '350px' }}
+              rules={[{ required: true, message: 'Please input your Password!' }]}
+            >
+              <Input.Password className="custom-input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className='btnLogin'
+              >
+                Login
+              </Button>
+            </Form.Item>
+          </Form>
+
+        </div>
       </div>
     </div>
   );
