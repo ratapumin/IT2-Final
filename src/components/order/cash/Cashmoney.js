@@ -74,7 +74,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     useEffect(() => {
         if (cash && sumCash) {
             const changeAmount = Number(cash) - Number(sumCash);
-            setChange(changeAmount > 0 ? changeAmount : '');
+            setChange(changeAmount > 0 ? changeAmount : 0);
             onChange(changeAmount > 0 ? changeAmount : 0);
             // console.log("Calculated Change:", changeAmount);
             // console.log("Calculated sumCash:", sumCash);

@@ -12,6 +12,12 @@ function SidebarDashboard() {
 
     const menuItems = [
         {
+            key: '/kathong',
+            label: (
+                <span style={{ fontWeight: 'bold', fontSize: '20px' ,textAlign:'center'}}>KATHONG POS</span> 
+            )
+        },
+        {
             key: '/dashboard',
             icon: <DashboardOutlined />,
             label: 'Dashboard',

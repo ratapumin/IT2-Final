@@ -10,7 +10,7 @@ function Login() {
 
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('')
-  const { user,setUser } = useUser()
+  const { user, setUser } = useUser()
 
 
 
@@ -18,7 +18,7 @@ function Login() {
     const token = localStorage.getItem('jwt')
     if (token) {
     }
-  },[])
+  }, [])
 
 
   const handleLogin = async (e) => {
@@ -36,7 +36,7 @@ function Login() {
       // const userRole = userData.role_type
       // ${userData.user_fname}
       swal({
-        title: "Login Successfuly ",  
+        title: "Login Successfuly ",
         text: `Welcome`,
         icon: "success",
         button: false,
@@ -60,7 +60,7 @@ function Login() {
 
   return (
     <>
-      <div className="content">
+      {/* <div className="content">
         <div className="box">
           <div className="box-logo">
             <img src={Logo} alt="logo" className="logo" />
@@ -90,7 +90,14 @@ function Login() {
           </form>
           <p></p>
         </div>
+      </div> */}
+      <div className='contentLogin'>
+        <div
+          className='leftContent'
+        >    <img src={Logo} alt="logo"/></div>
+        <div>login page</div>
       </div>
+
     </>
   );
 }

@@ -12,6 +12,7 @@ function Dashboard() {
     const navigate = useNavigate();
     const { user } = useUser();
     const [token, setToken] = useState();
+    const [currentTime, setCurrentTime] = useState(new Date());
     console.log(user)
 
     useEffect(() => {
@@ -34,21 +35,54 @@ function Dashboard() {
         }
     }, [token, navigate]);
 
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);  // Clear interval on component unmount
+    }, []);
+
+
     return (
-        <div className='bgDashboard' >
-            <p>welcome Owner</p>
-            <div className='contentDashboard'>
+        <>
 
-                <div className='flexCard'>
-                    <CardSales />
+
+            <div className='bgDashboard' >
+                <div
+                    style={{
+                        width: "100%",
+                        backgroundColor: "#fff",
+                        padding: '3px',
+                        textAlign: 'center',
+                        color: "#000",
+                        fontSize: '18px',
+                        position: 'sticky'
+                    }}
+                >
+                    {currentTime.toLocaleDateString('th-TH')} -
+                    {currentTime.toLocaleTimeString('th-TH', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                    })}
                 </div>
-                <div className='flexChart'>
-                    <SalesChart />
-                    <PopularChart />
+                <div className='contentDashboard'>
+
+                    <div className='flexCard'>
+                        <CardSales />
+                    </div>
+                    <div className='flexChart'>
+                        <SalesChart />
+                        <PopularChart />
+                    </div>
                 </div>
+
             </div>
+        </>
 
-        </div>
     );
 }
 

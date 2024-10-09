@@ -4,8 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { LogoutOutlined, AppstoreAddOutlined, UserOutlined } from '@ant-design/icons'; // นำเข้าไอคอนที่ต้องการ
 import { useLogout } from '../components/Logout'; // นำเข้าฟังก์ชัน useLogout
 import './Sidebar.css'; // อย่าลืมปรับ CSS ถ้าจำเป็น
-import { icons } from 'antd/es/image/PreviewGroup';
-import { width } from '@mui/system';
+
 
 const { Sider } = Layout;
 

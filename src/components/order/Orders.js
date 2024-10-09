@@ -121,6 +121,7 @@ function Orders({
                 key={item.p_id || index}>
                 <p className="item-box">{item.p_name}</p>
                 <p className="item-box">{item.p_price}</p>
+                <p className="item-box">{item.category}</p>
                 <p className="item-box">{item.quantity}</p>
               </div>
             ))}

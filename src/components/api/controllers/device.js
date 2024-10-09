@@ -25,7 +25,7 @@ async function printReceipt(receipt, res, qrCodePath) {
     printer.alignCenter();
     printer.bold(true);
     printer.setTextQuadArea(0, 0, 1, 1);
-    printer.println('Khathong Coffee');
+    printer.println('Kathong Coffee');
     printer.bold(false);
     if (qrCodePath) {
       printer.newLine();
@@ -294,7 +294,6 @@ exports.printCloseDaily = (req, res) => {
                 return res.status(500).json({ error: error.message });
               }
 
-              // ใช้ latestCloseDailyResults ที่ได้จาก query
               const receiptContent = generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults);
 
               logReceipt(receiptContent);
@@ -316,6 +315,131 @@ exports.printCloseDaily = (req, res) => {
   });
 };
 
+
+
+
+function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults) {
+  const receipt = [];
+  const totalSales = totalSalesResults[0]?.total_amount || 0;
+  const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
+
+  // ตรวจสอบและเพิ่มค่าลงใน receipt
+  const dateStr = `Date: ${new Date().toLocaleDateString()}`;
+  const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
+
+  if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
+  if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+  receipt.push(`  *** Sales Summary ***`);
+  
+  redeemResults.forEach(redeem => {
+      const totalValue = redeem.total_redeem_value !== null ? parseFloat(redeem.total_redeem_value) : 0;
+      const grossSalesLabel = 'Gross Sales';
+      const discountLabel = 'Discount';
+      const netSalesLabel = 'Net Sales';
+      const taxLabel = 'Tax';
+
+      const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
+      const discountValue = totalValue.toFixed(2);
+      const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2);
+      const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
+      const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2);
+      const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2);
+
+      // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
+      receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
+      receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
+      receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
+      receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
+  });
+  
+  receipt.push('-----------------------------------------');
+
+  // แสดง Products
+  receipt.push('*** Products ***');
+  receipt.push('-----------------------------------------');
+  receipt.push(' Id    Name                Category  Qty '.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+
+  productsResults.forEach(item => {
+      if (item.p_id && item.name && item.category && item.qty) {
+          const id = String(item.p_id).padEnd(4);
+          const name = item.name.padEnd(20);
+          const category = item.category.padEnd(5);
+          const qty = String(item.qty).padStart(3);
+          receipt.push(` ${id}  ${name}  ${category}  ${qty} `.padEnd(totalWidth));
+      } else {
+          console.error('Invalid product item:', item);
+      }
+  });
+
+  receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+
+  // เพิ่มข้อมูลการชำระเงิน
+  receipt.push('*** Sales by payment type ***');
+  receipt.push('-----------------------------------------');
+  receipt.push('Payment Type          Total Amount   '.padEnd(totalWidth));
+
+  paymentTypeResults.forEach(payment => {
+      if (payment.payment_type && payment.total_sales) {
+          const paymentType = payment.payment_type.padEnd(18);
+          const amount = payment.total_sales;
+          receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth));
+      } else {
+          console.error('Invalid payment type:', payment);
+      }
+  });
+
+  receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth));
+  receipt.push('-----------------------------------------');
+
+  // เพิ่มข้อมูลการใช้ redeem points
+  receipt.push('*** Points Usage Information ***');
+  receipt.push('-----------------------------------------');
+  receipt.push('    Points Redeemed      Discount(Baht)  ');
+
+  redeemResults.forEach(redeem => {
+      const redeemCount = redeem.redeem_count || 0; 
+      const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0; 
+      const redeemCountStr = String(redeemCount).padStart(10)*10;  
+      const totalValueStr = String(totalValue).padStart(10);  
+      receipt.push(` ${redeemCountStr}        ${totalValueStr}`);
+  });
+
+  receipt.push('-----------------------------------------');
+  
+  // เพิ่มข้อมูลจาก latestCloseDailyResults
+  if (latestCloseDailyResults && latestCloseDailyResults.length > 0) {
+    const latestCloseDaily = latestCloseDailyResults[0];
+    receipt.push(`*** Close Daily ***`);
+    receipt.push('-----------------------------------------');
+    receipt.push(`Date: ${latestCloseDaily.date}`.padEnd(totalWidth));
+
+    // จัดข้อความให้ตัวเลขตรงกัน
+    const cashInMachineLabel = 'Cash In Machine:';
+    const cashInSystemLabel = 'Cash In System:';
+    const cashDifferenceLabel = 'Cash Difference:';
+
+    const cashInMachineValue = latestCloseDaily.cash_in_machine.padStart(10);
+    const cashInSystemValue = latestCloseDaily.cash_in_system.padStart(10);
+    const cashDifferenceValue = latestCloseDaily.cash_difference.padStart(10);
+
+    receipt.push(`${cashInMachineLabel.padEnd(25)}${cashInMachineValue}`.padEnd(totalWidth));
+    receipt.push(`${cashInSystemLabel.padEnd(25)}${cashInSystemValue}`.padEnd(totalWidth));
+    receipt.push(`${cashDifferenceLabel.padEnd(25)}${cashDifferenceValue}`.padEnd(totalWidth));
+
+    receipt.push('-----------------------------------------');
+}
+  receipt.push(`Thank you for using our service`);
+
+  console.log('Total Sales Results:', totalSalesResults);
+  console.log('Products Results:', productsResults);
+  console.log('Payment Type Results:', paymentTypeResults);
+  console.log('Redeem Results:', redeemResults);
+  
+  return receipt;
+}
 
 
 
@@ -341,8 +465,12 @@ exports.printCloseDaily = (req, res) => {
 
       printer.alignCenter();
       printer.bold(true);
-      printer.println('Khathong Coffee');
+      printer.println('Kathong Coffee');
       printer.bold(false);
+      // printer.bold(true);
+      // printer.setTextQuadArea(0, 0, 1, 1);
+      // printer.println('Kathong Coffee');
+      // printer.bold(false);
       printer.newLine();
 
       // Print receipt lines
@@ -373,128 +501,5 @@ exports.printCloseDaily = (req, res) => {
 
 
 
-
-  function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults) {
-    const receipt = [];
-    const totalSales = totalSalesResults[0]?.total_amount || 0;
-    const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
-
-    // ตรวจสอบและเพิ่มค่าลงใน receipt
-    const dateStr = `Date: ${new Date().toLocaleDateString()}`;
-    const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
-
-    if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
-    if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
-    receipt.push('-----------------------------------------');
-    receipt.push(`  *** Sales Summary ***`);
-    
-    redeemResults.forEach(redeem => {
-        const totalValue = redeem.total_redeem_value !== null ? parseFloat(redeem.total_redeem_value) : 0;
-        const grossSalesLabel = 'Gross Sales';
-        const discountLabel = 'Discount';
-        const netSalesLabel = 'Net Sales';
-        const taxLabel = 'Tax';
-
-        const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
-        const discountValue = totalValue.toFixed(2);
-        const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2);
-        const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
-        const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2);
-        const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2);
-
-        // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
-        receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
-        receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
-        receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
-        receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
-    });
-    
-    receipt.push('-----------------------------------------');
-
-    // แสดง Products
-    receipt.push('*** Products ***');
-    receipt.push('-----------------------------------------');
-    receipt.push(' Id    Name                Category  Qty '.padEnd(totalWidth));
-    receipt.push('-----------------------------------------');
-
-    productsResults.forEach(item => {
-        if (item.p_id && item.name && item.category && item.qty) {
-            const id = String(item.p_id).padEnd(4);
-            const name = item.name.padEnd(20);
-            const category = item.category.padEnd(5);
-            const qty = String(item.qty).padStart(3);
-            receipt.push(` ${id}  ${name}  ${category}  ${qty} `.padEnd(totalWidth));
-        } else {
-            console.error('Invalid product item:', item);
-        }
-    });
-
-    receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth));
-    receipt.push('-----------------------------------------');
-
-    // เพิ่มข้อมูลการชำระเงิน
-    receipt.push('*** Sales by payment type ***');
-    receipt.push('-----------------------------------------');
-    receipt.push('Payment Type          Total Amount   '.padEnd(totalWidth));
-
-    paymentTypeResults.forEach(payment => {
-        if (payment.payment_type && payment.total_sales) {
-            const paymentType = payment.payment_type.padEnd(18);
-            const amount = payment.total_sales;
-            receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth));
-        } else {
-            console.error('Invalid payment type:', payment);
-        }
-    });
-
-    receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth));
-    receipt.push('-----------------------------------------');
-
-    // เพิ่มข้อมูลการใช้ redeem points
-    receipt.push('*** Points Usage Information ***');
-    receipt.push('-----------------------------------------');
-    receipt.push('    Points Redeemed      Discount(Baht)  ');
-
-    redeemResults.forEach(redeem => {
-        const redeemCount = redeem.redeem_count || 0; 
-        const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0; 
-        const redeemCountStr = String(redeemCount).padStart(10);  
-        const totalValueStr = String(totalValue).padStart(10);  
-        receipt.push(` ${redeemCountStr}        ${totalValueStr}`);
-    });
-
-    receipt.push('-----------------------------------------');
-    
-    // เพิ่มข้อมูลจาก latestCloseDailyResults
-    if (latestCloseDailyResults && latestCloseDailyResults.length > 0) {
-      const latestCloseDaily = latestCloseDailyResults[0];
-      receipt.push(`*** Latest Close Daily ***`);
-      receipt.push('-----------------------------------------');
-      receipt.push(`Date: ${latestCloseDaily.date}`.padEnd(totalWidth));
-  
-      // จัดข้อความให้ตัวเลขตรงกัน
-      const cashInMachineLabel = 'Cash In Machine:';
-      const cashInSystemLabel = 'Cash In System:';
-      const cashDifferenceLabel = 'Cash Difference:';
-  
-      const cashInMachineValue = latestCloseDaily.cash_in_machine.padStart(10);
-      const cashInSystemValue = latestCloseDaily.cash_in_system.padStart(10);
-      const cashDifferenceValue = latestCloseDaily.cash_difference.padStart(10);
-  
-      receipt.push(`${cashInMachineLabel.padEnd(25)}${cashInMachineValue}`.padEnd(totalWidth));
-      receipt.push(`${cashInSystemLabel.padEnd(25)}${cashInSystemValue}`.padEnd(totalWidth));
-      receipt.push(`${cashDifferenceLabel.padEnd(25)}${cashDifferenceValue}`.padEnd(totalWidth));
-  
-      receipt.push('-----------------------------------------');
-  }
-    receipt.push(`Thank you for using our service`.padEnd(totalWidth));
-
-    console.log('Total Sales Results:', totalSalesResults);
-    console.log('Products Results:', productsResults);
-    console.log('Payment Type Results:', paymentTypeResults);
-    console.log('Redeem Results:', redeemResults);
-    
-    return receipt;
-}
 
 

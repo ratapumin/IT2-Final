@@ -165,13 +165,13 @@
 .bg-order {
     border-radius: 10px;
     width: 90%;
-    height: 80%;
+    height: 90%;
     background-color: #FFE8A3;
     position: absolute;
     left: 50%;
     top: 45%;
     /* จัดให้อยู่ตรงกลางแนวนอน */
-    transform: translate(-50%, -40%);
+    transform: translate(-50%, -35%);
     /* ขยับให้อยู่ตรงกลาง */
 }
 
@@ -194,32 +194,29 @@
 
 .order-flex {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    /* ใช้ grid ในการจัดแบ่งคอลัมน์ */
+    grid-template-columns: 3fr 1fr 1fr 1fr;
     align-items: center;
     text-align: center;
-    padding-left: 20px;
-    gap: 10px;
-    /* ระยะห่างระหว่างคอลัมน์ */
+    padding-left: 15px;
+    gap: 5px;
     margin-top: 20px;
     cursor: pointer;
-    /* เพิ่ม cursor ให้แสดงว่าคลิกได้ */
+    font-size: 14px;
+
 }
 
 .order-flex.selected {
     border: 2px solid #007BFF;
-    /* ใช้ border เพื่อเน้นว่ารายการถูกเลือก */
     background-color: #E3F2FD;
-    /* เพิ่มสีพื้นหลังเพื่อเน้น */
     padding-top: 10px;
+
 }
 
 
 .item-box {
     text-align: left;
-    /* ปรับให้ตัวอักษรชิดซ้าย */
     justify-content: center;
-    padding-left: 10px;
+    /* padding-left: 10px; */
     cursor: pointer;
 }
 
@@ -345,7 +342,7 @@
     width: 100%;
     justify-content: space-between;
     padding: 10px;
-    bottom: -5%;
+    bottom: -16%;
 
 }
 

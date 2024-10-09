@@ -16,6 +16,7 @@ function DeleteProducts({ product, onDelete }) {
             await axios.delete(`http://localhost:5000/api/products/${product.p_id}`);
             Modal.success({
                 content: 'Your product has been deleted.',
+                centered:true
             });
             onDelete(); // Call onDelete to update the product list
             setModalDelete(false);
