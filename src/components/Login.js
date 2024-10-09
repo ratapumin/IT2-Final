@@ -1,107 +1,116 @@
-import Logo from '../img/logo-kathong.png'
+import { Form, Input, Button, notification, message, Spin } from 'antd';
+import Logo from '../img/logo-kathong.png';
 import './Login.css';
 import axios from 'axios';
 import { useEffect, useState } from "react";
-import swal from 'sweetalert';
 import { useUser } from './user/UserContext';
 
-
 function Login() {
-
   const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('')
-  const { user, setUser } = useUser()
-
-
+  const [password, setPassword] = useState('');
+  const { user, setUser } = useUser();
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt')
+    const token = localStorage.getItem('jwt');
     if (token) {
+      // handle token logic
     }
-  }, [])
+  }, []);
 
+  const handleLogin = async (values) => {
+    const hideLoadingMessage = message.loading('Logging in...', 0); // แสดงข้อความการหมุนแบบไม่หมดเวลา
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
     try {
-      console.log('Attempting login with:', { user_id: userId, user_password: password });
+      console.log('Attempting login with:', values);
       const res = await axios.post('http://localhost:5000/api/users/login', {
-        user_id: userId,
-        user_password: password
-      })
-      // console.log(userId, password)
-      const userData = res.data.user
-      setUser(userData)
-      localStorage.setItem('jwt', res.data.token)
-      // const userRole = userData.role_type
-      // ${userData.user_fname}
-      swal({
-        title: "Login Successfuly ",
-        text: `Welcome`,
-        icon: "success",
-        button: false,
-        timer: 1200,
-      }).then(() => {
+        user_id: values.userId,
+        user_password: values.password
+      });
+
+      const userData = res.data.user;
+      setUser(userData);
+      localStorage.setItem('jwt', res.data.token);
+
+      hideLoadingMessage(); // ซ่อนข้อความหมุนเมื่อการร้องขอสำเร็จ
+
+      notification.success({
+        message: 'Login Successfully',
+        description: (
+          <div>
+            <Spin /> {/* แสดงการหมุนใน notification */}
+            <span> Welcome </span>
+          </div>
+        ),
+        placement: 'topRight',
+        duration: 2,
+      });
+
+      setTimeout(() => {
         window.location.href = '/protected';
-      })
+      }, 2000);
+
     } catch (error) {
-      swal({
-        title: "Error",
-        text: "Login failed please try aging.",
-        icon: "error",
-        button: false,
-        timer: 1000
-      })
-      console.error('Login failed', error)
+      hideLoadingMessage(); // ซ่อนข้อความหมุนเมื่อเกิดข้อผิดพลาด
+
+      notification.error({
+        message: 'Error',
+        description: 'Login failed, please try again.',
+        placement: 'topRight',
+        duration: 2,
+      });
+      console.error('Login failed', error);
     }
-  }
-
-
+  };
 
   return (
-    <>
-      {/* <div className="content">
-        <div className="box">
-          <div className="box-logo">
-            <img src={Logo} alt="logo" className="logo" />
-          </div>
-          <form className="form" onSubmit={handleLogin}>
-            <label>User Id:</label>
-            <input
-              type="text"
-              className="input-box"
-              name="user_id"
+    <div className='contentLogin'>
+      <div className='leftContent'>
+        <img src={Logo} alt="logo" />
+      </div>
+      <div className='rightContent'>
+        <Form
+          className="form"
+          onFinish={handleLogin}
+          layout="vertical"
+        >
+          <Form.Item
+            label="User Id"
+            name="userId"
+            style={{ width: '340px' }}
+            rules={[{ required: true, message: 'Please enter your User ID!' }]}
+          >
+            <Input
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              required />
-            <label>Password:</label>
-            <input
-              type="password"
-              className="input-box"
-              name="password"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            style={{ width: '340px' }}
+            rules={[{ required: true, message: 'Please enter your password!' }]}
+          >
+            <Input.Password
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required />
-            <div className="button-container">
-              <button type="submit" className="center-button">
-                Login
-              </button>
-            </div>
-          </form>
-          <p></p>
-        </div>
-      </div> */}
-      <div className='contentLogin'>
-        <div
-          className='leftContent'
-        >    <img src={Logo} alt="logo"/></div>
-        <div>login page</div>
-      </div>
+            />
+          </Form.Item>
 
-    </>
+          <Form.Item>
+            <Button 
+              type="primary" 
+              style={{ width: '80px' }} 
+              htmlType="submit" 
+              block 
+            >
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </div>
   );
 }
 
 export default Login;
-
-
