@@ -21,7 +21,7 @@
 
 .rightContent {
   position: absolute;
-  right: 5%;
+  right: 6%;
   top: 50%;
   transform: translateY(-30%);
   display: flex;
