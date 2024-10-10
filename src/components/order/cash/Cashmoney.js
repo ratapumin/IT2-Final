@@ -11,9 +11,9 @@ const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         console.log(orderData)
-        await axios.post('http://localhost:5000/api/createOrder', orderData);
-        console.log('Order created successfully');
-        console.log('Order Data:', orderData);
+            await axios.post('http://localhost:5000/api/createOrder', orderData);
+            console.log('Order created successfully');
+            console.log('Order Data:', orderData);
         onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
@@ -174,6 +174,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             products: products.map(product => ({
                 p_id: product.p_id,
                 p_price: product.p_price,
+                p_type:product.category,
                 quantity: product.quantity
             })),
             history: historyEntries, // Store an array of history entries

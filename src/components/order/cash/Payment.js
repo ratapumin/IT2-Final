@@ -168,6 +168,7 @@ function Payment({
             products: products.map(product => ({
                 p_id: product.p_id,
                 p_price: product.p_price,
+                p_type:product.category,
                 quantity: product.quantity
             })),
             history: historyEntries, // Store an array of history entries

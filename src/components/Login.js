@@ -84,7 +84,7 @@ function Login() {
             </Form.Item>
             <Form.Item>
               <Button
-                type="primary"
+                // type="primary"
                 htmlType="submit"
                 className='btnLogin'
               >

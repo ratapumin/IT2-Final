@@ -48,7 +48,16 @@
 }
 
 .btnLogin {
-  background-color: brown;
-  color: white;
-  width: 80px;
+  background-color: #9c5d41 !important;
+  color: white !important;
+  width: 80px !important;
+  border: none;
+
+}
+
+.btnLogin:hover {
+  background-color: #c79a70 !important;
+  color: white !important;
+  width: 80px !important;
+  border: none;
 }

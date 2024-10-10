@@ -66,7 +66,7 @@ exports.printReceipt = async (req, res) => {
   const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, cash, change } = req.body;
 
   const sqlCustomer = `SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
-  const sqlProduct = `SELECT p_name, p_price FROM products WHERE p_id = ?`;
+  const sqlProduct = `SELECT p_name, p_price,category FROM products WHERE p_id = ?`;
 
   let totalEarn = 0;
   let totalRedeem = 0;
@@ -92,6 +92,7 @@ exports.printReceipt = async (req, res) => {
         resolve({
           p_id: product.p_id,
           p_name: productData.p_name,
+          p_category:productData.category,
           p_price: productData.p_price,
           quantity: product.quantity
         });
@@ -129,10 +130,10 @@ exports.printReceipt = async (req, res) => {
     receipt.push(`Date: ${order_date_time.split(' ')[0]}`.padEnd(totalWidth));
     receipt.push(`Time: ${order_date_time.split(' ')[1]}`.padEnd(totalWidth));
     receipt.push('------------------------------------------');
-    receipt.push('Item                   Qty     Amount');
-
+    receipt.push('Item                    Type   Qty   Amount');
+    // ใช้การเติมช่องว่างให้ตรงกับแต่ละช่อง
     productsData.forEach(product => {
-      const itemLine = `${product.p_name.padEnd(20)} ${String(product.quantity).padEnd(8)} ${product.p_price * product.quantity}`;
+      const itemLine = `${product.p_name.padEnd(24)} ${product.p_category.padEnd(5)} ${String(product.quantity).padEnd(4)} ${String(product.p_price * product.quantity).padStart(6)}`;
       receipt.push(itemLine);
     });
 
@@ -189,6 +190,7 @@ exports.printReceipt = async (req, res) => {
 
 
 
+//Print close daily
 exports.printCloseDaily = (req, res) => {
   const { date } = req.params; // เปลี่ยนจาก req.body เป็น req.params
   console.log('Requested date:', date); // log วันที่ที่ส่งมา
