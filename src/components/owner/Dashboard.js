@@ -13,7 +13,7 @@ function Dashboard() {
     const { user } = useUser();
     const [token, setToken] = useState();
     const [currentTime, setCurrentTime] = useState(new Date());
-    console.log(user)
+    // console.log(user)
 
     useEffect(() => {
         if (!user) {

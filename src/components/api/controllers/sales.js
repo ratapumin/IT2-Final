@@ -29,9 +29,7 @@ exports.readTypeSales = (req, res) => {
     })
 }
 
-
-
-exports.readGraphMonthly = (req, res) => {
+exports.readOldGraphMonthly = (req, res) => {
     const sqlGraphMonthly = `
                     SELECT DATE_FORMAT(orders.order_date_time, '%Y-%m') AS monthly, 
                     SUM(order_detail.price * order_detail.quantity) AS total_price
@@ -44,6 +42,35 @@ exports.readGraphMonthly = (req, res) => {
                       `
 
     conn.query(sqlGraphMonthly, (error, results) => {
+        if (error) {
+            res.status(400).json({ error })
+        }
+        else {
+            results = results.map(result => ({
+                monthly: convertToBangkokTimeforMonth(result.monthly),
+                total_price: result.total_price
+            }));
+            res.json(results);
+        }
+
+    })
+}
+
+exports.readGraphMonthly = (req, res) => {
+    const {id} = req.params
+    const sqlGraphMonthly = `
+                    SELECT DATE_FORMAT(orders.order_date_time, '%Y-%m') AS monthly, 
+                    SUM(order_detail.price * order_detail.quantity) AS total_price
+                    FROM order_detail
+                    JOIN orders
+                    ON order_detail.order_id = orders.order_id
+                    WHERE DATE_FORMAT(orders.order_date_time, '%Y') = ?   
+                    GROUP BY monthly
+                    ORDER BY monthly;
+
+                      `
+
+    conn.query(sqlGraphMonthly, id,(error, results) => {
         if (error) {
             res.status(400).json({ error })
         }
@@ -89,6 +116,7 @@ exports.readDaily = (req, res) => {
         }
     });
 };
+
 
 exports.readMonthly = (req, res) => {
 

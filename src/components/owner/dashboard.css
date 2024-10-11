@@ -24,6 +24,10 @@
     /* height: 65vh; */
     align-items: stretch;
     justify-content: space-around;
+    .ant-card-body {
+        padding: 24px !important;
+    }
+    
 }
 
 .border {
@@ -46,3 +50,18 @@
     /* border: solid; */
     height: 80%;
 }
+.ant-card-body {
+    padding: 10px !important;
+}
+
+.paymentmethod {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left; 
+    font-size: 20px;
+    }
+
+
+

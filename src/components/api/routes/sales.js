@@ -1,9 +1,10 @@
 const express = require('express')
-const { readTypeSales,readGraphMonthly, readDaily, readMonthly, readYear, topProductMonth, readRepotSales, topProductYear } = require('../controllers/sales')
+const { readTypeSales,readGraphMonthly, readDaily, readMonthly, readYear, topProductMonth, readRepotSales, topProductYear, readOldGraphMonthly } = require('../controllers/sales')
 const router = express.Router()
 
 router.get('/typesales/:date', readTypeSales)
-router.get('/graphmonthly', readGraphMonthly)
+router.get('/oldgraphmonthly/:id',readOldGraphMonthly)
+router.post('/graphmonthly/:id', readGraphMonthly)
 router.get('/daily/:id',readDaily)
 router.get('/monthly/:id',readMonthly)
 router.get('/year/:id',readYear)

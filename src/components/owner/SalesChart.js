@@ -10,52 +10,71 @@ import {
     Legend,
     ResponsiveContainer,
 } from 'recharts';
-import { Card, Select } from 'antd'; // Import Card และ Select จาก Ant Design
+import { Card, Select } from 'antd';
 import axios from 'axios';
+import moment from 'moment';
 
 const { Option } = Select;
 
 function SalesChart() {
     const [monthlySales, setMonthlySales] = useState([]);
-    const [chartType, setChartType] = useState('monthly'); // สร้าง state สำหรับเลือกประเภทกราฟ
+    const [chartType, setChartType] = useState('monthly');
+    const [oldMonthlySales, setOldMonthlySales] = useState([]);
+    const currentYear = moment().format('YYYY'); // กำหนดปีปัจจุบัน
+    const oldYear = moment().subtract(1, 'years').format('YYYY'); // กำหนดปีเก่า
 
     useEffect(() => {
+        const fetchOldMonthlySales = async () => {
+            try {
+                const res = await axios.post(`http://localhost:5000/api/graphmonthly/${oldYear}`);
+                const updatedOldSales = res.data.map(sale => ({
+                    ...sale,
+                    total_price: parseFloat(sale.total_price) * 1.10 // เพิ่ม 10%
+                }));
+                setOldMonthlySales(updatedOldSales);
+                console.log('old',res.data)
+            } catch (error) {
+                console.log(error.response);
+            }
+        };
+
         const fetchMonthlySales = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/graphmonthly');
-                console.log(res.data);
+                const res = await axios.post(`http://localhost:5000/api/graphmonthly/${currentYear}`);
                 setMonthlySales(res.data);
             } catch (error) {
                 console.log(error.response);
-                return error.response;
             }
         };
+
         fetchMonthlySales();
-    }, []);
+        fetchOldMonthlySales();
+    }, [currentYear, oldYear]);
 
-    // สร้าง array ของเดือนทั้ง 12 เดือน
-    const allMonths = [
-        { name: 'Jan', monthly: '2024-01', total_price: 0 },
-        { name: 'Feb', monthly: '2024-02', total_price: 0 },
-        { name: 'Mar', monthly: '2024-03', total_price: 0 },
-        { name: 'Apr', monthly: '2024-04', total_price: 0 },
-        { name: 'May', monthly: '2024-05', total_price: 0 },
-        { name: 'Jun', monthly: '2024-06', total_price: 0 },
-        { name: 'Jul', monthly: '2024-07', total_price: 0 },
-        { name: 'Aug', monthly: '2024-08', total_price: 0 },
-        { name: 'Sept', monthly: '2024-09', total_price: 0 },
-        { name: 'Oct', monthly: '2024-10', total_price: 0 },
-        { name: 'Nov', monthly: '2024-11', total_price: 0 },
-        { name: 'Dec', monthly: '2024-12', total_price: 0 },
-    ];
+    // ฟังก์ชันสร้างข้อมูลเดือนแบบ dynamic
+    const generateMonths = (year) => {
+        return Array.from({ length: 12 }, (_, i) => ({
+            name: moment().month(i).format('MMM'),
+            monthly: `${year}-${String(i + 1).padStart(2, '0')}`,
+            total_price: 0
+        }));
+    };
 
-    // ผสานข้อมูลยอดขายกับเดือนทั้งหมด
+    // สร้างข้อมูลเดือนสำหรับปีปัจจุบันและปีก่อนหน้า
+    const allMonths = generateMonths(currentYear);
+
     const mergedSalesData = allMonths.map((month) => {
         const salesData = monthlySales.find((sale) => sale.monthly === month.monthly);
-        return salesData ? { ...month, total_price: parseFloat(salesData.total_price) } : month;
+        const oldSalesData = oldMonthlySales.find((sale) => sale.monthly === month.monthly.replace(currentYear, oldYear));
+    
+        return {
+            ...month,
+            total_price: salesData ? Math.round(parseFloat(salesData.total_price)) : 0, // ปัดเศษทศนิยมออก
+            old_total_price: oldSalesData ? Math.round(parseFloat(oldSalesData.total_price)) : 0, // ปัดเศษทศนิยมออก
+        };
     });
+    
 
-    // ฟังก์ชันเปลี่ยนประเภทกราฟ
     const handleChartTypeChange = (value) => {
         setChartType(value);
     };
@@ -79,7 +98,7 @@ function SalesChart() {
         >
             <ResponsiveContainer width="100%" height={300}>
                 <ComposedChart
-                    data={mergedSalesData} // กำหนดข้อมูลที่แปลงแล้วให้กราฟ
+                    data={mergedSalesData}
                     margin={{
                         top: 20,
                         right: 20,
@@ -88,14 +107,14 @@ function SalesChart() {
                     }}
                 >
                     <CartesianGrid stroke="#f5f5f5" />
-                    <XAxis dataKey="name" /> {/* แสดงชื่อเดือนทั้งหมด */}
+                    <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
                     {chartType === 'monthly' && (
                         <>
-                            <Bar dataKey="total_price" barSize={20} fill="#413ea0" /> {/* กำหนดยอดขาย */}
-                            <Line type="monotone" dataKey="total_price" stroke="#ff7300" /> {/* เส้นกราฟยอดขาย */}
+                            <Bar dataKey="total_price" name='Total Monthly' barSize={20} fill="#413ea0" />
+                            <Line type="monotone" dataKey="old_total_price" name='Goal' stroke="#ff0000" /> {/* เส้นสีแดง */}
                         </>
                     )}
                     {chartType === 'yearly' && (
