@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 28, 2024 at 04:21 PM
+-- Generation Time: Oct 11, 2024 at 08:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,28 @@ SET time_zone = "+00:00";
 --
 -- Database: `kathongpos`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `closedaily`
+--
+
+CREATE TABLE `closedaily` (
+  `id` int(11) NOT NULL,
+  `cash_in_machine` decimal(10,2) NOT NULL,
+  `cash_in_system` decimal(10,2) NOT NULL,
+  `cash_difference` decimal(10,2) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `closedaily`
+--
+
+INSERT INTO `closedaily` (`id`, `cash_in_machine`, `cash_in_system`, `cash_difference`, `user_id`, `date`) VALUES
+(1, 50.00, 30.00, -20.00, 12345, '2024-10-11');
 
 -- --------------------------------------------------------
 
@@ -134,6 +156,7 @@ INSERT INTO `orders` (`order_id`, `order_no`, `order_date_time`, `payment_type`,
 ('0068', 68, '2024-09-28 12:58:44', 'cash', 12345, NULL),
 ('0069', 69, '2024-09-28 13:06:25', 'cash', 12345, NULL),
 ('1', 1, '2024-01-15 06:19:27', 'cash', 12345, NULL),
+('20241011001', 1, '2024-10-11 06:57:09', 'cash', 12345, NULL),
 ('ORD123452', 1, '2024-01-03 05:00:00', 'cash', 12345, 1);
 
 -- --------------------------------------------------------
@@ -275,7 +298,8 @@ INSERT INTO `order_detail` (`order_detail_id`, `order_id`, `p_id`, `quantity`, `
 (258, '0066', 20102, 1, 25.00),
 (259, '0067', 10106, 1, 35.00),
 (260, '0068', 10101, 1, 30.00),
-(261, '0069', 10101, 1, 30.00);
+(261, '0069', 10101, 1, 30.00),
+(262, '20241011001', 10101, 1, 30.00);
 
 -- --------------------------------------------------------
 
@@ -421,6 +445,13 @@ INSERT INTO `user_account` (`user_id`, `user_fname`, `user_lname`, `user_tel`, `
 --
 
 --
+-- Indexes for table `closedaily`
+--
+ALTER TABLE `closedaily`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
@@ -469,6 +500,12 @@ ALTER TABLE `user_account`
 --
 
 --
+-- AUTO_INCREMENT for table `closedaily`
+--
+ALTER TABLE `closedaily`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
@@ -478,7 +515,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `order_detail`
 --
 ALTER TABLE `order_detail`
-  MODIFY `order_detail_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=262;
+  MODIFY `order_detail_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=263;
 
 --
 -- AUTO_INCREMENT for table `points_history`
@@ -501,6 +538,12 @@ ALTER TABLE `user_account`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `closedaily`
+--
+ALTER TABLE `closedaily`
+  ADD CONSTRAINT `closedaily_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_account` (`user_id`);
 
 --
 -- Constraints for table `orders`
