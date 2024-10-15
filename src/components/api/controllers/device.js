@@ -488,7 +488,7 @@ async function printDaily(receipt, res) {
 
     console.log('Print done!');
 
-    return res.status(200).json({ message: "Receipt printed successfully." });
+    // return res.status(200).json({ message: "Receipt printed successfully." });
 
   } catch (error) {
     console.error("Print failed:", error);
@@ -504,7 +504,8 @@ async function printDaily(receipt, res) {
 
 exports.printReportSales = (req, res) => {
   const { startDate, endDate } = req.params;
-
+  const { statusPrint } = req.body;
+  console.log(statusPrint)
   // Queries
   const totalSalesQuery = `
         SELECT SUM(order_detail.price * order_detail.quantity) AS total_amount
@@ -629,11 +630,22 @@ exports.printReportSales = (req, res) => {
                   paymentTypeResults,
                   redeemResults,
                   monthlySalesResults, // Add monthlySalesResults here
-                  yearlySalesResults 
+                  yearlySalesResults
                 );
 
                 // Send or log the report
-                res.json(receiptContent);
+                res.json({
+                  totalSalesResults,
+                  productsResults,
+                  topProductsResults,
+                  paymentTypeResults,
+                  redeemResults,
+                  monthlySalesResults, // Add monthlySalesResults here
+                  yearlySalesResults
+                });
+                if (statusPrint === 'print') {
+                  printDaily(receiptContent, res)
+                }
               });
             });
           });
@@ -687,7 +699,7 @@ const generateReportContent = (
     receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
   });
 
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดงยอดขายในแต่ละเดือน
   receipt.push('         Monthly Sales Summary           '.padEnd(totalWidth));
@@ -697,7 +709,7 @@ const generateReportContent = (
     const monthLine = `${monthly.monthly.padEnd(15)} ${String(monthly.total_price).padStart(10)} THB`;
     receipt.push(monthLine.padEnd(totalWidth));
   });
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดงยอดขายในแต่ละปี
   receipt.push('         Yearly Sales Summary            '.padEnd(totalWidth));
@@ -707,7 +719,7 @@ const generateReportContent = (
     const yearlyLine = `${yearly.year.toString().padEnd(15)} ${String(yearly.total_price).padStart(10)} THB`;
     receipt.push(yearlyLine.padEnd(totalWidth));
   });
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดงรายการสินค้า
   receipt.push('Item                Type   Qty   Amount'.padEnd(totalWidth));
@@ -716,7 +728,7 @@ const generateReportContent = (
     const itemLine = `${product.name.padEnd(18)} ${product.category.padEnd(6)} ${String(product.qty).padStart(3)}   ${String(product.amount).padStart(7)}`;
     receipt.push(itemLine.padEnd(totalWidth));
   });
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดง 5 สินค้าที่ขายดีที่สุด
   receipt.push('              Top 5 Products              '.padEnd(totalWidth));
@@ -726,7 +738,7 @@ const generateReportContent = (
     const topItemLine = `${product.Product_Name.padEnd(18)} ${String(product.quantity).padStart(3)}   ${String(product.total_sales).padStart(10)}`;
     receipt.push(topItemLine.padEnd(totalWidth));
   });
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดงยอดขายตามประเภทการชำระเงิน
   receipt.push('      Sales Breakdown by Payment Type     '.padEnd(totalWidth));
@@ -735,14 +747,14 @@ const generateReportContent = (
     const paymentLine = `${paymentType.payment_type.padEnd(18)}   ${String(paymentType.total_sales).padStart(10)}`;
     receipt.push(paymentLine.padEnd(totalWidth));
   });
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   // แสดงข้อมูลการใช้คะแนน
   receipt.push('          Redeem Points Information       '.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   receipt.push(`Total Redeems:     ${redeemResults[0].redeem_count * 10}`.padEnd(totalWidth));
   receipt.push(`Total Redeem Value: ${redeemResults[0].total_redeem_value} THB`.padEnd(totalWidth));
-  receipt.push('-----------------------------------------' );
+  receipt.push('-----------------------------------------');
 
   return receipt;
 };

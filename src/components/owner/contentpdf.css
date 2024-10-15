@@ -41,7 +41,7 @@
         flex-direction: column;
         width: 300px;
         margin: 0 auto;
-        border: solid;
+        /* border: solid; */
 
         
     }
@@ -81,3 +81,20 @@
         flex: 1;
         margin: 0;
     }
+
+
+
+    .bothLabel {
+        display: flex;
+        justify-content: space-evenly;
+        text-align: end;
+        padding: 5px;
+    }
+    
+    .bothLabel p {
+        margin: 0;
+        padding: 0 10px;
+        line-height: 1.2;
+        width: 100px; 
+    }
+    

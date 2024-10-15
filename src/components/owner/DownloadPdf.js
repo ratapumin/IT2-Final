@@ -10,25 +10,25 @@ function DownloadPdf({ date }) {
     const [paymentType, setPaymentType] = useState();
     const [discount, setDiscount] = useState();
 
-    useEffect(() => {
-        const fetchProduct = async () => {
-            if (date && date.start && date.end) {
-                try {
-                    const res = await axios.get(`http://localhost:5000/api/reportsales/${date.start}/${date.end}`);
-                    setProductList(res.data.products);
-                    setSales(res.data.totalSales);
-                    setTopProducts(res.data.topProducts);
-                    setPaymentType(res.data.paymentTypes);
-                    setDiscount(res.data.redeemPoints);
-                } catch (error) {
-                    console.log(error.response);
-                }
-            } else {
-                console.log("No date range selected");
-            }
-        };
-        fetchProduct();
-    }, [date]);
+    // useEffect(() => {
+    //     const fetchProduct = async () => {
+    //         if (date && date.start && date.end) {
+    //             try {
+    //                 const res = await axios.get(`http://localhost:5000/api/reportsales/${date.start}/${date.end}`);
+    //                 setProductList(res.data.products);
+    //                 setSales(res.data.totalSales);
+    //                 setTopProducts(res.data.topProducts);
+    //                 setPaymentType(res.data.paymentTypes);
+    //                 setDiscount(res.data.redeemPoints);
+    //             } catch (error) {
+    //                 console.log(error.response);
+    //             }
+    //         } else {
+    //             console.log("No date range selected");
+    //         }
+    //     };
+    //     fetchProduct();
+    // }, [date]);
 
     const pdfDocument = (
         <Document>

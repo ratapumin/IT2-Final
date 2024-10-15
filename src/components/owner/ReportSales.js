@@ -4,15 +4,17 @@ import dayjs from 'dayjs';
 import './report.css';
 import ContentPdf from './ContentPdf';
 import { useState } from 'react';
-import DownloadPdf from './DownloadPdf';
+import axios from "axios";
 
 const { RangePicker } = DatePicker; // Import RangePicker จาก DatePicker
 
 function ReportSales() {
     const [date, setDate] = useState({
         start: dayjs().format('YYYY-MM-DD'),
-        end: dayjs().format('YYYY-MM-DD')
+        end: dayjs().format('YYYY-MM-DD'),
     }); // กำหนดค่าเริ่มต้นเป็นวันที่ปัจจุบัน
+    const [statusPrint, setStatusPrint] = useState('no')
+    const [printState, setPrintState] = useState('no')
 
     const onDateChange = (_, dateStr) => {
         if (dateStr && dateStr[0] && dateStr[1]) {
@@ -20,9 +22,44 @@ function ReportSales() {
             console.log("Selected Date Range:", dateStr);
         } else {
             setDate({ start: '', end: '' }); // ล้างค่าวันที่หากไม่มีการเลือก
+            console.log(date)
         }
     };
+    const handleonPrint = (value) => {
+        setPrintState(value)
+    }
 
+    const handlePrintReport = async () => {
+        if (printState === 'no') {
+
+            setStatusPrint('no');
+            console.log('prstat',printState)
+        } else {
+            setStatusPrint('print');
+
+            if (date && date.start && date.end) {
+                try {
+                    const res = await axios.post(
+                        `http://localhost:5000/api/printReportsales/${date.start}/${date.end}`,
+                        { statusPrint: 'print' } // ส่ง statusPrint เป็น 'print'
+                    );
+
+                    console.log("product", res.data);
+                    setStatusPrint('no');
+                    setPrintState('no')
+                } catch (error) {
+                    console.log(error.response);
+                    setStatusPrint('no');
+                    setPrintState('no')
+                }
+            } else {
+                console.log("No date range selected");
+                setStatusPrint('no'); 
+                setPrintState('no')
+            }
+        }
+
+    };
     return (
         <div className='bgreport'>
             <div className='contentReport'>
@@ -38,13 +75,18 @@ function ReportSales() {
                                 onChange={onDateChange} // เรียกฟังก์ชันเมื่อวันที่เปลี่ยน
                             />
                         </div>
-                            <DownloadPdf date={date} />
+                        {/* <DownloadPdf date={date} /> */}
+                        <Button type="primary"
+                            onClick={() => handlePrintReport()}
+                        >Print Report</Button>
 
                     </div>
                 </div>
                 <div className='bottomContent'>
                     <div className='boxContent'>
-                        <ContentPdf date={date} />
+                        <ContentPdf date={date} statusPrint={statusPrint}
+                            handleonPrint={handleonPrint}
+                        />
 
                     </div>
                 </div>

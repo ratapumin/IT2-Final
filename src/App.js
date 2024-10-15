@@ -25,6 +25,7 @@ import SidebarDashboard from "./components/owner/SidebarDashboard";
 import ReportSales from "./components/owner/ReportSales";
 import Employee from "./components/employee/Employee";
 import PrintReceipt from "./components/order/cash/PrintReceipt";
+import Reprint from "./components/owner/Reprint";
 // Layout ที่มี Sidebar
 function LayoutWithSidebar() {
   return (
@@ -88,6 +89,7 @@ function App() {
           <Route element={<LayoutWithSidebarDashborad />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/report" element={<ReportSales />} />
+            <Route path="/reprint" element={<Reprint/>}/>
             <Route path="/employee" element={<Employee/>}/>
           </Route>
 

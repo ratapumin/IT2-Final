@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import { DashboardOutlined, FileTextOutlined, TeamOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { DashboardOutlined, FileTextOutlined, TeamOutlined, ArrowLeftOutlined,PrinterOutlined  } from '@ant-design/icons';
 import './sidebar.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -28,6 +28,12 @@ function SidebarDashboard() {
             icon: <FileTextOutlined />,
             label: 'Report Sale',
             onClick: () => navigate("/report")
+        },
+        {
+            key: '/reprint',
+            icon: <PrinterOutlined />,
+            label: 'Reprint Receipt',
+            onClick: () => navigate("/reprint")
         },
         {
             key: '/employee',

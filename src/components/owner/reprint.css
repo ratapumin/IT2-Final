@@ -1,0 +1,105 @@
+.bgreport {
+    height: 100vh;
+    background-color: #F5F7FF;
+}
+
+.contentReport {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    /* เพิ่มความสูงเต็มที่ */
+
+}
+
+.topContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 50px;
+}
+
+.centerContent {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+}
+
+.centerBox {
+    padding: 5px;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start
+}
+
+.boxCalendar {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.bottomContent {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+.lefboxContent{
+    border: solid;
+    flex: 1;
+    min-height: 600px;
+    padding: 10px;
+}
+
+.lefboxContent::-webkit-scrollbar {
+    width: 12px;
+}
+
+.lefboxContent::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 10px;
+}
+
+.lefboxContent::-webkit-scrollbar-track {
+    /* background: transparent; */
+    background: #f1f1f1;
+}
+
+.boxContent {
+    /* display: flex; */
+    /* flex-direction: column; */
+    padding: 10px;
+    /* align-items: center; */
+    width: 793.7px;
+    min-height: 600px;
+    overflow-y: scroll;
+    scrollbar-width: 'thin';
+    scrollbar-color: 'unset';
+    background-color: #fff;
+
+}
+
+.boxContent::-webkit-scrollbar {
+    width: 12px;
+}
+
+.boxContent::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 10px;
+}
+
+.boxContent::-webkit-scrollbar-track {
+    /* background: transparent; */
+    background: #f1f1f1;
+}
+
+
+.contentPdf {
+    display: flex;
+    flex-direction: column;
+}
