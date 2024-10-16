@@ -1,9 +1,9 @@
-.bgreport {
+.bgReprint {
     height: 100vh;
     background-color: #F5F7FF;
 }
 
-.contentReport {
+.contentReprint {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -12,21 +12,21 @@
 
 }
 
-.topContent {
+.topReprintContent {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 50px;
 }
 
-.centerContent {
+.centerReprintContent {
     display: flex;
     flex-direction: row;
     gap: 10px;
     justify-content: center;
 }
 
-.centerBox {
+.centerReprintBox {
     padding: 5px;
     width: 60%;
     display: flex;
@@ -40,7 +40,8 @@
     align-items: flex-start;
 }
 
-.bottomContent {
+.bottomReprintContent {
+    padding: 10px;
     margin-bottom: 15px;
     display: flex;
     flex-direction: row;
@@ -49,57 +50,94 @@
     flex: 1;
     overflow: hidden;
 }
-.lefboxContent{
+
+.lefboxReprintContent {
     border: solid;
+    background-color: white;
     flex: 1;
     min-height: 600px;
+    /* แก้ไข min-height เป็น max-height */
+    max-height: 600px;
+    /* แก้ไข min-height เป็น max-height */
     padding: 10px;
+    overflow-y: auto;
+    /* เพิ่ม overflow เพื่อให้มี scroll */
 }
 
-.lefboxContent::-webkit-scrollbar {
-    width: 12px;
-}
-
-.lefboxContent::-webkit-scrollbar-thumb {
-    background-color: gray;
-    border-radius: 10px;
-}
-
-.lefboxContent::-webkit-scrollbar-track {
-    /* background: transparent; */
-    background: #f1f1f1;
-}
-
-.boxContent {
-    /* display: flex; */
-    /* flex-direction: column; */
+.selectId {
     padding: 10px;
-    /* align-items: center; */
-    width: 793.7px;
+    cursor: pointer;
+    /* เพิ่ม cursor pointer ให้ดูเหมือนคลิกได้ */
+}
+
+.selectId.selected {
+    border: solid blue;
+}
+
+.boxReprintContent {
+    border: solid;
+    padding: 10px;
+    width: 70%;
     min-height: 600px;
-    overflow-y: scroll;
-    scrollbar-width: 'thin';
-    scrollbar-color: 'unset';
+    /* แก้ไข min-height เป็น max-height */
+    max-height: 600px;
+    /* แก้ไข min-height เป็น max-height */
+    overflow-y: auto;
+    /* เพิ่ม overflow เพื่อให้มี scroll */
     background-color: #fff;
-
 }
 
-.boxContent::-webkit-scrollbar {
+.boxReprintContent::-webkit-scrollbar,
+.lefboxReprintContent::-webkit-scrollbar {
     width: 12px;
 }
 
-.boxContent::-webkit-scrollbar-thumb {
-    background-color: gray;
+.boxReprintContent::-webkit-scrollbar-thumb,
+.lefboxReprintContent::-webkit-scrollbar-thumb {
+    background-color: rgb(190, 188, 188);
     border-radius: 10px;
 }
 
-.boxContent::-webkit-scrollbar-track {
-    /* background: transparent; */
+.boxReprintContent::-webkit-scrollbar-track,
+.lefboxReprintContent::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
 
 
-.contentPdf {
+.orderList {
+    width: 60%;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr; /* กำหนดคอลัมน์ */
+    padding: 5px;
+    justify-items: start; /* จัดเรียงเนื้อหาซ้าย */
+    text-align: left; /* เปลี่ยนให้เป็น left เพื่อให้ดูเรียบร้อย */
+}
+
+.orderList div {
+    text-align: right; /* จัดข้อความให้ชิดขวาสำหรับคอลัมน์ที่มีจำนวนเงิน */
+}
+
+.orderList div:nth-child(4) {
+    /* ทำให้จำนวนเงินแสดงในฟอร์แมตที่ต้องการ */
+    padding-left: 10px; /* เพิ่มช่องว่างระหว่างคอลัมน์ */
+}
+
+
+.ordertotal {
+    width: 60%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 5px;
+    justify-content: space-between;
+    justify-items: stretch;
+    align-items: center;
+    text-align: center;
+}
+
+.nodata {
     display: flex;
-    flex-direction: column;
+    height: 75vh;
+    width: 100%;
+    align-items: center;
+    justify-items: start
 }

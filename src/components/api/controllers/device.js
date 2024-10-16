@@ -130,7 +130,7 @@ exports.printReceipt = async (req, res) => {
     receipt.push(`Date: ${order_date_time.split(' ')[0]}`.padEnd(totalWidth));
     receipt.push(`Time: ${order_date_time.split(' ')[1]}`.padEnd(totalWidth));
     receipt.push('------------------------------------------');
-    receipt.push('Item                    Type   Qty   Amount');
+    receipt.push('Item                    Type   Qty  Amount');
     // ใช้การเติมช่องว่างให้ตรงกับแต่ละช่อง
     productsData.forEach(product => {
       const itemLine = `${product.p_name.padEnd(24)} ${product.p_category.padEnd(5)} ${String(product.quantity).padEnd(4)} ${String(product.p_price * product.quantity).padStart(6)}`;
