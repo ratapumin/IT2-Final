@@ -28,10 +28,11 @@
 
 .centerReprintBox {
     padding: 5px;
-    width: 60%;
+    padding-right: 10px;
+    width: 80%;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start
+    justify-content: flex-end;
+    align-items: flex-start;
 }
 
 .boxCalendar {
@@ -49,25 +50,23 @@
     width: 100%;
     flex: 1;
     overflow: hidden;
+    justify-content: center;
 }
 
 .lefboxReprintContent {
     border: solid;
     background-color: white;
-    flex: 1;
+    /* flex: 1; */
+    width: 20%;
     min-height: 600px;
-    /* แก้ไข min-height เป็น max-height */
     max-height: 600px;
-    /* แก้ไข min-height เป็น max-height */
     padding: 10px;
     overflow-y: auto;
-    /* เพิ่ม overflow เพื่อให้มี scroll */
 }
 
 .selectId {
     padding: 10px;
     cursor: pointer;
-    /* เพิ่ม cursor pointer ให้ดูเหมือนคลิกได้ */
 }
 
 .selectId.selected {
@@ -77,13 +76,10 @@
 .boxReprintContent {
     border: solid;
     padding: 10px;
-    width: 70%;
+    width: 60%;
     min-height: 600px;
-    /* แก้ไข min-height เป็น max-height */
     max-height: 600px;
-    /* แก้ไข min-height เป็น max-height */
     overflow-y: auto;
-    /* เพิ่ม overflow เพื่อให้มี scroll */
     background-color: #fff;
 }
 
@@ -107,19 +103,24 @@
 .orderList {
     width: 60%;
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr; /* กำหนดคอลัมน์ */
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    /* กำหนดคอลัมน์ */
     padding: 5px;
-    justify-items: start; /* จัดเรียงเนื้อหาซ้าย */
-    text-align: left; /* เปลี่ยนให้เป็น left เพื่อให้ดูเรียบร้อย */
+    justify-items: start;
+    /* จัดเรียงเนื้อหาซ้าย */
+    text-align: left;
+    /* เปลี่ยนให้เป็น left เพื่อให้ดูเรียบร้อย */
 }
 
 .orderList div {
-    text-align: right; /* จัดข้อความให้ชิดขวาสำหรับคอลัมน์ที่มีจำนวนเงิน */
+    text-align: right;
+    /* จัดข้อความให้ชิดขวาสำหรับคอลัมน์ที่มีจำนวนเงิน */
 }
 
 .orderList div:nth-child(4) {
     /* ทำให้จำนวนเงินแสดงในฟอร์แมตที่ต้องการ */
-    padding-left: 10px; /* เพิ่มช่องว่างระหว่างคอลัมน์ */
+    padding-left: 10px;
+    /* เพิ่มช่องว่างระหว่างคอลัมน์ */
 }
 
 
@@ -134,10 +135,16 @@
     text-align: center;
 }
 
+.orderPoints {
+    display: flex;
+    justify-content: space-evenly;
+    width: 60%;
+}
+
 .nodata {
     display: flex;
     height: 75vh;
     width: 100%;
     align-items: center;
-    justify-items: start
+    justify-content: center;
 }
