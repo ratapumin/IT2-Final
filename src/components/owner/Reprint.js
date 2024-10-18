@@ -39,11 +39,20 @@ function Reprint() {
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(value);
-    }
+    };
+
+    const formatDateTime = (dateTimeString) => {
+        const dateTime = new Date(dateTimeString);
+        const localDateTime = new Date(dateTime.getTime() + (7 * 60 * 60 * 1000)); // เพิ่ม 7 ชั่วโมงเพื่อแปลงเป็นเวลาท้องถิ่น
+
+        const date = localDateTime.toISOString().split('T')[0]; // รูปแบบวันที่ YYYY-MM-DD
+        const time = `${localDateTime.getUTCHours().toString().padStart(2, '0')}:${localDateTime.getUTCMinutes().toString().padStart(2, '0')}:${localDateTime.getUTCSeconds().toString().padStart(2, '0')}`; // รูปแบบเวลา HH:MM:SS
+        return { date, time };
+    };
 
     // จัดกลุ่มใบเสร็จตาม order_id
     const groupedReceipts = receipts.reduce((acc, receipt) => {
-        const key = `${receipt.order_id}-${receipt.order_no}`; // ใช้ order_id และ order_no เป็น key
+        const key = `${receipt.order_id}-${receipt.order_no}-${receipt.user_fname}`; // ใช้ order_id และ order_no เป็น key
         if (!acc[key]) {
             acc[key] = [];
         }
@@ -79,25 +88,34 @@ function Reprint() {
                     <div className='boxReprintContent'>
                         {Object.keys(groupedReceipts).length > 0 ? (
                             Object.keys(groupedReceipts).map((key, index) => {
-                                const [orderId, orderNo] = key.split('-'); // แยก order_id และ order_no
+                                const [orderId, orderNo,userFname] = key.split('-'); // แยก order_id และ order_no
                                 const firstReceipt = groupedReceipts[key][0]; // รับใบเสร็จแรกเพื่อใช้แสดงวันที่และเวลา
 
-                                // แปลง order_date_time เป็นวันที่และเวลา
-                                const dateTime = new Date(firstReceipt.order_date_time);
-                                const date = dateTime.toISOString().split('T')[0]; // รูปแบบวันที่ YYYY-MM-DD
-                                const time = `${dateTime.getUTCHours().toString().padStart(2, '0')}:${dateTime.getUTCMinutes().toString().padStart(2, '0')}:${dateTime.getUTCSeconds().toString().padStart(2, '0')}`; // รูปแบบเวลา HH:MM:SS
+                                const { date, time } = formatDateTime(firstReceipt.order_date_time);
 
-                                // คำนวณ subtotal
                                 const subtotal = groupedReceipts[key].reduce((sum, receipt) => {
                                     return sum + (receipt.quantity * receipt.price);
                                 }, 0);
 
+                                const hasCustomer = firstReceipt.c_fname && firstReceipt.c_lname;
+
+                                // คำนวณแต้มสะสม, แต้มใช้ และแต้มคงเหลือ
+                                const pointsEarned = groupedReceipts[key].reduce((sum, receipt) => {
+                                    return receipt.type === 'earn' ? sum + receipt.points : sum;
+                                }, 0);
+
+                                const pointsRedeemed = groupedReceipts[key].reduce((sum, receipt) => {
+                                    return receipt.type === 'redeem' ? sum + receipt.points : sum;
+                                }, 0);
+
+                                // const currentPoints = pointsEarned - -pointsRedeemed;
+
                                 return (
                                     <div key={index}>
                                         <p>Re-Print</p>
-                                        <div>Emp: Ratapumin #{orderId} #{orderNo}</div>
-                                        <div>Date: {date}</div> {/* แสดงวันที่ */}
-                                        <div>Time: {time}</div> {/* แสดงเวลา */}
+                                        <div>Emp: {userFname.charAt(0).toUpperCase() + userFname.slice(1)} #{orderId} #{orderNo}</div>
+                                        <div>Date: {date}</div>
+                                        <div>Time: {time}</div>
                                         <p>----------------------------------------------------------------------------------------</p>
                                         <div className='orderList'>
                                             <p>Item</p>
@@ -119,13 +137,30 @@ function Reprint() {
                                         <p>----------------------------------------------------------------------------------------</p>
                                         <div className='ordertotal'>
                                             <p>Subtotal</p>
-                                            <p>{formatCurrency(subtotal)}</p> {/* แสดง subtotal */}
+                                            <p>{formatCurrency(subtotal)}</p>
                                             <p>Discount</p>
                                             <p>0</p>
                                             <p>Total</p>
-                                            <p>{formatCurrency(subtotal)} {/* แสดง total สำหรับตอนนี้เป็น subtotal */}</p>
+                                            <p>{formatCurrency(subtotal)}</p>
                                         </div>
                                         <p>----------------------------------------------------------------------------------------</p>
+
+                                        {hasCustomer ? (
+                                            <>
+                                                <div className='orderCustomer'>
+                                                    <p>Customer: {firstReceipt.c_fname} {firstReceipt.c_lname}</p>
+                                                </div>
+                                                <div className='orderPoints'>
+                                                    <p>*** Point ***</p>
+                                                    <p>Collect: {pointsEarned}</p>
+                                                    <p>Redeem: {pointsRedeemed ? `${pointsRedeemed}` : 0}</p>
+                                                    {/* <p>Current: {currentPoints}</p> */}
+                                                </div>
+                                            </>
+                                        ) : null}
+
+
+
                                         <div className='orderthk'>
                                             <p>Thank you</p>
                                             <p>Please come again soon</p>
