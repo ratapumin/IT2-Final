@@ -299,7 +299,7 @@ exports.printCloseDaily = (req, res) => {
               const receiptContent = generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults);
 
               logReceipt(receiptContent);
-              // printDaily(receiptContent, res);
+              printDaily(receiptContent, res);
               res.json({
                 totalSalesResults,
                 productsResults,
