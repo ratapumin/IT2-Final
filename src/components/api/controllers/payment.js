@@ -102,32 +102,65 @@ exports.payment = (req, res) => {
     });
 };
 
+exports.pointstype = (req, res) => {
 
+
+    const { date } = req.params
+    const sqlPointType = `
+        SELECT 
+            COUNT(CASE WHEN points_history.type = 'redeem' THEN 1 END) AS redeem_count,
+            DATE(points_history.transaction_date) AS transaction_date
+        FROM 
+            points_history
+        WHERE 
+            DATE(points_history.transaction_date) = ?
+        GROUP BY 
+            DATE(points_history.transaction_date);
+    `;
+    const value = [date]
+    conn.query(sqlPointType, value, (error, resultsPoint) => {
+        if (error) {
+            // Handle sqlPointType error
+            return res.status(400).json({ error });
+        }
+
+        // Both queries successful, send response with both results
+        res.json(resultsPoint);
+        // exports.closedaily(req, res, resultsPoint);
+
+    });
+}
 
 exports.closedaily = (req, res) => {
-    const { cash_in_machine, date,user_id } = req.body;
-    const sqlClosedaily = `
-        INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
-        SELECT 
-            ? AS cash_in_machine,
-            SUM(order_detail.price * order_detail.quantity) AS cash_in_system,
-            SUM(order_detail.price * order_detail.quantity) - ? AS cash_difference,
-            ?, 
-            ?
-        FROM order_detail
-        JOIN orders ON order_detail.order_id = orders.order_id 
-        WHERE DATE(orders.order_date_time) = ?
-        AND orders.payment_type = 'cash'; 
-    `;
+    const { cash_in_machine, date, user_id, redeem_count } = req.body;
 
-    const value = [cash_in_machine, cash_in_machine, user_id,date, date];
+    // ดึงค่า redeem_count จาก resultsPoint เพื่อใช้ในการลบ
+    const redeeDiscount = redeem_count * 5
+    console.log('redeeo',redeeDiscount)
+
+    const sqlClosedaily = `
+    INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
+    SELECT 
+        ? AS cash_in_machine,
+        (SUM(order_detail.price * order_detail.quantity) - ?) AS cash_in_system,  -- หักด้วย redeemCount
+        (SUM(order_detail.price * order_detail.quantity) - ? - ?) AS cash_difference,  -- หัก redeemCount และ cash_in_machine
+        ?, 
+        ?
+    FROM order_detail
+    JOIN orders ON order_detail.order_id = orders.order_id 
+    WHERE DATE(orders.order_date_time) = ?
+    AND orders.payment_type = 'cash';
+`;
+
+
+    const value = [cash_in_machine, redeeDiscount, cash_in_machine, redeeDiscount, user_id, date, date];
+
+
     conn.query(sqlClosedaily, value, (error, results) => {
         if (error) {
             res.status(400).json({ error });
         } else {
-            console.log('Warnings:', results.warningStatus);
             res.json(results);
-            console.log(results);
         }
     });
-}
+};

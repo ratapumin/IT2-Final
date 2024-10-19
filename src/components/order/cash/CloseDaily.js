@@ -28,16 +28,31 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
     const postCloseDaily = async () => {
         try {
-            // const currentDateTime = moment().format('YYYY-MM-DD HH:mm:ss');
             const currentDate = moment().format('YYYY-MM-DD'); // แปลงเป็นวันที่
+
+            // เรียก API pointstype
+            const pointTypeRes = await axios.post(`http://localhost:5000/api/pointstype/${currentDate}`);
+            const pointTypeData = pointTypeRes.data;
+
+            console.log('Point Type Data:', pointTypeData);
+
+            // ตรวจสอบว่า pointTypeData มีข้อมูลหรือไม่
+            const redeemCount = pointTypeData.length > 0 ? pointTypeData[0].redeem_count : 0;
+
+            // ส่งข้อมูลไปยัง API closedaily พร้อมกับค่าที่คำนวณได้
             const res = await axios.post('http://localhost:5000/api/closedaily', {
                 cash_in_machine: cashInput,
                 date: currentDate,
-                user_id: user.user_id
+                user_id: user.user_id,
+                redeem_count: redeemCount // ใช้ค่า redeem_count ที่ดึงมา
             });
-            setCashInput('')
+
+            setCashInput('');
             console.log(res.data);
-            printReceiptDaily(currentDate) // ส่งเฉพาะวันที่
+
+            // พิมพ์ใบเสร็จรายวัน
+            printReceiptDaily(currentDate);
+
             notification.success({
                 message: 'Success',
                 description: 'Close daily sales recorded successfully!',
@@ -51,9 +66,11 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
             });
         }
     };
-    
 
-    const printReceiptDaily = async(dateTime)=>{
+
+
+
+    const printReceiptDaily = async (dateTime) => {
         try {
             const res = await axios.post(`http://localhost:5000/api/printdaily/${dateTime}`)
             console.log(res.data);
@@ -75,18 +92,18 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
         setCashInput(e.target.value);
     };
 
-    const handleCheckTotal = () => {
-        const onCash = parseFloat(cashInput);
-        if (onCash !== parseFloat(totalcash)) {
-            postCloseDaily();
-        } else {
-            notification.warning({
-                message: 'Warning',
-                description: 'Total cash does not match!',
-            });
-            handleCloseDaily(false); // ปิด modal หากค่าตรงกัน
-        }
-    };
+    // const handleCheckTotal = () => {
+    //     const onCash = parseFloat(cashInput);
+    //     if (onCash !== parseFloat(totalcash)) {
+    //         postCloseDaily();
+    //     } else {
+    //         notification.warning({
+    //             message: 'Warning',
+    //             description: 'Total cash does not match!',
+    //         });
+    //         handleCloseDaily(false); // ปิด modal หากค่าตรงกัน
+    //     }
+    // };
 
     return (
         <>
@@ -124,7 +141,9 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
                         </Form.Item>
                     </Form>
                     <Space>
-                        <Button key="ok" type="primary" onClick={handleCheckTotal}>
+                        <Button key="ok" type="primary" onClick={() =>
+                            postCloseDaily()
+                        }>
                             Ok
                         </Button>
                         <Button key="close" onClick={() => handleCloseDaily(false)}>
