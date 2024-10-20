@@ -15,6 +15,7 @@ function ReportSales() {
     }); // กำหนดค่าเริ่มต้นเป็นวันที่ปัจจุบัน
     const [statusPrint, setStatusPrint] = useState('no')
     const [printState, setPrintState] = useState('no')
+    const [productList, setProductList] = useState([])
 
     const onDateChange = (_, dateStr) => {
         if (dateStr && dateStr[0] && dateStr[1]) {
@@ -27,16 +28,29 @@ function ReportSales() {
     };
     const handleonPrint = (value) => {
         setPrintState(value)
+        console.log('prstat', printState)
+        console.log('productLis aaaa', productList)
     }
 
-    const handlePrintReport = async () => {
-        if (printState === 'no') {
 
+    const handleProductList = (value) => {
+        setProductList(value)
+        console.log('productLis aaaa', productList)
+    }
+
+
+    const handlePrintReport = async () => {
+        // if (printState === 'no') {
+
+        //     setStatusPrint('no');
+        // } else {
+        // setStatusPrint('print');
+        if (productList.length === 0) {
             setStatusPrint('no');
-            console.log('prstat',printState)
+            setPrintState('no');
         } else {
             setStatusPrint('print');
-
+            setPrintState('print');
             if (date && date.start && date.end) {
                 try {
                     const res = await axios.post(
@@ -45,6 +59,8 @@ function ReportSales() {
                     );
 
                     console.log("product", res.data);
+
+                    console.log("prostatusPrintduct", statusPrint);
                     setStatusPrint('no');
                     setPrintState('no')
                 } catch (error) {
@@ -54,10 +70,12 @@ function ReportSales() {
                 }
             } else {
                 console.log("No date range selected");
-                setStatusPrint('no'); 
+                setStatusPrint('no');
                 setPrintState('no')
             }
         }
+
+        // }
 
     };
     return (
@@ -86,6 +104,7 @@ function ReportSales() {
                     <div className='boxContent'>
                         <ContentPdf date={date} statusPrint={statusPrint}
                             handleonPrint={handleonPrint}
+                            products={handleProductList}
                         />
 
                     </div>

@@ -3,7 +3,7 @@ import axios from "axios";
 import './contentpdf.css'
 import { Empty } from 'antd';
 
-function ContentPdf({ date, statusPrint, handleonPrint }) {
+function ContentPdf({ date, statusPrint, handleonPrint, products }) {
     const [productList, setProductList] = useState([]);
     const [sales, setSales] = useState()
     const [topProducts, setTopProducts] = useState()
@@ -16,36 +16,44 @@ function ContentPdf({ date, statusPrint, handleonPrint }) {
     useEffect(() => {
         const fetchProduct = async () => {
             if (date && date.start && date.end) {
-                console.log(date)
-                // console.log('eiie',statusPrint)
+                console.log(date);
+                console.log('eiie', statusPrint);
                 try {
-                    const res = await axios.post(`http://localhost:5000/api/printReportsales/${date.start}/${date.end}`,
-                        {
-                            statusPrint
-                        })
-                    console.log("product", res.data);
+                    const res = await axios.post(`http://localhost:5000/api/printReportsales/${date.start}/${date.end}`, {
+                        statusPrint,
+                    });
+
+                    console.log("product", res.data.productsResults);
+
+                    // ตั้งค่า state ตามข้อมูลที่ได้มา
                     setProductList(res.data.productsResults || []);
                     setSales(res.data.totalSalesResults[0] || {});
                     setTopProducts(res.data.topProductsResults || []);
                     setPaymentType(res.data.paymentTypeResults || []);
                     setDiscount(res.data.redeemResults || []);
-                    setMonthlySales(res.data.monthlySalesResults || [])
-                    setYearSales(res.data.yearlySalesResults || [])
-                    if (res.data.productsResults.length > 0) {
-                        handleonPrint('print')
-                        // console.log('hanb',handleonPrint)
+                    setMonthlySales(res.data.monthlySalesResults || []);
+                    setYearSales(res.data.yearlySalesResults || []);
+                    products(res.data.productsResults)
+                    // ตรวจสอบว่ามีข้อมูล productsResults หรือไม่
+                    if (productList.length === 0) {
+                        handleonPrint('no');
+                        console.log("productList", productList);
+
+                    } else {
+                        console.log("productList", productList);
+                        handleonPrint('print');
                     }
-                    handleonPrint('no')
                 } catch (error) {
                     console.log(error.response);
                 }
             } else {
                 console.log("No date range selected");
-                console.log(date)
+                console.log(date);
             }
         };
         fetchProduct();
     }, [date]);
+
 
 
     return (
