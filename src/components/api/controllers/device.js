@@ -695,8 +695,8 @@ const generateReportContent = (
     // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
     receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
     receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
-    receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
     receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
+    receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
   });
 
   receipt.push('-----------------------------------------');

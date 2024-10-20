@@ -35,6 +35,7 @@ function ContentPdf({ date, statusPrint, handleonPrint }) {
                         handleonPrint('print')
                         // console.log('hanb',handleonPrint)
                     }
+                    handleonPrint('no')
                 } catch (error) {
                     console.log(error.response);
                 }
@@ -78,19 +79,27 @@ function ContentPdf({ date, statusPrint, handleonPrint }) {
                                 ? discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)
                                 : '0.00'}
                         </div>
-                        <div className="label">Net Sales</div>
-                        <div className="value">
-                            {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
-                                ? (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0)).toFixed(2)
-                                : '0.00'
-                            }
-                        </div>
                         <div className="label">Tax</div>
                         <div className="value">
                             {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
-                                ? ((sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)) - (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)) * ((100 / 107))).toFixed(2)
+                                ? (
+                                    (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2))
+                                    -
+                                    (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)) * ((100 / 107)
+                                    )).toFixed(2)
                                 : '0.00'
                             }</div>
+                        <div className="label">Net Sales</div>
+                        <div className="value">
+                            {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
+                                ? (
+                                    (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0))
+                                    *
+                                    (100 / 107)).toFixed(2)
+                                : '0.00'
+                            }
+                        </div>
+
                     </div>
                     <span>-------------------------------------------------------------------</span>
                     <div className="label">*** Monthly Sales Summary ***</div>
