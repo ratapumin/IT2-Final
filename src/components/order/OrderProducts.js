@@ -56,10 +56,10 @@ function OrderProducts() {
   }, [token, navigate]);
 
 
-  useEffect(() => {
-    console.log(carts)
-    console.log(showorderId)
-  }, [showorderId, carts])
+  // useEffect(() => {
+  //   console.log(carts)
+  //   console.log(showorderId)
+  // }, [showorderId, carts])
 
   // useEffect(() => {
   //   console.log(member)
@@ -158,7 +158,7 @@ function OrderProducts() {
 
   const handleCashAmount = (cash) => {
     setCashAmount(cash)
-    console.log(cashAmount)
+    // console.log('orderProduct',cashAmount)
   }
 
   const handleSetSum = (sum) => {
@@ -176,20 +176,20 @@ function OrderProducts() {
   }
 
   const handleGetPoints = (member) => {
-    console.log('handleGetPoints called');
-    console.log('Current member:', member);
+    // console.log('handleGetPoints called');
+    // console.log('Current member:', member);
     if (member) {
       const dividePoints = Math.floor(sumCash / 25);
       setGetPoints(dividePoints);
-      console.log('getPoints', dividePoints);
+      // console.log('getPoints', dividePoints);
     } else {
       console.log('No member found');
     }
   };
 
   const handleRedeemPoints = (member) => {
-    console.log('handleRedeemPoints called');
-    console.log('Current member:', member);
+    // console.log('handleRedeemPoints called');
+    // console.log('Current member:', member);
     if (member) {
       const currentPoints = member.c_points;
       const dividePoints = Math.floor(sumCash / 25);
@@ -199,7 +199,7 @@ function OrderProducts() {
         const minusMoney = sumCash - 5
         setRedeemPoints(minusPoints);
         setMinusCash(minusMoney)
-        console.log('redeemPoints', minusPoints);
+        // console.log('redeemPoints', minusPoints);
       }
     } else {
       console.log('No member found');

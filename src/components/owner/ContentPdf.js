@@ -55,6 +55,11 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
     }, [date]);
 
 
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(value));
+    };
+
+
 
     return (
         <>
@@ -77,14 +82,19 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                         <div className="label">Gross Sales</div>
                         <div className="value">
                             {sales && sales.total_amount !== null && sales.total_amount !== undefined
-                                ? sales.total_amount
+                                ? formatCurrency(
+                                    (Number(sales.total_amount) || 0).toFixed(2)  // Ensure it's a number
+                                )
                                 : '0.00'
                             }
                         </div>
                         <div className="label">Discount</div>
                         <div className="value">
                             {discount && discount.length > 0
-                                ? discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)
+                                ?
+                                formatCurrency(
+                                    discount.reduce((total, item) => total + Number(item.total_redeem_value), 0).toFixed(2)
+                                )
                                 : '0.00'}
                         </div>
                         <div className="label">Tax</div>
@@ -101,9 +111,12 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                         <div className="value">
                             {discount && discount.length > 0 && sales && sales.total_amount !== null && sales.total_amount !== undefined
                                 ? (
-                                    (sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0))
-                                    *
-                                    (100 / 107)).toFixed(2)
+                                    formatCurrency(
+                                        ((sales.total_amount - discount.reduce((total, item) => total + Number(item.total_redeem_value), 0))
+                                            *
+                                            (100 / 107)).toFixed(2) // Fix the number before formatting
+                                    )
+                                )
                                 : '0.00'
                             }
                         </div>
@@ -126,7 +139,7 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                                     {month.monthly}
                                 </p>
                                 <p>
-                                    {month.total_price}
+                                    {formatCurrency(Number(month.total_price).toFixed(2))}
                                 </p>
                             </div>
                         ))}
@@ -145,7 +158,7 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                                     {year.year}
                                 </p>
                                 <p>
-                                    {year.total_price}
+                                    {formatCurrency(Number(year.total_price).toFixed(2))}
                                 </p>
                             </div>
                         ))}
@@ -177,7 +190,7 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                                 <p>{product.name}</p>
                                 <p>{product.qty}</p>
                                 <p>{product.price}</p>
-                                <p>{product.amount}</p>
+                                <p>{formatCurrency(Number(product.amount).toFixed(2))}</p>
                             </div>
                         ))
                     }
@@ -209,7 +222,7 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                                 <div className="label">
                                     {type.payment_type.charAt(0).toUpperCase() + type.payment_type.slice(1)}
                                 </div>
-                                <div className="value">{type.total_sales}</div>
+                                <div className="value">{formatCurrency(Number(type.total_sales).toFixed(2))} </div>
                             </div>
                         ))}
                     </div>
@@ -221,11 +234,11 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                             <div key={point.redeem_count}>
                                 <div className="paymentRow">
                                     <div className="label">Redeem Point:</div>
-                                    <div className="value">{point.redeem_count * 10}</div>
+                                    <div className="value">{formatCurrency(Number(point.redeem_count * 10).toFixed(2))}</div>
                                 </div>
                                 <div className="paymentRow">
                                     <div className="label">Discount (Baht):</div>
-                                    <div className="value">{point.total_redeem_value}</div>
+                                    <div className="value">{formatCurrency(Number(point.total_redeem_value).toFixed(2))}</div>
                                 </div>
                             </div>
                         ))}

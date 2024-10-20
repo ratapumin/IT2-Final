@@ -11,9 +11,9 @@ const createOrder = async (setOrderData, onDeleteAll) => {
     try {
         const orderData = setOrderData();
         console.log(orderData)
-            await axios.post('http://localhost:5000/api/createOrder', orderData);
-            console.log('Order created successfully');
-            console.log('Order Data:', orderData);
+        await axios.post('http://localhost:5000/api/createOrder', orderData);
+        console.log('Order created successfully');
+        console.log('Order Data:', orderData);
         onDeleteAll();
     } catch (error) {
         console.error('Error creating order:', error);
@@ -50,7 +50,8 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     useEffect(() => {
         if (configMoney) {
             setCash(configMoney.toString());
-            // onCashChange(configMoney);
+            onCashChange(configMoney);
+            // console.log('cash', cash)
         }
     }, [configMoney, onCashChange]);
 
@@ -65,7 +66,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
         const newCash = cash + num.toString();
         setCash(newCash);
         onCashChange(newCash);
-        console.log("Updated Cash in calNum:", newCash);
+        // console.log("Updated Cash in calNum:", newCash);
     };
 
 
@@ -73,7 +74,13 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     // คิดเงิน
     useEffect(() => {
         if (cash && sumCash) {
-            const changeAmount = Number(cash) - Number(sumCash);
+            let totalAmount = Number(sumCash);
+            if (redeemPoints) {
+                totalAmount -= 5;
+                console.log(totalAmount)
+            }
+            console.log('cash', cash)
+            const changeAmount = Number(cash) - Number(totalAmount);
             setChange(changeAmount > 0 ? changeAmount : 0);
             onChange(changeAmount > 0 ? changeAmount : 0);
             // console.log("Calculated Change:", changeAmount);
@@ -85,7 +92,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
 
 
     const handleDelete = () => {
-        console.log(typeof cash);
+        // console.log(typeof cash);
         const newCash = cash.slice(0, -1);
         setCash(newCash);
         onCashChange(newCash);
@@ -174,7 +181,7 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             products: products.map(product => ({
                 p_id: product.p_id,
                 p_price: product.p_price,
-                p_type:product.category,
+                p_type: product.category,
                 quantity: product.quantity
             })),
             history: historyEntries, // Store an array of history entries
@@ -195,12 +202,12 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
     const handleEnterClick = () => {
         // กำหนดยอดรวมที่ต้องจ่าย
         let totalAmount = Number(sumCash);
-    
+
         // หากมีการใช้แต้ม ให้หัก 5 บาท
         if (redeemPoints) {
             totalAmount -= 5;
         }
-    
+
         // ตรวจสอบว่าเงินสดที่กรอกเข้ามามีมากพอหรือไม่
         if (Number(cash) < totalAmount) {
             Modal.error({
@@ -210,19 +217,19 @@ function Cashmoney({ onCashChange, products, sumCash, onChange, onDeleteAll,
             });
             return;
         }
-    
+
         // สร้าง orderInfoData เป็น object
         const orderInfoData = {
             ...setOrderData(), // get the order data from setOrderData
             cash: cash,       // เพิ่ม cash
             change: change    // เพิ่ม change
         };
-    
+
         console.log(orderInfoData); // Log to ensure order info is correct
         setOrderInfo(orderInfoData); // set the order info state
         setModal2Open(true);
     };
-    
+
 
     const showSuccessNotification = () => {
         notification.success({

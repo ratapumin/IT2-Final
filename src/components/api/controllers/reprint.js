@@ -3,6 +3,11 @@ const Printer = require('node-thermal-printer').printer;
 const types = require('node-thermal-printer').types;
 const conn = require('../db');
 
+
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(value));
+  };
+
 exports.showOrderIs = (req, res) => {
 
     const sqlSeleteOrderId = `  SELECT order_id FROM orders  `

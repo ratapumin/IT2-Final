@@ -51,33 +51,40 @@ function Payment({
 
     const handleSearch = () => {
         const member = members.find(member => member.c_tel === tel);
-        setCurrentMember(member)
-        setContactName(member ? `${member.c_fname}  ${member.c_lname} Points: ${member.c_points}` : 'ไม่พบข้อมูล');
-        console.log('findmember', member)
+        if (member) {
+            setCurrentMember(member);
+            setContactName(`${member.c_fname} ${member.c_lname} Points: ${member.c_points}`);
+        } else {
+            setCurrentMember(null);
+            setContactName('ไม่พบข้อมูล');
+        }
+        // console.log('findmember', member);
     };
 
     const handleSelectMemberCollect = () => {
         const member = members.find(member => member.c_tel === tel);
-        setCurrentMember(member)
-        console.log('findmember', member)
-        OnsaveMember(member)
         if (member) {
-            onGetPoints(member)
+            setCurrentMember(member);
+            OnsaveMember(member);
+            onGetPoints(member);
+        } else {
+            setCurrentMember(null);
         }
-        setCollect(false)
+        setCollect(false);
     };
-
-
+    
     const handleSelectMemberRedeem = () => {
         const member = members.find(member => member.c_tel === tel);
-        setCurrentMember(member)
-        console.log('findmember', member)
-        OnsaveMember(member)
         if (member) {
-            onRedeemPoints(member)
+            setCurrentMember(member);
+            OnsaveMember(member);
+            onRedeemPoints(member);
+        } else {
+            setCurrentMember(null);
         }
-        setRedeem(false)
+        setRedeem(false);
     };
+    
 
 
     const handleCollect = () => {
@@ -92,7 +99,7 @@ function Payment({
         setContactName('');
     };
 
-    
+
     useEffect(() => {
         const fetchOrderId = async () => {
             try {
@@ -133,8 +140,9 @@ function Payment({
     const utcDate = moment().format('YYYY-MM-DD HH:mm:ss');
     const setOrderData = () => {
         let c_id = currentMember ? `${currentMember.c_id}` : null;
-        let newPoints = getPoints || 0;
-        let minusPoints = redeemPoints || 0;
+        let newPoints = currentMember ? getPoints || 0 : 0;
+        let minusPoints = currentMember ? redeemPoints || 0 : 0;
+        
 
         const historyEntries = [];
 
@@ -168,7 +176,7 @@ function Payment({
             products: products.map(product => ({
                 p_id: product.p_id,
                 p_price: product.p_price,
-                p_type:product.category,
+                p_type: product.category,
                 quantity: product.quantity
             })),
             history: historyEntries, // Store an array of history entries
@@ -186,8 +194,8 @@ function Payment({
         setShowCreateOrder(false);
         const createOrderData = setOrderData()
         setOrderInfo(createOrderData)
-        console.log('Order Data:', orderInfo);
-        console.log('eie prommp')
+        // console.log('Order Data:', orderInfo);
+        // console.log('eie prommp')
         onDeleteAll();
         resetMember();
         selectedType('Coffee');

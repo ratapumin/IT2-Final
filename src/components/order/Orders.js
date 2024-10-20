@@ -43,15 +43,16 @@ function Orders({
   }
 
 
-  useEffect(() => {
-    console.log(products)
-  })
+  // useEffect(() => {
+  //   console.log(products)
+  // })
 
-  useEffect(() => {
-    console.log(OnsaveMember)
-    console.log('getPoints', getPoints)
+  // useEffect(() => {
+  //   console.log(OnsaveMember)
+  //   console.log('getPoints', getPoints)
+  //   console.log('chash order', change)
 
-  })
+  // })
 
 
   const countItem = useCallback(() => {
@@ -95,8 +96,9 @@ function Orders({
       </p>
     </div>
   );
-
-
+  // useEffect(() => {
+  //   console.log('order pasge', cash)
+  // }, [cash])
 
   return (
     <section className="orders">
@@ -168,38 +170,8 @@ function Orders({
                   : ''}</Button>
               </Popover>
 
-              {/* <p>{OnsaveMember !== null && OnsaveMember !== ''
-                ? `${OnsaveMember.c_fname}  ${OnsaveMember.c_lname}`
-                : ''}</p> */}
             </section>
 
-            {/* <section className="currentPoints">
-              <p>
-                Current Points
-              </p>
-              <p>{OnsaveMember !== null && OnsaveMember !== ''
-                ? (
-                  OnsaveMember.c_points === null
-                    ? '0'
-                    : OnsaveMember.c_points ?? '0'
-                )
-                : ''}</p>
-            </section> */}
-
-            {/* <section className="getPoints">
-              <p>
-                Get Points
-              </p>
-              <p>{getPoints !== null && getPoints !== ''
-                ? `+${getPoints}`
-                : ''}</p>
-              <p>
-                {minusCash !== null && minusCash !== ''
-                  ? `${minusCash}`
-                  : ''
-                }
-              </p>
-            </section> */}
           </>
         )}
 

@@ -7,6 +7,12 @@ const QRCode = require('qrcode');
 const path = require('path');
 
 
+
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2 }).format(Number(value));
+};
+
 function logReceipt(receipt) {
   console.log("Receipt:\n", receipt.join('\n'));
 }
@@ -320,6 +326,7 @@ exports.printCloseDaily = (req, res) => {
 
 
 
+
 function generateReceiptContent(totalSalesResults, productsResults, paymentTypeResults, redeemResults, latestCloseDailyResults) {
   const receipt = [];
   const totalSales = totalSalesResults[0]?.total_amount || 0;
@@ -349,10 +356,10 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
     const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2);
 
     // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
-    receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
-    receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
-    receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
-    receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
+    receipt.push(`${grossSalesLabel.padEnd(20)} ${formatCurrency(grossSalesValue).padStart(10)}`);
+    receipt.push(`${discountLabel.padEnd(20)} ${formatCurrency(discountValue).padStart(10)}`);
+    receipt.push(`${netSalesLabel.padEnd(20)} ${formatCurrency(netSalesValue).padStart(10)}`);
+    receipt.push(`${taxLabel.padEnd(20)} ${formatCurrency(taxValue).padStart(10)}`);
   });
 
   receipt.push('-----------------------------------------');
@@ -375,7 +382,7 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
     }
   });
 
-  receipt.push(`Total product amount: ${totalSales}`.padEnd(totalWidth));
+  receipt.push(`Total product amount: ${formatCurrency(totalSales)}`.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
 
   // เพิ่มข้อมูลการชำระเงิน
@@ -387,13 +394,13 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
     if (payment.payment_type && payment.total_sales) {
       const paymentType = payment.payment_type.padEnd(18);
       const amount = payment.total_sales;
-      receipt.push(`  ${paymentType}     ${amount}`.padEnd(totalWidth));
+      receipt.push(`  ${paymentType}     ${formatCurrency(amount)}`.padEnd(totalWidth));
     } else {
       console.error('Invalid payment type:', payment);
     }
   });
 
-  receipt.push(`Total Sales by Payment Type: ${totalSales} `.padEnd(totalWidth));
+  receipt.push(`Total Sales by Payment Type: ${formatCurrency(totalSales)} `.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
 
   // เพิ่มข้อมูลการใช้ redeem points
@@ -406,7 +413,7 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
     const totalValue = redeem.total_redeem_value !== null ? redeem.total_redeem_value : 0;
     const redeemCountStr = String(redeemCount).padStart(10) * 10;
     const totalValueStr = String(totalValue).padStart(10);
-    receipt.push(` ${redeemCountStr}        ${totalValueStr}`);
+    receipt.push(` ${redeemCountStr}        ${formatCurrency(totalValueStr)}`);
   });
 
   receipt.push('-----------------------------------------');
@@ -427,9 +434,9 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
     const cashInSystemValue = latestCloseDaily.cash_in_system.padStart(10);
     const cashDifferenceValue = latestCloseDaily.cash_difference.padStart(10);
 
-    receipt.push(`${cashInMachineLabel.padEnd(25)}${cashInMachineValue}`.padEnd(totalWidth));
-    receipt.push(`${cashInSystemLabel.padEnd(25)}${cashInSystemValue}`.padEnd(totalWidth));
-    receipt.push(`${cashDifferenceLabel.padEnd(25)}${cashDifferenceValue}`.padEnd(totalWidth));
+    receipt.push(`${cashInMachineLabel.padEnd(25)}${formatCurrency(cashInMachineValue)}`.padEnd(totalWidth));
+    receipt.push(`${cashInSystemLabel.padEnd(25)}${formatCurrency(cashInSystemValue)}`.padEnd(totalWidth));
+    receipt.push(`${cashDifferenceLabel.padEnd(25)}${formatCurrency(cashDifferenceValue)}`.padEnd(totalWidth));
 
     receipt.push('-----------------------------------------');
   }
@@ -466,10 +473,11 @@ async function printDaily(receipt, res) {
 
     printer.alignCenter();
     printer.bold(true);
+    printer.setTextQuadArea(0, 0, 1, 1);
     printer.println('Kathong Coffee');
     printer.bold(false);
     printer.newLine();
-
+    printer.setTextNormal();
     // Print receipt lines
     receipt.forEach(line => {
       if (typeof line === 'string' && line.trim()) {
@@ -528,6 +536,7 @@ exports.printReportSales = (req, res) => {
         SELECT
             order_detail.p_id AS product_id,
             products.p_name AS Product_Name,
+            products.category AS category,
             SUM(order_detail.price * order_detail.quantity) AS total_sales,
             SUM(order_detail.quantity) AS quantity
         FROM
@@ -540,7 +549,7 @@ exports.printReportSales = (req, res) => {
         GROUP BY
             order_detail.p_id
         ORDER BY
-            total_sales DESC
+            quantity DESC
         LIMIT 5`;
 
   const sqlPaymentType = `
@@ -630,7 +639,9 @@ exports.printReportSales = (req, res) => {
                   paymentTypeResults,
                   redeemResults,
                   monthlySalesResults, // Add monthlySalesResults here
-                  yearlySalesResults
+                  yearlySalesResults,
+                  startDate,  // Pass startDate
+                  endDate     // Pass endDate
                 );
 
                 // Send or log the report
@@ -641,7 +652,9 @@ exports.printReportSales = (req, res) => {
                   paymentTypeResults,
                   redeemResults,
                   monthlySalesResults, // Add monthlySalesResults here
-                  yearlySalesResults
+                  yearlySalesResults,
+                  startDate,  // Pass startDate
+                  endDate     // Pass endDate
                 });
                 if (statusPrint === 'print') {
                   printDaily(receiptContent, res)
@@ -661,18 +674,21 @@ const generateReportContent = (
   topProductsResults,
   paymentTypeResults,
   redeemResults,
-  monthlySalesResults, // รับค่า monthlySalesResults เข้ามา
-  yearlySalesResults // รับค่า yearlySalesResults เข้ามา
+  monthlySalesResults,
+  yearlySalesResults,
+  startDate,
+  endDate
 ) => {
   const receipt = [];
   const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
   const totalSales = totalSalesResults[0]?.total_amount || 0;
 
   // เพิ่มวันที่และเวลาในใบเสร็จ
-  const dateStr = `Date: ${new Date().toLocaleDateString()}`;
+  const dateStr = `Date Range: ${startDate} to ${endDate}`;
+  const datePrint = `Date Print: ${new Date().toLocaleDateString()}`;
   const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
-
   if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
+  if (datePrint) receipt.push(datePrint.padEnd(totalWidth));
   if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   receipt.push(`  *** Sales Summary ***`);
@@ -686,17 +702,17 @@ const generateReportContent = (
     const taxLabel = 'Tax';
 
     const grossSalesValue = totalSales; // ค่าที่ได้จาก totalSales
-    const discountValue = totalValue.toFixed(2);
-    const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2);
-    const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2); // แยกภาษีออกจากยอดขายสุทธิ (สมมติว่า VAT 7%)
-    const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2);
-    const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2);
+    const discountValue = totalValue.toFixed(2)
+    const saleAfterDiscount = (grossSalesValue - parseFloat(discountValue)).toFixed(2)
+    const salesWithoutTax = (saleAfterDiscount / 1.07).toFixed(2)
+    const taxValue = (saleAfterDiscount - salesWithoutTax).toFixed(2)
+    const netSalesValue = (grossSalesValue - parseFloat(discountValue) - parseFloat(taxValue)).toFixed(2)
 
     // เพิ่มข้อมูลลงใน receipt โดยกำหนดระยะห่าง
-    receipt.push(`${grossSalesLabel.padEnd(20)} ${String(grossSalesValue).padStart(10)}`);
-    receipt.push(`${discountLabel.padEnd(20)} ${String(discountValue).padStart(10)}`);
-    receipt.push(`${taxLabel.padEnd(20)} ${String(taxValue).padStart(10)}`);
-    receipt.push(`${netSalesLabel.padEnd(20)} ${String(netSalesValue).padStart(10)}`);
+    receipt.push(`${grossSalesLabel.padEnd(20)} ${String(formatCurrency(grossSalesValue)).padStart(10)}`);
+    receipt.push(`${discountLabel.padEnd(20)} ${String(formatCurrency(discountValue)).padStart(10)}`);
+    receipt.push(`${taxLabel.padEnd(20)} ${String(formatCurrency(taxValue)).padStart(10)}`);
+    receipt.push(`${netSalesLabel.padEnd(20)} ${String(formatCurrency(netSalesValue)).padStart(10)}`);
   });
 
   receipt.push('-----------------------------------------');
@@ -706,7 +722,7 @@ const generateReportContent = (
   receipt.push('-----------------------------------------');
   receipt.push('Month           Total Sales'.padEnd(totalWidth));
   monthlySalesResults.forEach(monthly => {
-    const monthLine = `${monthly.monthly.padEnd(15)} ${String(monthly.total_price).padStart(10)} THB`;
+    const monthLine = `${monthly.monthly.padEnd(15)} ${String(formatCurrency(monthly.total_price)).padStart(10)} THB`;
     receipt.push(monthLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');
@@ -716,7 +732,7 @@ const generateReportContent = (
   receipt.push('-----------------------------------------');
   receipt.push('Year            Total Sales'.padEnd(totalWidth));
   yearlySalesResults.forEach(yearly => {
-    const yearlyLine = `${yearly.year.toString().padEnd(15)} ${String(yearly.total_price).padStart(10)} THB`;
+    const yearlyLine = `${yearly.year.toString().padEnd(15)} ${String(formatCurrency(yearly.total_price)).padStart(10)} THB`;
     receipt.push(yearlyLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');
@@ -725,7 +741,7 @@ const generateReportContent = (
   receipt.push('Item                Type   Qty   Amount'.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   productsResults.forEach(product => {
-    const itemLine = `${product.name.padEnd(18)} ${product.category.padEnd(6)} ${String(product.qty).padStart(3)}   ${String(product.amount).padStart(7)}`;
+    const itemLine = `${product.name.padEnd(18)}  ${product.category.padEnd(6)} ${String(product.qty).padStart(3)}  ${String(formatCurrency(product.amount)).padStart(7)}`;
     receipt.push(itemLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');
@@ -733,9 +749,9 @@ const generateReportContent = (
   // แสดง 5 สินค้าที่ขายดีที่สุด
   receipt.push('              Top 5 Products              '.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
-  receipt.push('Item                Qty   Total Sales'.padEnd(totalWidth));
+  receipt.push('Item                Type   Qty   Amount'.padEnd(totalWidth));
   topProductsResults.forEach(product => {
-    const topItemLine = `${product.Product_Name.padEnd(18)} ${String(product.quantity).padStart(3)}   ${String(product.total_sales).padStart(10)}`;
+    const topItemLine = `${product.Product_Name.padEnd(18)}  ${product.category.padEnd(6)} ${String(product.quantity).padStart(3)}  ${String(formatCurrency(product.total_sales)).padStart(7)}`;
     receipt.push(topItemLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');
@@ -744,7 +760,7 @@ const generateReportContent = (
   receipt.push('      Sales Breakdown by Payment Type     '.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   paymentTypeResults.forEach(paymentType => {
-    const paymentLine = `${paymentType.payment_type.padEnd(18)}   ${String(paymentType.total_sales).padStart(10)}`;
+    const paymentLine = `${paymentType.payment_type.padEnd(18)}   ${String(formatCurrency(paymentType.total_sales)).padStart(10)}`;
     receipt.push(paymentLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');
@@ -752,8 +768,8 @@ const generateReportContent = (
   // แสดงข้อมูลการใช้คะแนน
   receipt.push('          Redeem Points Information       '.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
-  receipt.push(`Total Redeems:     ${redeemResults[0].redeem_count * 10}`.padEnd(totalWidth));
-  receipt.push(`Total Redeem Value: ${redeemResults[0].total_redeem_value} THB`.padEnd(totalWidth));
+  receipt.push(`Redeem Point:     ${formatCurrency(redeemResults[0].redeem_count * 10)}`.padEnd(totalWidth));
+  receipt.push(`Discount (Baht):  ${formatCurrency(redeemResults[0].total_redeem_value)}`.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
 
   return receipt;
