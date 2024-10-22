@@ -3,8 +3,11 @@ import thTH from 'antd/es/locale/th_TH'; // ใช้ locale ภาษาไท�
 import dayjs from 'dayjs';
 import './report.css';
 import ContentPdf from './ContentPdf';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from "axios";
+import { useUser } from '../user/UserContext';
+import { useNavigate } from 'react-router-dom';
+
 
 const { RangePicker } = DatePicker; // Import RangePicker จาก DatePicker
 
@@ -16,6 +19,14 @@ function ReportSales() {
     const [statusPrint, setStatusPrint] = useState('no')
     const [printState, setPrintState] = useState('no')
     const [productList, setProductList] = useState([])
+    const navigate = useNavigate();
+    const { user } = useUser();
+
+    useEffect(() => {
+        if (!user || user.role === 'O') {
+            navigate('/protected');
+        }
+    }, [user, navigate]);
 
     const onDateChange = (_, dateStr) => {
         if (dateStr && dateStr[0] && dateStr[1]) {
@@ -55,7 +66,12 @@ function ReportSales() {
                 try {
                     const res = await axios.post(
                         `http://localhost:5000/api/printReportsales/${date.start}/${date.end}`,
-                        { statusPrint: 'print' } // ส่ง statusPrint เป็น 'print'
+                        {
+                            statusPrint: 'print',
+                            user_fname: user.user_fname,
+                            user_lname: user.user_lname
+                        }
+
                     );
 
                     console.log("product", res.data);

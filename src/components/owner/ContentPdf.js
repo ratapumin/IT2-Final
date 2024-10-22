@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './contentpdf.css'
 import { Empty } from 'antd';
+import { useUser } from '../user/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function ContentPdf({ date, statusPrint, handleonPrint, products }) {
     const [productList, setProductList] = useState([]);
@@ -11,7 +13,14 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
     const [discount, setDiscount] = useState()
     const [monthlySales, setMonthlySales] = useState()
     const [yearSales, setYearSales] = useState()
+    const navigate = useNavigate();
+    const { user } = useUser();
 
+    useEffect(() => {
+        if (!user || user.role === 'O') {
+            navigate('/protected');
+        }
+    }, [user, navigate]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -21,6 +30,8 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                 try {
                     const res = await axios.post(`http://localhost:5000/api/printReportsales/${date.start}/${date.end}`, {
                         statusPrint,
+                        user_fname: user.user_fname,
+                        user_lname: user.user_lname
                     });
 
                     console.log("product", res.data.productsResults);
@@ -73,6 +84,15 @@ function ContentPdf({ date, statusPrint, handleonPrint, products }) {
                             On {date && date.start && date.end ?
                                 (date.start === date.end ? date.start : `${date.start} To ${date.end}`)
                                 : 'ไม่ระบุ'}
+                        </div>
+                    </div>
+                    <div className="saleReport">
+                        <div className="label">User : </div>
+                        <div>
+                            {user
+                                ? (`${user.user_fname.charAt(0).toUpperCase() + user.user_fname.slice(1)} ${user.user_lname.charAt(0).toUpperCase() + user.user_lname.slice(1)}`)
+                                : 'Unknown'
+                            }
                         </div>
                     </div>
                     <span>-------------------------------------------------------------------</span>

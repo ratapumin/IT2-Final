@@ -300,9 +300,14 @@ exports.printCloseDaily = (req, res) => {
                                           DATE_FORMAT(closedaily.date, '%Y-%m-%d') AS date, 
                                           closedaily.cash_in_machine, 
                                           closedaily.cash_in_system, 
-                                          closedaily.cash_difference
+                                          closedaily.cash_difference,
+                                          closedaily.user_id,
+                                              user_account.user_fname,
+                                          user_account.user_lname
                                           FROM 
                                               closedaily
+                                          JOIN user_account
+                                          ON user_account.user_id = closedaily.user_id
                                           ORDER BY 
                                               closedaily.id DESC
                                           LIMIT 1
@@ -350,6 +355,15 @@ function generateReceiptContent(totalSalesResults, productsResults, paymentTypeR
 
   if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
   if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
+  if (latestCloseDailyResults && latestCloseDailyResults.length > 0) {
+    const latestCloseDaily = latestCloseDailyResults[0];
+    const userName = `${latestCloseDaily.user_fname.charAt(0).toUpperCase() + latestCloseDaily.user_fname.slice(1)} ${latestCloseDaily.user_lname.charAt(0).toUpperCase() + latestCloseDaily.user_lname.slice(1)} `;
+    // ${userName.charAt(0).toUpperCase() + userName.slice(1)}
+    receipt.push(`User: ${userName}`.padEnd(totalWidth));
+  } else {
+    receipt.push(`User: Unknown User`.padEnd(totalWidth));
+  }
+
   receipt.push('-----------------------------------------');
   receipt.push(`  *** Sales Summary ***`);
 
@@ -524,7 +538,7 @@ async function printDaily(receipt, res) {
 
 exports.printReportSales = (req, res) => {
   const { startDate, endDate } = req.params;
-  const { statusPrint } = req.body;
+  const { statusPrint, user_fname, user_lname } = req.body;
   console.log(statusPrint)
   // Queries
   const totalSalesQuery = `
@@ -653,8 +667,11 @@ exports.printReportSales = (req, res) => {
                   monthlySalesResults, // Add monthlySalesResults here
                   yearlySalesResults,
                   startDate,  // Pass startDate
-                  endDate     // Pass endDate
+                  endDate,     // Pass endDate
+                  user_fname,
+                  user_lname
                 );
+                // console.log(user_fname,user_lname)
 
                 // Send or log the report
                 res.json({
@@ -663,11 +680,14 @@ exports.printReportSales = (req, res) => {
                   topProductsResults,
                   paymentTypeResults,
                   redeemResults,
-                  monthlySalesResults, // Add monthlySalesResults here
+                  monthlySalesResults,
                   yearlySalesResults,
-                  startDate,  // Pass startDate
-                  endDate     // Pass endDate
+                  startDate,
+                  endDate,
+                  user_fname,
+                  user_lname
                 });
+                // logReceipt(receiptContent)
                 if (statusPrint === 'print') {
                   printDaily(receiptContent, res)
                 }
@@ -689,7 +709,9 @@ const generateReportContent = (
   monthlySalesResults,
   yearlySalesResults,
   startDate,
-  endDate
+  endDate,
+  user_fname,
+  user_lname
 ) => {
   const receipt = [];
   const totalWidth = 40; // กำหนดความกว้างสำหรับการจัดรูปแบบ
@@ -699,9 +721,11 @@ const generateReportContent = (
   const dateStr = `Date Range: ${startDate} to ${endDate}`;
   const datePrint = `Date Print: ${new Date().toLocaleDateString()}`;
   const timeStr = `Time: ${new Date().toLocaleTimeString()}`;
+  const user = `User: ${user_fname?.charAt(0).toUpperCase() + user_fname?.slice(1) || 'Unknown'} ${user_lname?.charAt(0).toUpperCase() + user_lname?.slice(1) || 'User'}`;
   if (dateStr) receipt.push(dateStr.padEnd(totalWidth));
   if (datePrint) receipt.push(datePrint.padEnd(totalWidth));
   if (timeStr) receipt.push(timeStr.padEnd(totalWidth));
+  if (user) receipt.push(user.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   receipt.push(`  *** Sales Summary ***`);
 
