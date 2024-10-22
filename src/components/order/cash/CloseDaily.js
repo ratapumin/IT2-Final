@@ -36,15 +36,15 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
 
             console.log('Point Type Data:', pointTypeData);
 
-            // ตรวจสอบว่า pointTypeData มีข้อมูลหรือไม่
-            const redeemCount = pointTypeData.length > 0 ? pointTypeData[0].redeem_count : 0;
+            // คำนวณจำนวน redeem ที่มีประเภทการชำระเป็น cash
+            const redeemCount = pointTypeData.filter(item => item.type === 'redeem' && item.payment_type === 'cash').length;
 
             // ส่งข้อมูลไปยัง API closedaily พร้อมกับค่าที่คำนวณได้
             const res = await axios.post('http://localhost:5000/api/closedaily', {
                 cash_in_machine: cashInput,
                 date: currentDate,
                 user_id: user.user_id,
-                redeem_count: redeemCount // ใช้ค่า redeem_count ที่ดึงมา
+                redeem_count: redeemCount // ใช้ค่า redeem_count ที่คำนวณได้
             });
 
             setCashInput('');
@@ -66,6 +66,7 @@ function CloseDaily({ CloseDaily, handleCloseDaily }) {
             });
         }
     };
+
 
 
 

@@ -27,7 +27,7 @@ exports.payment = (req, res) => {
 
     const sqlOrder = 'INSERT INTO orders (order_id, order_no, order_date_time, payment_type, user_id, c_id) VALUES (?, ?, ?, ?, ?, ?)';
     const sqlOrderDetail = 'INSERT INTO order_detail (order_id, p_id, quantity, price) VALUES (?, ?, ?, ?)';
-    const sqlPointsHistory = 'INSERT INTO points_history (c_id, points, type, transaction_date) VALUES (?, ?, ?, ?)';
+    const sqlPointsHistory = 'INSERT INTO points_history (c_id, points, type, transaction_date, order_id) VALUES (?, ?, ?, ?, ?)';
     const sqlUpdateCustomer = `UPDATE customers SET c_points = COALESCE(c_points, 0) + ? WHERE c_id = ?`;
 
     conn.beginTransaction((err) => {
@@ -60,7 +60,7 @@ exports.payment = (req, res) => {
             // Insert into Points_history for each history entry
             const insertHistoryEntries = history.map(entry => {
                 return new Promise((resolve, reject) => {
-                    conn.query(sqlPointsHistory, [entry.c_id, entry.points, entry.type, entry.transaction_data], (err) => {
+                    conn.query(sqlPointsHistory, [entry.c_id, entry.points, entry.type, entry.transaction_data, order_id], (err) => {
                         if (err) {
                             reject(err);
                         } else {
@@ -107,15 +107,17 @@ exports.pointstype = (req, res) => {
 
     const { date } = req.params
     const sqlPointType = `
-        SELECT 
-            COUNT(CASE WHEN points_history.type = 'redeem' THEN 1 END) AS redeem_count,
-            DATE(points_history.transaction_date) AS transaction_date
-        FROM 
-            points_history
-        WHERE 
-            DATE(points_history.transaction_date) = ?
-        GROUP BY 
-            DATE(points_history.transaction_date);
+                        SELECT 
+                            points_history.type,
+                            orders.payment_type,
+                            orders.order_date_time 
+                        FROM 
+                            points_history
+                        JOIN 
+                            orders ON orders.order_id = points_history.order_id
+                        WHERE 
+                            DATE(orders.order_date_time) = ?
+
     `;
     const value = [date]
     conn.query(sqlPointType, value, (error, resultsPoint) => {
@@ -136,14 +138,14 @@ exports.closedaily = (req, res) => {
 
     // ดึงค่า redeem_count จาก resultsPoint เพื่อใช้ในการลบ
     const redeeDiscount = redeem_count * 5
-    console.log('redeeo',redeeDiscount)
+    console.log('redeeo', redeeDiscount)
 
     const sqlClosedaily = `
     INSERT INTO closedaily (cash_in_machine, cash_in_system, cash_difference, user_id, date)
     SELECT 
         ? AS cash_in_machine,
         (SUM(order_detail.price * order_detail.quantity) - ?) AS cash_in_system,  -- หักด้วย redeemCount
-        (SUM(order_detail.price * order_detail.quantity) - ? - ?) AS cash_difference,  -- หัก redeemCount และ cash_in_machine
+        (? - (SUM(order_detail.price * order_detail.quantity)  - ?)) AS cash_difference,  -- หัก redeemCount และ cash_in_machine
         ?, 
         ?
     FROM order_detail
