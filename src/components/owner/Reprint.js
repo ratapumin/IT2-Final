@@ -8,6 +8,7 @@ function Reprint() {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [receipts, setReceipts] = useState([]);
     const [statusPrint, setStatusPrint] = useState('');
+    const [productList, setProductList] = useState([])
 
     useEffect(() => {
         const fetchOrderId = async () => {
@@ -31,7 +32,9 @@ function Reprint() {
             try {
                 const res = await axios.post(`http://localhost:5000/api/reprintreceipt/${orderId}`);
                 console.log(res.data);
-                setReceipts(res.data);
+                setReceipts(res.data.PointHistoryResult || []); // ถ้าไม่มีข้อมูลให้เป็น []
+                setProductList(res.data.ReceiptResult || []);  // ถ้าไม่มีข้อมูลให้เป็น []
+                console.log(res.data.ReceiptResult);
             } catch (error) {
                 console.log(error.response);
             }
@@ -51,42 +54,41 @@ function Reprint() {
         return { date, time };
     };
 
-    // จัดกลุ่มใบเสร็จตาม order_id
-    const groupedReceipts = receipts.reduce((acc, receipt) => {
-        const key = `${receipt.order_id}-${receipt.order_no}-${receipt.user_fname}`; // ใช้ order_id และ order_no เป็น key
-        if (!acc[key]) {
-            acc[key] = [];
-        }
-        acc[key].push(receipt);
-        return acc;
-    }, {});
-
-
     const setReprintReceipt = () => {
-        if (receipts.length === 0) {
-            return null;
+        if (!receipts || receipts.length === 0) {
+            return {
+                user_fname: '',
+                order_id: '',
+                order_no: '',
+                order_date: '',
+                order_time: '',
+                products: [],
+                subtotal: '0.00',
+                discount: '0.00',
+                total: '0.00',
+                customer: null,
+                pointsEarned: 0,
+                pointsRedeemed: 0
+            };
         }
 
         const firstReceipt = receipts[0];
         const { date, time } = formatDateTime(firstReceipt.order_date_time);
 
-        const subtotal = receipts.reduce((sum, receipt) => {
-            return sum + (receipt.quantity * receipt.price);
+        const subtotal = productList.reduce((sum, product) => {
+            return sum + (product.quantity * parseFloat(product.price));
         }, 0);
+        
 
-        // หาคะแนนที่ได้รับ (earn) จากใบเสร็จแรกที่พบ
+
+
         const earnedPoints = receipts.find(receipt => receipt.type === "earn")?.points || 0;
-
-        // หาคะแนนที่ใช้ (redeem) จากใบเสร็จแรกที่พบ
         const redeemedPoints = receipts.find(receipt => receipt.type === "redeem")?.points || 0;
 
-        console.log(`Collect: ${earnedPoints}`);
-        console.log(`Redeem: ${Math.abs(redeemedPoints)}`);
-
-        const pointsEarned = earnedPoints;  // ใช้คะแนนที่ได้รับจากใบเสร็จแรก
-        const pointsRedeemed = redeemedPoints  // ใช้คะแนนที่ใช้จากใบเสร็จแรก โดยใช้ค่าเป็นบวก
-
         const hasCustomer = firstReceipt.c_fname && firstReceipt.c_lname;
+        const discount = redeemedPoints ? 5 : 0;
+        const total = formatCurrency(subtotal - discount);
+
 
         return {
             user_fname: firstReceipt.user_fname,
@@ -94,22 +96,21 @@ function Reprint() {
             order_no: firstReceipt.order_no,
             order_date: date,
             order_time: time,
-            products: receipts.map(receipt => ({
-                p_id: receipt.p_id,
-                p_name: receipt.p_name,
-                p_price: receipt.price,
-                category: receipt.category,
-                quantity: receipt.quantity
+            products: productList.map(product => ({
+                p_id: product.p_id,
+                p_name: product.p_name,
+                p_price: product.price,
+                category: product.category,
+                quantity: product.quantity
             })),
             subtotal: formatCurrency(subtotal),
-            discount: pointsRedeemed > 0 ? 5 : 0,
-            total: pointsRedeemed > 0 ? formatCurrency(subtotal - 5) : formatCurrency(subtotal),
+            discount: redeemedPoints ? 5 : 0,
+            total: total,
             customer: hasCustomer ? `${firstReceipt.c_fname} ${firstReceipt.c_lname}` : null,
-            pointsEarned,  // ส่งค่า pointsEarned ตรง ๆ
-            pointsRedeemed  // ส่งค่า pointsRedeemed ตรง ๆ
+            pointsEarned: earnedPoints,
+            pointsRedeemed: redeemedPoints
         };
     };
-
 
 
 
@@ -132,7 +133,8 @@ function Reprint() {
         }
     }
 
-
+    const receiptData = setReprintReceipt(receipts, productList);
+    // console.log(receiptData.total)
 
 
     return (
@@ -141,22 +143,16 @@ function Reprint() {
                 <div className='topReprintContent'>Reprint</div>
                 <div className='centerReprintContent'>
                     <div className='centerReprintBox'>
-                        <Button type='primary'
-                            onClick={() => {
-                                handleReprintReceipt()
-                            }}
-                        >Prinnt receipt</Button>
+                        <Button type='primary' onClick={handleReprintReceipt}>Print receipt</Button>
                     </div>
                 </div>
                 <div className='bottomReprintContent'>
                     <div className='lefboxReprintContent'>
                         {showOrderId && showOrderId.length > 0 ? (
                             showOrderId.map((orderId, index) => (
-                                <div
-                                    key={`${orderId.order_id}-${index}`}
+                                <div key={`${orderId.order_id}-${index}`}
                                     className={`selectId ${selectedOrderId === orderId.order_id ? 'selected' : ''}`}
-                                    onClick={() => handleSelect(orderId.order_id)}
-                                >
+                                    onClick={() => handleSelect(orderId.order_id)}>
                                     {orderId.order_id}
                                 </div>
                             ))
@@ -167,99 +163,76 @@ function Reprint() {
                         )}
                     </div>
                     <div className='boxReprintContent'>
-
-                        {Object.keys(groupedReceipts).length > 0 ? (
-                            Object.keys(groupedReceipts).map((key, index) => {
-                                const [orderId, orderNo, userFname] = key.split('-'); // แยก order_id และ order_no
-                                const firstReceipt = groupedReceipts[key][0]; // รับใบเสร็จแรกเพื่อใช้แสดงวันที่และเวลา
-
-                                const { date, time } = formatDateTime(firstReceipt.order_date_time);
-
-                                const subtotal = groupedReceipts[key].reduce((sum, receipt) => {
-                                    return sum + (receipt.quantity * receipt.price);
-                                }, 0);
-
-                                const hasCustomer = firstReceipt.c_fname && firstReceipt.c_lname;
-
-                                const pointsEarned = groupedReceipts[key]
-                                    .filter((receipt) => receipt.type === 'earn')
-                                    .slice(0, 1) // นับแค่ใบเสร็จแรกของประเภท 'earn'
-                                    .reduce((sum, receipt) => sum + receipt.points, 0);
-
-                                const pointsRedeemed = groupedReceipts[key]
-                                    .filter((receipt) => receipt.type === 'redeem')
-                                    .slice(0, 1) // นับแค่ใบเสร็จแรกของประเภท 'redeem'
-                                    .reduce((sum, receipt) => sum + receipt.points, 0);
-
-
-                                // const currentPoints = pointsEarned - -pointsRedeemed;
-
-                                return (
-                                    <div key={index}>
-                                        <p style={{ textAlign: 'center', width: '60%', fontWeight: "bold", fontSize: "30px" }}>Re-Print</p>
-                                        <div>Emp: {userFname.charAt(0).toUpperCase() + userFname.slice(1)} #{orderId} #{orderNo}</div>
-                                        <div>Date: {date}</div>
-                                        <div>Time: {time}</div>
-                                        <p>----------------------------------------------------------------------------------------</p>
-                                        <div className='orderList'>
-                                            <p>Item</p>
-                                            <p>Type</p>
-                                            <p>Qyt</p>
-                                            <p>Amount</p>
-                                        </div>
-
-                                        {groupedReceipts[key].map((receipt, receiptIndex) => (
-                                            <div
-                                                className='orderList'
-                                                key={receiptIndex}>
-                                                <div>{receipt.p_name}</div>
-                                                <div>{receipt.category}</div>
-                                                <div>{receipt.quantity}</div>
-                                                <div>{formatCurrency(receipt.quantity * receipt.price)}</div> {/* แสดงจำนวนเงินที่จัดรูปแบบแล้ว */}
-                                            </div>
-                                        ))}
-                                        <p>----------------------------------------------------------------------------------------</p>
-                                        <div className='ordertotal'>
-                                            <p>Subtotal</p>
-                                            <p>{formatCurrency(subtotal)}</p>
-                                            <p>Discount</p>
-                                            <p>{pointsRedeemed ? '5' : 0}</p>
-                                            <p>Total</p>
-                                            <p>{pointsRedeemed ? formatCurrency(subtotal - 5) : formatCurrency(subtotal)}</p>
-                                        </div>
-                                        <p>----------------------------------------------------------------------------------------</p>
-
-                                        {hasCustomer ? (
-                                            <>
-                                                <div>
-                                                    <p>Customer: {firstReceipt.c_fname} {firstReceipt.c_lname}</p>
-                                                </div>
-                                                <p style={{ textAlign: 'center', width: '60%' }}>*** Point ***</p>
-                                                <div className='orderPoints'>
-                                                    <p>Collect: {pointsEarned}</p>
-                                                    <p>Redeem: {pointsRedeemed ? `${pointsRedeemed}` : 0}</p>
-                                                </div>
-                                            </>
-                                        ) : null}
-
-
-                                        <div className='orderthk'>
-                                            <p>Thank you</p>
-                                            <p>Please come again soon</p>
-                                        </div>
+                        {receiptData ? (
+                            <>
+                                <p style={{ textAlign: 'center', width: '60%', fontWeight: "bold", fontSize: "30px" }}>Re-Print</p>
+                                <div>Emp: {receiptData.user_fname} #{receiptData.order_id} #{receiptData.order_no}</div>
+                                <div>Date: {receiptData.order_date}</div>
+                                <div>Time: {receiptData.order_time}</div>
+                                <p>----------------------------------------------------------------------------------------</p>
+                                <div className='orderList'>
+                                    <p>Item</p>
+                                    <p>Type</p>
+                                    <p>Qty</p>
+                                    <p>Amount</p>
+                                </div>
+                                {receiptData.products.map(product => (
+                                    <div key={product.p_id} className='orderList'>
+                                        <div>{product.p_name}</div>
+                                        <div>{product.category}</div>
+                                        <div>{product.quantity}</div>
+                                        <div>{formatCurrency(product.quantity * product.p_price)}</div>
                                     </div>
-                                );
-                            })
+                                ))}
+                                <p>----------------------------------------------------------------------------------------</p>
+                                <div className='ordertotal'>
+                                    <p>Subtotal</p>
+                                    <p>{receiptData.subtotal}</p>
+                                    <p>Discount</p>
+                                    <p>{receiptData.pointsRedeemed ? '5' : 0}</p>
+                                    <p>Total</p>
+                                    <p>{receiptData.total}</p>
+                                </div>
+                                {receiptData.customer && (
+                                    <>
+                                        <p>----------------------------------------------------------------------------------------</p>
+                                        <p>Customer: {receiptData.customer}</p>
+                                    </>
+                                )}
+                                {(receiptData.pointsEarned > 0 || receiptData.pointsRedeemed > 0) && (
+                                    <>
+                                        <p style={{ textAlign: 'center', width: '60%' }}>*** Point ***</p>
+                                        <div className='orderPoints'>
+                                            <p>Collect: {receiptData.pointsEarned}</p>
+                                            <p>Redeem: {receiptData.pointsRedeemed}</p>
+                                        </div>
+                                    </>
+                                )}
+                                <>
+                                    <p>----------------------------------------------------------------------------------------</p>
+                                    <div className='orderthk'>
+                                        <p>Thank you</p>
+                                        <p>Please come again soon</p>
+                                    </div>
+                                </>
+                            </>
                         ) : (
+
                             <p className='nodata'>
                                 <Empty />
                             </p>
+
                         )}
                     </div>
                 </div>
             </div>
         </div>
     );
+
+
 }
 
 export default Reprint;
+
+
+
