@@ -9,8 +9,8 @@ import PrintReceipt from './PrintReceipt';
 
 const createOrder = async (setOrderData, onDeleteAll) => {
     try {
-        const orderData = setOrderData();
-        console.log(orderData)
+        const orderData = setOrderData(); 
+                console.log("Order Data before sending:", orderData); 
         await axios.post('http://localhost:5000/api/createOrder', orderData);
         console.log('Order created successfully');
         console.log('Order Data:', orderData);

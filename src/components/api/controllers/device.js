@@ -69,14 +69,15 @@ async function printReceipt(receipt, res, qrCodePath) {
 exports.printReceipt = async (req, res) => {
   console.log("Incoming request body:", req.body);
   const phoneNumber = '0621645650';
-  const { order_id, order_no, order_date_time, customer, products, history, paymentMethod, cash, change } = req.body;
+  const { order_id, order_no, order_date_time, user_id, customer, products, history, paymentMethod, cash, change } = req.body;
 
   const sqlCustomer = `SELECT c_fname as firstname, c_lname as lastname, c_points FROM customers WHERE c_id = ?`;
-  const sqlProduct = `SELECT p_name, p_price,category FROM products WHERE p_id = ?`;
-
+  const sqlProduct = `SELECT p_name, p_price, category FROM products WHERE p_id = ?`;
+  const sqlUser = `SELECT user_fname FROM user_account WHERE user_id = ?`; // เปลี่ยนตรงนี้ให้ดึงแค่ user_fname
   let totalEarn = 0;
   let totalRedeem = 0;
 
+  // คำนวณคะแนนที่ได้รับและคะแนนที่ใช้
   history.forEach(entry => {
     if (entry.type === 'earn') {
       totalEarn += entry.points;
@@ -112,10 +113,23 @@ exports.printReceipt = async (req, res) => {
     let discount = totalRedeem ? 5 : 0;
     const totalPrice = subtotal - discount;
 
+    // ดึงชื่อผู้ใช้จากฐานข้อมูล
+    const [userResult] = await new Promise((resolve, reject) => {
+      conn.query(sqlUser, [user_id], (error, results) => {
+        if (error) return reject(error);
+        resolve(results);
+      });
+    });
+
+
+
+    const userName = userResult ? userResult.user_fname : 'Unknown User'; // ถ้าไม่พบให้ใช้ Unknown User
+    // console.log("User Name:", userName); // ตรวจสอบชื่อผู้ใช้ที่ถูก
+
     const receipt = [];
     const totalWidth = 40;
 
-    let qrCodePath = null; // กำหนด path สำหรับไฟล์ QR Code
+    let qrCodePath = null;
     if (paymentMethod === 'promtpay') {
       const qrCodeData = generatePayload(phoneNumber, { amount: totalPrice });
       qrCodePath = path.join(__dirname, `qrcode_${order_id}.png`);
@@ -132,11 +146,12 @@ exports.printReceipt = async (req, res) => {
 
     // สร้างบรรทัดต่างๆ สำหรับใบเสร็จ
     receipt.push('------------------------------------------');
-    receipt.push(`Emp: Ratapumin   #${order_id}   #${order_no}`.padEnd(totalWidth));
+    receipt.push(`Emp: ${userName.charAt(0).toUpperCase() + userName.slice(1)}   #${order_id}   #${order_no}`.padEnd(totalWidth)); // เปลี่ยน user_id เป็น userName
     receipt.push(`Date: ${order_date_time.split(' ')[0]}`.padEnd(totalWidth));
     receipt.push(`Time: ${order_date_time.split(' ')[1]}`.padEnd(totalWidth));
     receipt.push('------------------------------------------');
     receipt.push('Item                    Type   Qty  Amount');
+
     // ใช้การเติมช่องว่างให้ตรงกับแต่ละช่อง
     productsData.forEach(product => {
       const itemLine = `${product.p_name.padEnd(24)} ${product.p_category.padEnd(5)} ${String(product.quantity).padEnd(4)} ${String(product.p_price * product.quantity).padStart(6)}`;
@@ -189,9 +204,6 @@ exports.printReceipt = async (req, res) => {
     console.error("Failed to get products:", error);
     res.status(500).json({ message: "Failed to get product details.", error });
   }
-
-
-
 };
 
 
