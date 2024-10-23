@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 23, 2024 at 03:44 PM
+-- Generation Time: Oct 23, 2024 at 06:30 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,14 +42,11 @@ CREATE TABLE `closedaily` (
 
 INSERT INTO `closedaily` (`id`, `cash_in_machine`, `cash_in_system`, `cash_difference`, `user_id`, `date`) VALUES
 (1, 50.00, 30.00, -20.00, 12345, '2024-10-11'),
-(2, 3500.00, 215.00, -3285.00, 12345, '2024-10-18'),
-(3, 3500.00, 215.00, -3285.00, 12345, '2024-10-18'),
 (4, 3500.00, 215.00, -3285.00, 12345, '2024-10-18'),
 (29, 200.00, 125.00, -75.00, 12345, '2024-10-19'),
-(30, 200.00, 120.00, -80.00, 12345, '2024-10-20'),
 (31, 2000.00, 1205.00, -795.00, 12345, '2024-10-20'),
-(41, 500.00, 295.00, 205.00, 12345, '2024-10-22'),
-(42, 500.00, 295.00, 205.00, 12345, '2024-10-22');
+(42, 500.00, 295.00, 205.00, 12345, '2024-10-22'),
+(43, 1690.00, 1545.00, 145.00, 12345, '2024-10-23');
 
 -- --------------------------------------------------------
 
@@ -887,7 +884,9 @@ INSERT INTO `orders` (`order_id`, `order_no`, `order_date_time`, `payment_type`,
 ('20241023001', 1, '2024-10-23 11:59:19', 'promtpay', 12345, 18),
 ('20241023002', 2, '2024-10-23 11:59:40', 'cash', 12345, 1),
 ('20241023003', 3, '2024-10-23 12:00:53', 'promtpay', 12345, 18),
-('20241023004', 4, '2024-10-23 12:04:22', 'cash', 12345, NULL);
+('20241023004', 4, '2024-10-23 12:04:22', 'cash', 12345, NULL),
+('20241023005', 5, '2024-10-23 13:46:39', 'cash', 12345, NULL),
+('20241023006', 6, '2024-10-23 13:46:50', 'promtpay', 12345, NULL);
 
 -- --------------------------------------------------------
 
@@ -2275,7 +2274,11 @@ INSERT INTO `order_detail` (`order_detail_id`, `order_id`, `p_id`, `quantity`, `
 (1665, '20231212007', 10103, 33, 30.00),
 (1666, '20231212008', 10201, 43, 25.00),
 (1667, '20231212009', 30102, 22, 25.00),
-(1668, '20231212010', 20203, 31, 25.00);
+(1668, '20231212010', 20203, 31, 25.00),
+(1669, '20241023005', 10101, 1, 30.00),
+(1670, '20241023005', 10106, 1, 35.00),
+(1671, '20241023006', 10102, 1, 30.00),
+(1672, '20241023006', 20101, 1, 25.00);
 
 -- --------------------------------------------------------
 
@@ -2817,7 +2820,7 @@ INSERT INTO `products` (`p_id`, `p_name`, `p_price`, `p_type`, `category`) VALUE
 (20201, 'Tea Thai', 15, 'Tea', 'HOT'),
 (20202, 'Black Tea', 15, 'Tea', 'HOT'),
 (20203, 'Green Tea', 25, 'Tea', 'HOT'),
-(20204, ' Lemon Tea123', 15, 'Tea', 'HOT'),
+(20204, 'Lemon Tea', 15, 'Tea', 'HOT'),
 (20205, 'Black Green Tea', 25, 'Tea', 'HOT'),
 (30101, 'Cocoa', 30, 'Chocolate', 'ICE'),
 (30102, 'Ovaltine', 25, 'Chocolate', 'ICE'),
@@ -2916,7 +2919,7 @@ ALTER TABLE `user_account`
 -- AUTO_INCREMENT for table `closedaily`
 --
 ALTER TABLE `closedaily`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -2928,7 +2931,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `order_detail`
 --
 ALTER TABLE `order_detail`
-  MODIFY `order_detail_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1669;
+  MODIFY `order_detail_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1673;
 
 --
 -- AUTO_INCREMENT for table `points_history`
