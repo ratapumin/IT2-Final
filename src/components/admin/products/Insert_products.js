@@ -54,14 +54,6 @@ function Insert_products({ insertProduct, productList }) {
         console.log(categoryPrefix)
     };
 
-    const handlePart = (e) => {
-        const value = e.target.value;
-        setPartId(value);
-        console.log('set value', value);
-        const categoryPrefix = form.getFieldValue('category') === 'ICE' ? '1' : '2';
-        updateProductId(productIdPrefix, categoryPrefix);
-    };
-
     useEffect(() => {
         setIsModalVisible(true);
 

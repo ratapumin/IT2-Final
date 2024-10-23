@@ -137,6 +137,7 @@
                     <EditProduct
                         product={products.find((p) => p.p_id === editProductId)}
                         saveEdit={handleSaveEdit}
+                        productList={products}
                     />
                 )}
 

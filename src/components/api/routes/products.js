@@ -32,9 +32,11 @@ router.post('/products', (req, res) => {
 
 //update products
 router.put('/products/:id', (req, res) => {
-    const { p_id, p_name, p_price, p_type, category } = req.body
-    const sql = 'UPDATE products SET p_name = ?, p_price = ? , p_type = ?, category = ? WHERE p_id = ?'
-    const values = [p_name, p_price, p_type, category, p_id];
+    const { p_id, p_name, p_price, p_type, category } = req.body;
+    const id = req.params.id; // ใช้ id จาก URL แทน
+
+    const sql = 'UPDATE products SET p_id = ?, p_name = ?, p_price = ?, p_type = ?, category = ? WHERE p_id = ?';
+    const values = [p_id,p_name, p_price, p_type, category, id]; // ใช้ id แทน p_id ที่ส่งมา
     conn.query(sql, values, (error, results) => {
         if (error) {
             res.status(500).json({ error });
@@ -46,7 +48,9 @@ router.put('/products/:id', (req, res) => {
             }
         }
     });
-})
+});
+
+
 
 
 router.delete('/products/:id', (req, res) => {
