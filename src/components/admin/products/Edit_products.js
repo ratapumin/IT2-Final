@@ -214,7 +214,6 @@ function EditProducts({ product, saveEdit, productList }) {
                             <Option value="Coffee">Coffee</Option>
                             <Option value="Tea">Tea</Option>
                             <Option value="Chocolate">Chocolate</Option>
-                            <Option value="Another">Another</Option>
                         </Select>
                     </div>
                     <div style={{ width: '48%' }}>

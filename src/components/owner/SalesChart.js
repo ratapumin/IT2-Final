@@ -10,18 +10,16 @@ import {
     Legend,
     ResponsiveContainer,
 } from 'recharts';
-import { Card, Select } from 'antd';
+import { Card } from 'antd';
 import axios from 'axios';
 import moment from 'moment';
 
-const { Option } = Select;
-
 function SalesChart() {
     const [monthlySales, setMonthlySales] = useState([]);
-    const [chartType, setChartType] = useState('monthly');
     const [oldMonthlySales, setOldMonthlySales] = useState([]);
-    const currentYear = moment().format('YYYY'); // กำหนดปีปัจจุบัน
-    const oldYear = moment().subtract(1, 'years').format('YYYY'); // กำหนดปีเก่า
+    const [redeemCounts, setRedeemCounts] = useState([]); // Initialize as an array
+    const currentYear = moment().format('YYYY'); // Current year
+    const oldYear = moment().subtract(1, 'years').format('YYYY'); // Previous year
 
     useEffect(() => {
         const fetchOldMonthlySales = async () => {
@@ -29,10 +27,10 @@ function SalesChart() {
                 const res = await axios.post(`http://localhost:5000/api/graphmonthly/${oldYear}`);
                 const updatedOldSales = res.data.map(sale => ({
                     ...sale,
-                    total_price: parseFloat(sale.total_price) * 1.10 // เพิ่ม 10%
+                    total_price: parseFloat(sale.total_price) * 1.10 // Increase by 10%
                 }));
                 setOldMonthlySales(updatedOldSales);
-                console.log('old',res.data)
+                console.log('old', res.data);
             } catch (error) {
                 console.log(error.response);
             }
@@ -42,50 +40,83 @@ function SalesChart() {
             try {
                 const res = await axios.post(`http://localhost:5000/api/graphmonthly/${currentYear}`);
                 setMonthlySales(res.data);
+                console.log('new', res.data);
             } catch (error) {
                 console.log(error.response);
             }
         };
 
-        fetchMonthlySales();
-        fetchOldMonthlySales();
+        const fetchRedeem = async () => {
+            try {
+                const pointTypeRes = await axios.post(`http://localhost:5000/api/pointstypeyear/${currentYear}`);
+                const pointTypeData = pointTypeRes.data;
+
+                // Filter redeem data
+                const redeemData = pointTypeData.filter(item => item.type === 'redeem');
+
+                // Count redeems for each month
+                const redeemCountByMonth = generateMonths(currentYear).map(month => {
+                    const count = redeemData.filter(item =>
+                        moment(item.order_date_time).format('YYYY-MM') === month.monthly
+                    ).length;
+                    return {
+                        ...month,
+                        redeem_count: count // Add redeem count per month
+                    };
+                });
+
+                console.log(redeemCountByMonth); // Display results
+                return redeemCountByMonth; // Return the count for use later
+            } catch (error) {
+                console.log(error.response);
+            }
+        };
+
+        const loadSalesData = async () => {
+            const redeemCounts = await fetchRedeem();
+            await fetchMonthlySales();
+            await fetchOldMonthlySales();
+            setRedeemCounts(redeemCounts); // Store redeem counts to state
+        };
+
+        loadSalesData();
     }, [currentYear, oldYear]);
 
-    // ฟังก์ชันสร้างข้อมูลเดือนแบบ dynamic
+    // Function to create dynamic month data
     const generateMonths = (year) => {
         return Array.from({ length: 12 }, (_, i) => ({
             name: moment().month(i).format('MMM'),
             monthly: `${year}-${String(i + 1).padStart(2, '0')}`,
-            total_price: 0
+            total_price: 0,
+            redeem_count: 0 // Add redeem_count
         }));
     };
 
-    // สร้างข้อมูลเดือนสำหรับปีปัจจุบันและปีก่อนหน้า
+    // Create month data for current and previous years
     const allMonths = generateMonths(currentYear);
-
     const mergedSalesData = allMonths.map((month) => {
         const salesData = monthlySales.find((sale) => sale.monthly === month.monthly);
         const oldSalesData = oldMonthlySales.find((sale) => sale.monthly === month.monthly.replace(currentYear, oldYear));
-    
+        const redeemCount = redeemCounts.find((redeem) => redeem.monthly === month.monthly)?.redeem_count || 0;
+
+        const total_price = salesData ? Math.round(parseFloat(salesData.total_price)) : 0; // Round total price
+        const adjusted_total_price = total_price - (redeemCount * 5); // Adjust total price by redeem count
+
         return {
             ...month,
-            total_price: salesData ? Math.round(parseFloat(salesData.total_price)) : 0, // ปัดเศษทศนิยมออก
-            old_total_price: oldSalesData ? Math.round(parseFloat(oldSalesData.total_price)) : 0, // ปัดเศษทศนิยมออก
+            total_price: adjusted_total_price, // Use adjusted total price
+            old_total_price: oldSalesData ? Math.round(parseFloat(oldSalesData.total_price)) : 0, // Round old total price
         };
     });
+
     
-
-    const handleChartTypeChange = (value) => {
-        setChartType(value);
-    };
-
     return (
         <Card
-            title={
+            title={(
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Sales Chart</span>
                 </div>
-            }
+            )}
             className="cardSalesChart"
         >
             <ResponsiveContainer width="100%" height={300}>
@@ -103,12 +134,8 @@ function SalesChart() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    {chartType === 'monthly' && (
-                        <>
-                            <Bar dataKey="total_price" name='Total Monthly' barSize={20} fill="#413ea0" />
-                            <Line type="monotone" dataKey="old_total_price" name='Goal' stroke="#ff0000" /> {/* เส้นสีแดง */}
-                        </>
-                    )}
+                    <Bar dataKey="total_price" name='Total Monthly' barSize={20} fill="#413ea0" />
+                    <Line type="monotone" dataKey="old_total_price" name='Goal' stroke="#ff0000" /> {/* Red line */}
                 </ComposedChart>
             </ResponsiveContainer>
         </Card>

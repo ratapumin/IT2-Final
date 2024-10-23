@@ -15,6 +15,10 @@ function CardSales() {
     const [token, setToken] = useState();
     const [totalCash, setTotalCash] = useState()
     const [totalpromptpay, setTotalpromptpay] = useState()
+    const [discountMountly, setDiscountMountly] = useState()
+    const [discountYear, setDiscountYear] = useState()
+    const [discountCash, setDiscountCash] = useState()
+    const [discountPromtpay, setDiscountPromtpay] = useState()
 
     // ตรวจสอบ role และนำทาง
     useEffect(() => {
@@ -55,6 +59,14 @@ function CardSales() {
                 const date_time = moment().format('YYYY-MM');
                 const res = await axios.get(`http://localhost:5000/api/monthly/${date_time}`);
                 console.log('monthly', res.data[0]);
+
+                const pointTypeRes = await axios.post(`http://localhost:5000/api/pointstypemonthly/${date_time}`);
+                const pointTypeData = pointTypeRes.data;
+                const redeemPoints = pointTypeData.filter(point => point.type === 'redeem').length;
+                // console.log('asd',redeemPoints)
+                const discount = (redeemPoints ? redeemPoints * 5 : 0)
+                console.log(discount)
+                setDiscountMountly(discount)
                 setMonthlySales(res.data[0]);
             } catch (error) {
                 console.log('Error', error.message);
@@ -65,24 +77,41 @@ function CardSales() {
             try {
                 const date_time = moment().format('YYYY');
                 const res = await axios.get(`http://localhost:5000/api/year/${date_time}`);
-                console.log('year', res.data[0]);
+                // console.log('year', res.data[0]);
+                const pointTypeRes = await axios.post(`http://localhost:5000/api/pointstypeyear/${date_time}`);
+                const pointTypeData = pointTypeRes.data;
+                const redeemPoints = pointTypeData.filter(point => point.type === 'redeem').length;
+                // console.log(redeemPoints)
+                const discount = (redeemPoints ? redeemPoints * 5 : 0)
+                // console.log(discount)
+                setDiscountYear(discount)
                 setYearSales(res.data[0]);
+
             } catch (error) {
                 console.log('Error', error.message);
             }
         };
+
+
         const fetchTotalPrice = async () => {
             try {
-        
+
                 const currentDate = moment().format('YYYY-MM-DD');
                 const res = await axios.get(`http://localhost:5000/api/typesales/${currentDate}`);
-
                 // แยกค่าออกตาม payment_type
                 const cashData = res.data.find(item => item.payment_type === 'cash') || {};
                 const promptpayData = res.data.find(item => item.payment_type === 'promtpay') || {};
-console.log(res.data)
+                console.log(res.data)
                 setTotalCash(cashData.total || 0);
                 setTotalpromptpay(promptpayData.total || 0)
+                const pointTypeRes = await axios.post(`http://localhost:5000/api/pointstype/${currentDate}`);
+                const pointTypeData = pointTypeRes.data;
+                console.log(pointTypeData)
+                const redeemCashCount = pointTypeData.filter(item => item.type === 'redeem' && item.payment_type === 'cash').length;
+                const redeemPromtpayCount = pointTypeData.filter(item => item.type === 'redeem' && item.payment_type === 'promtpay').length;
+                console.log(redeemCashCount, redeemPromtpayCount)
+                setDiscountCash(redeemCashCount ? redeemCashCount * 5 : 0)
+                setDiscountPromtpay(redeemPromtpayCount ? redeemPromtpayCount * 5 : 0)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -105,14 +134,14 @@ console.log(res.data)
                 bordered={false}
                 style={{ width: 300, height: 150 }}
             >
-                 <div className="paymentmethod">
-            <div className="payment-item">
-               CASH: <span >{formatCurrency(totalCash)}</span>
-            </div>
-            <div className="payment-item">
-                PROMPTPAY: <span >{formatCurrency(totalpromptpay)}</span>
-            </div>  
-        </div>
+                <div className="paymentmethod">
+                    <div className="payment-item">
+                        CASH: <span >{formatCurrency(totalCash - discountCash)}</span>
+                    </div>
+                    <div className="payment-item">
+                        PROMPTPAY: <span >{formatCurrency(totalpromptpay - discountPromtpay)}</span>
+                    </div>
+                </div>
 
             </Card>
 
@@ -125,7 +154,7 @@ console.log(res.data)
                     style={{ fontSize: '50px' }}
                 >
 
-                    {dailySales ? `${formatCurrency(dailySales.TotalSales)}` : '0'}
+                    {dailySales ? `${formatCurrency(dailySales.TotalSales - discountCash - discountPromtpay)}` : '0'}
                 </p>
             </Card>
             <Card
@@ -136,7 +165,7 @@ console.log(res.data)
                 <p
                     style={{ fontSize: '50px' }}
                 >
-                    {monthlySales ? ` ${formatCurrency(monthlySales.TotalSales)}` : '0'}
+                    {monthlySales ? ` ${formatCurrency(monthlySales.TotalSales - discountMountly)}` : '0'}
                 </p>
             </Card>
             <Card
@@ -147,7 +176,7 @@ console.log(res.data)
                 <p
                     style={{ fontSize: '50px' }}
                 >
-                    {yearSales ? `${formatCurrency(yearSales.TotalSales)}` : '0'}
+                    {yearSales ? `${formatCurrency(yearSales.TotalSales - discountYear)}` : '0'}
                 </p>
             </Card>
         </>

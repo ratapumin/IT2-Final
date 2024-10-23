@@ -777,7 +777,7 @@ const generateReportContent = (
   receipt.push('Item                Type   Qty   Amount'.padEnd(totalWidth));
   receipt.push('-----------------------------------------');
   productsResults.forEach(product => {
-    const itemLine = `${product.name.padEnd(18)}  ${product.category.padEnd(6)} ${String(product.qty).padStart(3)}  ${String(formatCurrency(product.amount)).padStart(7)}`;
+    const itemLine = `${product.name.padEnd(18)}   ${product.category.padEnd(6)}${String(product.qty).padStart(2)} ${String(formatCurrency(product.amount)).padStart(7)}`;
     receipt.push(itemLine.padEnd(totalWidth));
   });
   receipt.push('-----------------------------------------');

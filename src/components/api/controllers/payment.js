@@ -103,8 +103,6 @@ exports.payment = (req, res) => {
 };
 
 exports.pointstype = (req, res) => {
-
-
     const { date } = req.params
     const sqlPointType = `
                         SELECT 
@@ -120,6 +118,67 @@ exports.pointstype = (req, res) => {
 
     `;
     const value = [date]
+    conn.query(sqlPointType, value, (error, resultsPoint) => {
+        if (error) {
+            // Handle sqlPointType error
+            return res.status(400).json({ error });
+        }
+
+        // Both queries successful, send response with both results
+        res.json(resultsPoint);
+        // exports.closedaily(req, res, resultsPoint);
+
+    });
+}
+
+exports.pointsTypemonthly = (req, res) => {
+    const { monthly } = req.params
+    const sqlPointType = `
+                           SELECT 
+                                points_history.type,
+                                orders.payment_type,
+                                orders.order_date_time 
+                            FROM 
+                                points_history
+                            JOIN 
+                                orders ON orders.order_id = points_history.order_id
+                            WHERE 
+                                DATE_FORMAT(orders.order_date_time, '%Y-%m') = ?
+
+                        `;
+    const value = [monthly]
+    conn.query(sqlPointType, value, (error, resultsPoint) => {
+        if (error) {
+            // Handle sqlPointType error
+            return res.status(400).json({ error });
+        }
+
+        // Both queries successful, send response with both results
+        res.json(resultsPoint);
+        // exports.closedaily(req, res, resultsPoint);
+
+    });
+}
+
+
+
+exports.pointsTypeYear = (req, res) => {
+    const { year } = req.params
+    const sqlPointType = `
+                            SELECT 
+                                points_history.type,
+                                orders.payment_type,
+                                orders.order_date_time 
+                            FROM 
+                                points_history
+                            JOIN 
+                                orders ON orders.order_id = points_history.order_id
+                            WHERE 
+                                YEAR(orders.order_date_time) = ?
+
+
+                        `;
+    const value = [year]
     conn.query(sqlPointType, value, (error, resultsPoint) => {
         if (error) {
             // Handle sqlPointType error
