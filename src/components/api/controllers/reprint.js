@@ -9,7 +9,8 @@ const formatCurrency = (value) => {
 
 // Function to fetch all order IDs
 exports.showOrderIs = (req, res) => {
-    const sqlSelectOrderId = `SELECT order_id FROM orders`;
+    const sqlSelectOrderId = `SELECT order_id FROM orders ORDER BY orders.order_id ASC`;
+
 
     conn.query(sqlSelectOrderId, (error, result) => {
         if (error) {
@@ -249,6 +250,41 @@ async function reprintReceipt(receipt, res) {
 // 6	c_status	varchar(10)	utf8mb4_general_ci		Yes	NULL			Change Change	Drop Drop
 
 
+	
+
+// Full texts
+// c_id
+// c_tel
+// c_fname
+// c_lname
+// c_points
+// c_status
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 1
+// 0621645650
+// Ratapumin
+// Naudom
+// 5
+// Active
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 18
+// 0935166934
+// Thitima
+// Prabuntow
+// 46
+// Active
+
+
+
+
+
+
 // #	Name	Type	Collation	Attributes	Null	Default	Comments	Extra	Action
 // 1	order_detail_id Primary	int(3)			No	None		AUTO_INCREMENT	Change Change	Drop Drop
 // 2	order_id Index	varchar(12)	utf8mb4_general_ci		No	None			Change Change	Drop Drop
@@ -273,6 +309,240 @@ async function reprintReceipt(receipt, res) {
 // 4	p_type	varchar(10)	utf8mb4_general_ci		Yes	NULL			Change Change	Drop Drop
 // 5	category	text	utf8mb4_general_ci		Yes	NULL			Change Change	Drop Drop
 
+
+// Full texts
+// p_id
+// p_name
+// p_price
+// p_type
+// category
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10101
+// Americano
+// 30
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10102
+// Espresso
+// 30
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10103
+// Cappuccino
+// 30
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10104
+// Mocha
+// 30
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10105
+// Latte
+// 30
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10106
+// Black Honey Lemon
+// 35
+// Coffee
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10201
+// Americano
+// 25
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10202
+// Espresso
+// 25
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10203
+// Cappuccino
+// 25
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10204
+// Mocha
+// 25
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10205
+// Latte
+// 25
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 10206
+// Black Honey Lemon
+// 30
+// Coffee
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20101
+// Tea Thai
+// 25
+// Tea
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20102
+// Black Tea
+// 20
+// Tea
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20103
+// Green Tea
+// 30
+// Tea
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20104
+// Lemon Tea
+// 25
+// Tea
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20105
+// Black Green Tea
+// 30
+// Tea
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20201
+// Tea Thai
+// 15
+// Tea
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20202
+// Black Tea
+// 15
+// Tea
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20203
+// Green Tea
+// 25
+// Tea
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20204
+//  Lemon Tea
+// 15
+// Tea
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 20205
+// Black Green Tea
+// 25
+// Tea
+// HOT
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 30101
+// Cocoa
+// 30
+// Chocolate
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 30102
+// Ovaltine
+// 25
+// Chocolate
+// ICE
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 30201
+// Cocoa
+// 25
+// Chocolate
+// HOT
+
+
 // #	Name	Type	Collation	Attributes	Null	Default	Comments	Extra	Action
 // 1	user_id Primary	int(5)			No	None		AUTO_INCREMENT	Change Change	Drop Drop
 // 2	user_fname	varchar(30)	utf8mb4_general_ci		No	None			Change Change	Drop Drop
@@ -282,3 +552,74 @@ async function reprintReceipt(receipt, res) {
 // 6	role_type	varchar(1)	utf8mb4_general_ci		No	None			Change Change	Drop Drop
 // 7	user_status	varchar(10)	utf8mb4_general_ci		No	None			Change Change	Drop Drop
 // 8	user_password	varchar(15)	utf8mb4_general_ci		Yes	NULL			Change Change	Drop Drop	
+
+
+// Full texts
+// user_id
+// user_fname
+// user_lname
+// user_tel
+// user_id_card
+// role_type
+// user_status
+// user_password
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 5151
+// kanya
+// jampa
+// 0824315254
+// 3900987581154
+// O
+// Active
+// 12345
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 11927
+// admin
+// admin
+// 0621645651
+// 1909802511927
+// A
+// Active
+// 11111
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 12345
+// thiti
+// prabun
+// 0935166934
+// 1955487632514
+// O
+// Active
+// 12345
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 22453
+// Thitima
+// Prabuntow
+// 0935166935
+// 3909887515495
+// E
+// Active
+// 12345
+
+// Edit Edit
+// Copy Copy
+// Delete Delete
+// 53725
+// Ratapumin
+// Naudom
+// 0621645650
+// 1909802511928
+// E
+// Active
+// 11111

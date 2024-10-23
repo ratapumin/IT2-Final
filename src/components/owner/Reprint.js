@@ -15,6 +15,7 @@ function Reprint() {
             try {
                 const res = await axios.get('http://localhost:5000/api/showorderid');
                 setShowOrderId(res.data);
+                console.log(res.data)
             } catch (error) {
                 console.log(error.response);
             }
@@ -56,20 +57,7 @@ function Reprint() {
 
     const setReprintReceipt = () => {
         if (!receipts || receipts.length === 0) {
-            return {
-                user_fname: '',
-                order_id: '',
-                order_no: '',
-                order_date: '',
-                order_time: '',
-                products: [],
-                subtotal: '0.00',
-                discount: '0.00',
-                total: '0.00',
-                customer: null,
-                pointsEarned: 0,
-                pointsRedeemed: 0
-            };
+            return null
         }
 
         const firstReceipt = receipts[0];
@@ -78,7 +66,7 @@ function Reprint() {
         const subtotal = productList.reduce((sum, product) => {
             return sum + (product.quantity * parseFloat(product.price));
         }, 0);
-        
+
 
 
 
@@ -136,11 +124,20 @@ function Reprint() {
     const receiptData = setReprintReceipt(receipts, productList);
     // console.log(receiptData.total)
 
+    const formatOrderId = (orderId) => {
+        const datePart = orderId.slice(0, 8); // ดึงวันที่ 8 หลักแรก
+        const year = datePart.slice(0, 4);
+        const month = datePart.slice(4, 6);
+        const day = datePart.slice(6, 8);
+        return `${year}-${month}-${day}`; // รูปแบบ YYYY-MM-DD
+    };
+
+
 
     return (
         <div className='bgReprint'>
             <div className='contentReprint'>
-                <div className='topReprintContent'>Reprint</div>
+                <div className='topReprintContent'></div>
                 <div className='centerReprintContent'>
                     <div className='centerReprintBox'>
                         <Button type='primary' onClick={handleReprintReceipt}>Print receipt</Button>
@@ -149,18 +146,32 @@ function Reprint() {
                 <div className='bottomReprintContent'>
                     <div className='lefboxReprintContent'>
                         {showOrderId && showOrderId.length > 0 ? (
-                            showOrderId.map((orderId, index) => (
-                                <div key={`${orderId.order_id}-${index}`}
-                                    className={`selectId ${selectedOrderId === orderId.order_id ? 'selected' : ''}`}
-                                    onClick={() => handleSelect(orderId.order_id)}>
-                                    {orderId.order_id}
-                                </div>
-                            ))
+                            showOrderId.map((orderId, index) => {
+                                // แยกวันที่และหมายเลข order
+                                const formattedDate = formatOrderId(orderId.order_id);
+                                const orderNumber = orderId.order_id.slice(8); // ดึงหมายเลข order ที่เหลือ
+                                const formattedOrderId = `${formattedDate}`; // แสดงเฉพาะวันที่
+
+                                // ถ้าคุณต้องการให้แสดงหมายเลข order ที่ไม่ใช่ '007' หรือแสดงข้อความถ้าเป็น '007'
+                                // const orderDisplay = orderNumber === '007' ? 'ไม่ทราบหมายเลข' : orderNumber;
+
+                                return (
+                                    <div
+                                        key={`${orderId.order_id}-${index}`}
+                                        className={`selectId ${selectedOrderId === orderId.order_id ? 'selected' : ''}`}
+                                        onClick={() => handleSelect(orderId.order_id)}>
+                                        {orderId.order_id} | {formattedOrderId} 
+                                        
+                                    </div>
+                                );
+                            })
                         ) : (
                             <p className='nodata'>
                                 <Empty />
                             </p>
                         )}
+
+
                     </div>
                     <div className='boxReprintContent'>
                         {receiptData ? (

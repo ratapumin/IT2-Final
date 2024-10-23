@@ -84,14 +84,6 @@ function SalesChart() {
             title={
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Sales Chart</span>
-                    <Select
-                        defaultValue="monthly"
-                        style={{ width: 200 }}
-                        onChange={handleChartTypeChange}
-                    >
-                        <Option value="monthly">Monthly</Option>
-                        <Option value="yearly">Yearly</Option>
-                    </Select>
                 </div>
             }
             className="cardSalesChart"
@@ -116,9 +108,6 @@ function SalesChart() {
                             <Bar dataKey="total_price" name='Total Monthly' barSize={20} fill="#413ea0" />
                             <Line type="monotone" dataKey="old_total_price" name='Goal' stroke="#ff0000" /> {/* เส้นสีแดง */}
                         </>
-                    )}
-                    {chartType === 'yearly' && (
-                        <Line type="monotone" dataKey="total_price" stroke="#00aaff" />
                     )}
                 </ComposedChart>
             </ResponsiveContainer>

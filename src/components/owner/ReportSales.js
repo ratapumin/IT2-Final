@@ -98,7 +98,6 @@ function ReportSales() {
         <div className='bgreport'>
             <div className='contentReport'>
                 <div className='topContent'>
-                    Report Sales
                 </div>
                 <div className='centerContent'>
                     <div className='centerBox'>
